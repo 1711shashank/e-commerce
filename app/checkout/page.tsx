@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   const { cart, cartSubtotal, clearCart } = useStore();
   const [placed, setPlaced] = useState(false);
   const subtotal = cartSubtotal();
-  const shipping = subtotal >= 75 || subtotal === 0 ? 0 : 8;
+  const shipping = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
   const total = subtotal + shipping;
 
   if (placed) {

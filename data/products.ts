@@ -10,8 +10,8 @@ export const products: Product[] = [
     name: "Floral Lawn Kurta Set",
     category: "women",
     subCategory: "lawn",
-    price: 120,
-    discountPrice: 96,
+    price: 11499,
+    discountPrice: 9199,
     images: [
       img("photo-1594633312681-425c7b97ccd1"),
       img("photo-1515886657613-9f3515b0c78f"),
@@ -34,7 +34,7 @@ export const products: Product[] = [
     name: "Embroidered Chiffon Gown",
     category: "women",
     subCategory: "formals",
-    price: 280,
+    price: 26899,
     images: [
       img("photo-1595777457583-95e059d581b8"),
       img("photo-1566174053879-31528523f8ae"),
@@ -57,8 +57,8 @@ export const products: Product[] = [
     name: "Linen Wrap Dress",
     category: "women",
     subCategory: "casual",
-    price: 98,
-    discountPrice: 78,
+    price: 9399,
+    discountPrice: 7499,
     images: [
       img("photo-1434389677669-e08b4cac3105"),
       img("photo-1496747611176-843222e1e57c"),
@@ -81,7 +81,7 @@ export const products: Product[] = [
     name: "Pearl Silk Blouse",
     category: "women",
     subCategory: "casual",
-    price: 110,
+    price: 10599,
     images: [
       img("photo-1564257631407-4deb1f99d992"),
       img("photo-1591047139829-d91aecb6caea"),
@@ -104,7 +104,7 @@ export const products: Product[] = [
     name: "Printed Lawn Dupatta Set",
     category: "women",
     subCategory: "lawn",
-    price: 135,
+    price: 12999,
     images: [
       img("photo-1581044777550-4cfa60707c03"),
       img("photo-1509631179647-0177331693ae"),
@@ -127,7 +127,7 @@ export const products: Product[] = [
     name: "Tailored Cotton Shirt",
     category: "men",
     subCategory: "shirts",
-    price: 85,
+    price: 8199,
     images: [
       img("photo-1596755094514-f87e34085b2c"),
       img("photo-1602810318383-e386cc2a3ccf"),
@@ -150,8 +150,8 @@ export const products: Product[] = [
     name: "Linen Band Collar Kurta",
     category: "men",
     subCategory: "kurtas",
-    price: 95,
-    discountPrice: 76,
+    price: 9099,
+    discountPrice: 7299,
     images: [
       img("photo-1583743814966-8936f5b7be1a"),
       img("photo-1617137968427-85924c800a22"),
@@ -174,7 +174,7 @@ export const products: Product[] = [
     name: "Structured Wool Blazer",
     category: "men",
     subCategory: "shirts",
-    price: 220,
+    price: 21099,
     images: [
       img("photo-1507679799987-c73779587ccf"),
       img("photo-1594938298603-c8148c4dae35"),
@@ -197,8 +197,8 @@ export const products: Product[] = [
     name: "Relaxed Oxford Shirt",
     category: "men",
     subCategory: "shirts",
-    price: 72,
-    discountPrice: 58,
+    price: 6899,
+    discountPrice: 5599,
     images: [
       img("photo-1598033129183-c4f50c736f10"),
       img("photo-1603252109303-2751441dd157"),
@@ -221,7 +221,7 @@ export const products: Product[] = [
     name: "Embroidered Festive Kurta",
     category: "men",
     subCategory: "kurtas",
-    price: 145,
+    price: 13899,
     images: [
       img("photo-1552374196-1ab2a1c593e8"),
       img("photo-1617127365659-c47fa864d8bc"),
@@ -243,7 +243,7 @@ export const products: Product[] = [
     slug: "kids-floral-frock",
     name: "Kids Floral Frock",
     category: "kids",
-    price: 48,
+    price: 4599,
     images: [
       img("photo-1519238263530-99bdd11df2ea"),
       img("photo-1515488042361-ee00e0ddd4e4"),
@@ -265,8 +265,8 @@ export const products: Product[] = [
     slug: "kids-linen-shirt-set",
     name: "Kids Linen Shirt Set",
     category: "kids",
-    price: 55,
-    discountPrice: 44,
+    price: 5299,
+    discountPrice: 4199,
     images: [
       img("photo-1471286174890-9c112ffca5b4"),
       img("photo-1503454537195-1dcabb73ffb9"),
@@ -288,7 +288,7 @@ export const products: Product[] = [
     slug: "kids-party-lehenga",
     name: "Kids Party Lehenga",
     category: "kids",
-    price: 78,
+    price: 7499,
     images: [
       img("photo-1518831959646-742c3a14ebf7"),
       img("photo-1522771739844-6a9f6d5f14af"),
@@ -310,7 +310,7 @@ export const products: Product[] = [
     slug: "unstitched-floral-lawn-3pc",
     name: "Unstitched Floral Lawn 3PC",
     category: "unstitched",
-    price: 65,
+    price: 6199,
     images: [
       img("photo-1558171813-4c088753af8f"),
       img("photo-1620799140408-edc6dcb6d633"),
@@ -332,8 +332,8 @@ export const products: Product[] = [
     slug: "unstitched-embroidered-karandi",
     name: "Unstitched Embroidered Karandi",
     category: "unstitched",
-    price: 110,
-    discountPrice: 88,
+    price: 10599,
+    discountPrice: 8399,
     images: [
       img("photo-1528459801416-a9e53bbf4e17"),
       img("photo-1610030469983-98e550d6193c"),
@@ -355,7 +355,7 @@ export const products: Product[] = [
     slug: "unstitched-silk-jacquard",
     name: "Unstitched Silk Jacquard",
     category: "unstitched",
-    price: 150,
+    price: 14399,
     images: [
       img("photo-1594938298603-c8148c4dae35"),
       img("photo-1558171813-4c088753af8f"),
@@ -377,7 +377,7 @@ export const products: Product[] = [
     slug: "ready-to-wear-pleated-skirt",
     name: "Pleated Midi Skirt",
     category: "ready-to-wear",
-    price: 88,
+    price: 8399,
     images: [
       img("photo-1583496661160-fb5886a0aaaa"),
       img("photo-1572804013427-4d7ca7268217"),
@@ -399,8 +399,8 @@ export const products: Product[] = [
     slug: "ready-to-wear-cropped-jacket",
     name: "Cropped Tailored Jacket",
     category: "ready-to-wear",
-    price: 165,
-    discountPrice: 132,
+    price: 15799,
+    discountPrice: 12699,
     images: [
       img("photo-1551028719-00167b16eac5"),
       img("photo-1591047139829-d91aecb6caea"),
@@ -422,7 +422,7 @@ export const products: Product[] = [
     slug: "ready-to-wear-wide-leg-trouser",
     name: "Wide Leg Trouser",
     category: "ready-to-wear",
-    price: 92,
+    price: 8799,
     images: [
       img("photo-1594633312681-425c7b97ccd1"),
       img("photo-1515372039744-b8f02a3ae446"),
@@ -445,8 +445,8 @@ export const products: Product[] = [
     name: "Striped Maxi Dress",
     category: "women",
     subCategory: "casual",
-    price: 105,
-    discountPrice: 63,
+    price: 10099,
+    discountPrice: 5999,
     images: [
       img("photo-1496747611176-843222e1e57c"),
       img("photo-1515372039744-b8f02a3ae446"),
@@ -469,8 +469,8 @@ export const products: Product[] = [
     name: "Denim Shirt Dress",
     category: "women",
     subCategory: "casual",
-    price: 90,
-    discountPrice: 54,
+    price: 8599,
+    discountPrice: 5199,
     images: [
       img("photo-1541099649105-f69ad21f3246"),
       img("photo-1576995853123-5a10305d93c0"),
@@ -493,7 +493,7 @@ export const products: Product[] = [
     name: "Velvet Evening Kurta",
     category: "women",
     subCategory: "formals",
-    price: 195,
+    price: 18699,
     images: [
       img("photo-1566174053879-31528523f8ae"),
       img("photo-1595777457583-95e059d581b8"),
@@ -515,7 +515,7 @@ export const products: Product[] = [
     slug: "cotton-poplin-shirt-dress",
     name: "Cotton Poplin Shirt Dress",
     category: "ready-to-wear",
-    price: 102,
+    price: 9799,
     images: [
       img("photo-1572804013427-4d7ca7268217"),
       img("photo-1483985988355-763728e1935b"),
@@ -537,8 +537,8 @@ export const products: Product[] = [
     slug: "mens-slim-chinos",
     name: "Slim Fit Chinos",
     category: "men",
-    price: 78,
-    discountPrice: 62,
+    price: 7499,
+    discountPrice: 5999,
     images: [
       img("photo-1473966968600-fa801b869a1a"),
       img("photo-1624378439575-d8705ad7ae80"),
@@ -560,7 +560,7 @@ export const products: Product[] = [
     slug: "knit-crewneck-sweater",
     name: "Knit Crewneck Sweater",
     category: "men",
-    price: 115,
+    price: 10999,
     images: [
       img("photo-1576566588028-4147f3842f27"),
       img("photo-1620799140408-edc6dcb6d633"),
@@ -583,7 +583,7 @@ export const products: Product[] = [
     name: "Organza Dupatta Shawl",
     category: "women",
     subCategory: "formals",
-    price: 58,
+    price: 5599,
     images: [
       img("photo-1515886657613-9f3515b0c78f"),
       img("photo-1581044777550-4cfa60707c03"),
@@ -605,8 +605,8 @@ export const products: Product[] = [
     slug: "kids-cotton-tee-pack",
     name: "Kids Soft Cotton Tee Pack",
     category: "kids",
-    price: 36,
-    discountPrice: 28,
+    price: 3499,
+    discountPrice: 2699,
     images: [
       img("photo-1503454537195-1dcabb73ffb9"),
       img("photo-1471286174890-9c112ffca5b4"),
@@ -628,7 +628,7 @@ export const products: Product[] = [
     slug: "unstitched-digital-print-lawn",
     name: "Digital Print Lawn Suite",
     category: "unstitched",
-    price: 72,
+    price: 6899,
     images: [
       img("photo-1620799140408-edc6dcb6d633"),
       img("photo-1558171813-4c088753af8f"),

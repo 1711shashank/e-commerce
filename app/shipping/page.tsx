@@ -23,7 +23,7 @@ export default function ShippingPage() {
         <section>
           <h2 className="font-display text-2xl text-foreground">Shipping</h2>
           <p className="mt-3">
-            Standard delivery typically takes 3–7 business days. Orders over ₹75
+            Standard delivery typically takes 3–7 business days. Orders over ₹7,199
             ship free. Express options may be offered at checkout in a future
             release.
           </p>

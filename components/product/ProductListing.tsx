@@ -139,6 +139,7 @@ export function ProductListing({
           <ActiveFilters
             filters={filters}
             sort={sort}
+            priceRange={priceRange}
             onChange={(f) => {
               setFilters(f);
               setPage(1);

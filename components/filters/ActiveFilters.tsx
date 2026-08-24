@@ -8,12 +8,14 @@ interface ActiveFiltersProps {
   sort: SortOption;
   onChange: (filters: ProductFilters) => void;
   onClearAll: () => void;
+  priceRange: { min: number; max: number };
 }
 
 export function ActiveFilters({
   filters,
   onChange,
   onClearAll,
+  priceRange,
 }: ActiveFiltersProps) {
   const chips: { key: string; label: string; clear: () => void }[] = [];
 
@@ -71,12 +73,21 @@ export function ActiveFilters({
       clear: () => onChange({ ...filters, inStock: null }),
     });
   }
-  if (filters.minPrice != null || filters.maxPrice != null) {
+
+  const minActive =
+    filters.minPrice != null && filters.minPrice !== priceRange.min;
+  const maxActive =
+    filters.maxPrice != null && filters.maxPrice !== priceRange.max;
+  if (minActive || maxActive) {
     chips.push({
       key: "price",
-      label: `₹${filters.minPrice ?? 0} – ₹${filters.maxPrice ?? "∞"}`,
+      label: `₹${filters.minPrice ?? priceRange.min} – ₹${filters.maxPrice ?? priceRange.max}`,
       clear: () =>
-        onChange({ ...filters, minPrice: undefined, maxPrice: undefined }),
+        onChange({
+          ...filters,
+          minPrice: priceRange.min,
+          maxPrice: priceRange.max,
+        }),
     });
   }
 

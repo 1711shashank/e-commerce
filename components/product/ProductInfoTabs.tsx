@@ -20,7 +20,7 @@ const tabs = [
     id: "shipping",
     label: "Shipping & Returns",
     content: () =>
-      "Standard shipping 3–7 business days. Free shipping on orders over ₹75. Returns accepted within 30 days of delivery for unused items with tags attached.",
+      "Standard shipping 3–7 business days. Free shipping on orders over ₹7,199. Returns accepted within 30 days of delivery for unused items with tags attached.",
   },
 ];
 
