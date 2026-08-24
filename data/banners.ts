@@ -17,7 +17,7 @@ export const banners: Banner[] = [
     ctaLabel: "Shop Sale",
     ctaHref: "/collections/sale",
     image:
-      "https://images.unsplash.com/photo-1441984904996-e0b14ba4d3d1?w=1600&q=80",
+      "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1600&q=80",
   },
   {
     id: "banner-3",
@@ -26,7 +26,7 @@ export const banners: Banner[] = [
     ctaLabel: "Explore Men",
     ctaHref: "/collections/men",
     image:
-      "https://images.unsplash.com/photo-1490570471622-f13da808d8f4?w=1600&q=80",
+      "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=1600&q=80",
   },
 ];
 

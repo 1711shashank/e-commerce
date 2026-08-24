@@ -15,7 +15,7 @@ export const categories: Category[] = [
     name: "Men",
     slug: "men",
     image:
-      "https://images.unsplash.com/photo-1490570471622-f13da808d8f4?w=800&q=80",
+      "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=800&q=80",
     description: "Refined essentials and seasonal menswear",
     parentId: null,
   },
@@ -24,7 +24,7 @@ export const categories: Category[] = [
     name: "Kids",
     slug: "kids",
     image:
-      "https://images.unsplash.com/photo-1503919545889-aef636e10ad1?w=800&q=80",
+      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80",
     description: "Soft, playful pieces for little ones",
     parentId: null,
   },
@@ -51,7 +51,7 @@ export const categories: Category[] = [
     name: "Sale",
     slug: "sale",
     image:
-      "https://images.unsplash.com/photo-1441984904996-e0b14ba4d3d1?w=800&q=80",
+      "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&q=80",
     description: "Limited-time offers on seasonal favourites",
     parentId: null,
   },

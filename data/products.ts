@@ -84,7 +84,7 @@ export const products: Product[] = [
     price: 110,
     images: [
       img("photo-1564257631407-4deb1f99d992"),
-      img("photo-1551163943-3b7beeaa5d1b"),
+      img("photo-1591047139829-d91aecb6caea"),
     ],
     sizes: ["S", "M", "L"],
     colors: ["Pearl", "Black"],
@@ -201,7 +201,7 @@ export const products: Product[] = [
     discountPrice: 58,
     images: [
       img("photo-1598033129183-c4f50c736f10"),
-      img("photo-1620012252813-3f1f5e0a0c0a"),
+      img("photo-1603252109303-2751441dd157"),
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: ["Blue", "White", "Pink"],
@@ -246,7 +246,7 @@ export const products: Product[] = [
     price: 48,
     images: [
       img("photo-1519238263530-99bdd11df2ea"),
-      img("photo-1503919545889-aef636e10ad1"),
+      img("photo-1515488042361-ee00e0ddd4e4"),
     ],
     sizes: ["2Y", "3Y", "4Y", "5Y", "6Y"],
     colors: ["Pink", "Yellow", "Mint"],
@@ -291,7 +291,7 @@ export const products: Product[] = [
     price: 78,
     images: [
       img("photo-1518831959646-742c3a14ebf7"),
-      img("photo-1622290291465-a2a1d3c0e4a0"),
+      img("photo-1522771739844-6a9f6d5f14af"),
     ],
     sizes: ["2Y", "3Y", "4Y", "5Y"],
     colors: ["Gold", "Red", "Teal"],
@@ -335,7 +335,7 @@ export const products: Product[] = [
     price: 110,
     discountPrice: 88,
     images: [
-      img("photo-1558618666-fcd25c85f82e"),
+      img("photo-1528459801416-a9e53bbf4e17"),
       img("photo-1610030469983-98e550d6193c"),
     ],
     sizes: ["One Size"],
@@ -425,7 +425,7 @@ export const products: Product[] = [
     price: 92,
     images: [
       img("photo-1594633312681-425c7b97ccd1"),
-      img("photo-1506629082955-511b1aa95263"),
+      img("photo-1515372039744-b8f02a3ae446"),
     ],
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Ivory", "Black", "Stone"],
@@ -473,7 +473,7 @@ export const products: Product[] = [
     discountPrice: 54,
     images: [
       img("photo-1541099649105-f69ad21f3246"),
-      img("photo-1582418702059-97ebaf033195"),
+      img("photo-1576995853123-5a10305d93c0"),
     ],
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Light Wash", "Indigo"],
@@ -585,7 +585,7 @@ export const products: Product[] = [
     subCategory: "formals",
     price: 58,
     images: [
-      img("photo-1601924999984-4a8c0c2e0f0a"),
+      img("photo-1515886657613-9f3515b0c78f"),
       img("photo-1581044777550-4cfa60707c03"),
     ],
     sizes: ["One Size"],
