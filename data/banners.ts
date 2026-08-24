@@ -34,7 +34,7 @@ export const promoStrips = [
   {
     id: "promo-1",
     title: "Free Shipping",
-    description: "On orders over $75",
+    description: "On orders over ₹75",
   },
   {
     id: "promo-2",

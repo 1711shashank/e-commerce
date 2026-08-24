@@ -74,7 +74,7 @@ export function ActiveFilters({
   if (filters.minPrice != null || filters.maxPrice != null) {
     chips.push({
       key: "price",
-      label: `$${filters.minPrice ?? 0} – $${filters.maxPrice ?? "∞"}`,
+      label: `₹${filters.minPrice ?? 0} – ₹${filters.maxPrice ?? "∞"}`,
       clear: () =>
         onChange({ ...filters, minPrice: undefined, maxPrice: undefined }),
     });
