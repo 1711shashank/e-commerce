@@ -51,6 +51,20 @@ When portal and store use different hosts:
 
 Never bake `NEXT_PUBLIC_API_URL=http://localhost` into the UI image if staff use `admin.localhost` — that causes CORS.
 
+## Before commit (required for UI changes)
+
+Yes — run lint + build in `src/ui` **before** committing or rebuilding the Docker UI image. Catches type errors, broken admin routes, and prerender crashes that `npm run dev` often misses.
+
+```bash
+cd src/ui
+npm run lint
+npm run build
+```
+
+Only commit when both succeed. If build fails on `/admin` prerender, fix hydrate/`dynamic` issues before committing (see below).
+
+Optional: after a green local build, `docker compose up -d --build ui` so `admin.localhost` matches what you verified.
+
 ## Build / deploy gotchas
 
 - Admin pages that touch zustand `persist` can crash static prerender — use `export const dynamic = "force-dynamic"` on `app/admin/layout.tsx` and make `usePersistHydrated` tolerate missing `persist`.
