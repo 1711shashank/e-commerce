@@ -7,6 +7,8 @@ const CATALOG_PROXY =
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Django APIs require trailing slashes; without this, POST /api/auth/login/ → 308 → 500
+  skipTrailingSlashRedirect: true,
   images: {
     remotePatterns: [
       {
@@ -27,11 +29,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/auth/:path*",
-        destination: `${AUTH_PROXY}/api/auth/:path*`,
+        destination: `${AUTH_PROXY}/api/auth/:path*/`,
       },
       {
         source: "/api/products/:path*",
-        destination: `${CATALOG_PROXY}/api/products/:path*`,
+        destination: `${CATALOG_PROXY}/api/products/:path*/`,
       },
       {
         source: "/api/products",
@@ -39,7 +41,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/categories/:path*",
-        destination: `${CATALOG_PROXY}/api/categories/:path*`,
+        destination: `${CATALOG_PROXY}/api/categories/:path*/`,
       },
       {
         source: "/api/categories",
