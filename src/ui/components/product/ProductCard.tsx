@@ -11,6 +11,7 @@ import {
 } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import type { Product, ViewMode } from "@/lib/types";
+import { getDefaultProductImage, getImagesForColor } from "@/lib/variants";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -23,6 +24,12 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
   const wished = isInWishlist(product.id);
   const discount = getDiscountPercent(product);
   const price = getEffectivePrice(product);
+  const defaultColor = product.colors[0] ?? "";
+  const cardImages = defaultColor
+    ? getImagesForColor(product, defaultColor)
+    : product.images;
+  const primaryImage = cardImages[0] ?? getDefaultProductImage(product);
+  const hoverImage = cardImages[1];
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,7 +46,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
           className="relative aspect-[3/4] w-28 shrink-0 overflow-hidden bg-border/40 sm:w-40"
         >
           <Image
-            src={product.images[0]}
+            src={primaryImage}
             alt={product.name}
             fill
             sizes="160px"
@@ -97,15 +104,15 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-border/30">
           <Image
-            src={product.images[0]}
+            src={primaryImage}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
-          {product.images[1] && (
+          {hoverImage && (
             <Image
-              src={product.images[1]}
+              src={hoverImage}
               alt=""
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

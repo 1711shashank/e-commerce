@@ -1,3 +1,11 @@
+export interface ProductVariant {
+  id?: string;
+  color: string;
+  size: string;
+  stockQty: number;
+  sku?: string;
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -9,6 +17,8 @@ export interface Product {
   images: string[];
   sizes: string[];
   colors: string[];
+  variants?: ProductVariant[];
+  colorImages?: Record<string, string[]>;
   fabric?: string;
   description: string;
   isNew: boolean;

@@ -43,7 +43,7 @@ function EditBody({
   }
   if (missing || !product) notFound();
 
-  return <ProductForm categories={categories} product={product} />;
+  return <ProductForm key={product.id} categories={categories} product={product} />;
 }
 
 export default function EditProductClient({

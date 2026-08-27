@@ -1,21 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { FormEvent } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, Plus, X } from "lucide-react";
+import { ChevronDown, ImageIcon, Layers } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import {
   FABRIC_OPTIONS,
-  SIZE_OPTIONS,
   buildProductFromForm,
   emptyProductForm,
   productToFormValues,
   type ProductFormValues,
 } from "@/lib/catalog";
-import { createProduct, updateProduct } from "@/lib/catalog-api";
+import { syncVariantStock } from "@/lib/variants";
+import { ProductInventoryModal } from "@/components/admin/ProductInventoryModal";
+import { ProductImagesModal } from "@/components/admin/ProductImagesModal";
+import { ProductGallery } from "@/components/product/ProductGallery";
+import {
+  createProduct,
+  updateProduct,
+  uploadProductImage,
+} from "@/lib/catalog-api";
 import { useAuthStore } from "@/lib/auth-store";
 import { ApiError } from "@/lib/api";
 import { formatPrice } from "@/lib/services";
@@ -58,6 +64,24 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     () => product?.sizes[0] ?? "M",
   );
   const [openTab, setOpenTab] = useState("description");
+  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [imagesOpen, setImagesOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [previewColor, setPreviewColor] = useState(
+    () => (product?.colors[0] ?? "") || "",
+  );
+
+  useEffect(() => {
+    if (values.colors.length && !values.colors.includes(selectedColor)) {
+      setSelectedColor(values.colors[0]);
+    }
+    if (values.colors.length && !values.colors.includes(previewColor)) {
+      setPreviewColor(values.colors[0]);
+    }
+    if (values.sizes.length && !values.sizes.includes(selectedSize)) {
+      setSelectedSize(values.sizes[0]);
+    }
+  }, [values.colors, values.sizes, selectedColor, selectedSize, previewColor]);
 
   const parents = useMemo(
     () => categories.filter((c) => !c.parentId && c.slug !== "sale"),
@@ -69,6 +93,21 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     ? categories.filter((c) => c.parentId === selectedParent.id)
     : [];
 
+  const totalStock = useMemo(
+    () => values.variants.reduce((sum, v) => sum + v.stockQty, 0),
+    [values.variants],
+  );
+
+  const totalImages = useMemo(
+    () =>
+      values.colors.reduce(
+        (sum, color) =>
+          sum + (values.colorImages[color] ?? []).filter(Boolean).length,
+        0,
+      ),
+    [values.colors, values.colorImages],
+  );
+
   const dirty = useMemo(
     () => JSON.stringify(values) !== JSON.stringify(initial),
     [values, initial],
@@ -79,10 +118,30 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const sale = values.discountPrice.trim() ? Number(values.discountPrice) : null;
   const displayPrice =
     sale != null && Number.isFinite(sale) && sale > 0 ? sale : regular;
-  const images = values.images.filter(Boolean);
-  const safeActive = images.length
-    ? Math.min(activeImage, images.length - 1)
+  const colorImagesForSelected = selectedColor
+    ? (values.colorImages[selectedColor] ?? []).filter(Boolean)
+    : [];
+  const safeActive = colorImagesForSelected.length
+    ? Math.min(activeImage, colorImagesForSelected.length - 1)
     : 0;
+
+  const previewImages = useMemo(() => {
+    if (!previewColor) return [];
+    return (values.colorImages[previewColor] ?? []).filter(Boolean);
+  }, [previewColor, values.colorImages]);
+
+  const setColorImages = (color: string, images: string[]) => {
+    setValues((prev) => ({
+      ...prev,
+      colorImages: { ...prev.colorImages, [color]: images },
+    }));
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      delete next.images;
+      delete next.colorImages;
+      return next;
+    });
+  };
 
   const setField = <K extends keyof ProductFormValues>(
     key: K,
@@ -99,10 +158,14 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
   const toggleSize = (size: string) => {
     setValues((prev) => {
-      const next = prev.sizes.includes(size)
+      const sizes = prev.sizes.includes(size)
         ? prev.sizes.filter((s) => s !== size)
         : [...prev.sizes, size];
-      return { ...prev, sizes: next };
+      return {
+        ...prev,
+        sizes,
+        variants: syncVariantStock(prev.colors, sizes, prev.variants),
+      };
     });
     setSelectedSize(size);
     setError(null);
@@ -114,6 +177,13 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   };
 
   const addImage = () => {
+    if (!selectedColor) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        colors: "Add a color before uploading images.",
+      }));
+      return;
+    }
     const url = newImageUrl.trim();
     if (!url) return;
     try {
@@ -125,34 +195,69 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       }));
       return;
     }
-    setValues((prev) => ({ ...prev, images: [...prev.images, url] }));
+    const current = values.colorImages[selectedColor] ?? [];
+    setColorImages(selectedColor, [...current, url]);
     setNewImageUrl("");
-    setActiveImage(values.images.length);
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      delete next.images;
-      return next;
-    });
+    setActiveImage(current.length);
   };
 
   const removeImage = (index: number) => {
-    setValues((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-    setActiveImage((prev) => (prev > index ? prev - 1 : prev === index ? 0 : prev));
+    if (!selectedColor) return;
+    const current = values.colorImages[selectedColor] ?? [];
+    setColorImages(
+      selectedColor,
+      current.filter((_, i) => i !== index),
+    );
+    setActiveImage((prev) =>
+      prev > index ? prev - 1 : prev === index ? 0 : prev,
+    );
   };
 
   const moveImage = (index: number, dir: -1 | 1) => {
+    if (!selectedColor) return;
+    const current = values.colorImages[selectedColor] ?? [];
     const target = index + dir;
-    if (target < 0 || target >= values.images.length) return;
-    setValues((prev) => {
-      const next = [...prev.images];
-      const [item] = next.splice(index, 1);
-      next.splice(target, 0, item);
-      return { ...prev, images: next };
-    });
+    if (target < 0 || target >= current.length) return;
+    const next = [...current];
+    const [item] = next.splice(index, 1);
+    next.splice(target, 0, item);
+    setColorImages(selectedColor, next);
     setActiveImage(target);
+  };
+
+  const uploadImages = async (files: File[]) => {
+    if (!selectedColor) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        colors: "Add a color before uploading images.",
+      }));
+      return;
+    }
+    if (!access) {
+      setError("You must be logged in to upload images.");
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        uploaded.push(await uploadProductImage(file, access));
+      }
+      const current = values.colorImages[selectedColor] ?? [];
+      setColorImages(selectedColor, [...current, ...uploaded]);
+      setActiveImage(current.length);
+    } catch (err) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        images:
+          err instanceof ApiError
+            ? err.message
+            : "Could not upload image. Is the catalog service running?",
+      }));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const addColor = () => {
@@ -162,21 +267,37 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       setNewColor("");
       return;
     }
-    setValues((prev) => ({ ...prev, colors: [...prev.colors, name] }));
+    setValues((prev) => {
+      const colors = [...prev.colors, name];
+      return {
+        ...prev,
+        colors,
+        variants: syncVariantStock(colors, prev.sizes, prev.variants),
+        colorImages: { ...prev.colorImages, [name]: [] },
+      };
+    });
     setSelectedColor(name);
+    setActiveImage(0);
     setNewColor("");
     setFieldErrors((prev) => {
       const next = { ...prev };
       delete next.colors;
+      delete next.variants;
       return next;
     });
   };
 
   const removeColor = (color: string) => {
-    setValues((prev) => ({
-      ...prev,
-      colors: prev.colors.filter((c) => c !== color),
-    }));
+    setValues((prev) => {
+      const colors = prev.colors.filter((c) => c !== color);
+      const { [color]: _removed, ...colorImages } = prev.colorImages;
+      return {
+        ...prev,
+        colors,
+        colorImages,
+        variants: syncVariantStock(colors, prev.sizes, prev.variants),
+      };
+    });
     if (selectedColor === color) {
       setSelectedColor(
         values.colors.find((c) => c !== color) ?? "",
@@ -205,8 +326,14 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     }
     if (!values.sizes.length) errs.sizes = "Add at least one size.";
     if (!values.colors.length) errs.colors = "Add at least one color.";
-    if (!values.images.filter(Boolean).length) {
-      errs.images = "Add at least one image.";
+    if (!values.variants.some((v) => v.stockQty > 0)) {
+      errs.variants = "Set stock for at least one color and size.";
+    }
+    for (const color of values.colors) {
+      if (!(values.colorImages[color] ?? []).some(Boolean)) {
+        errs.images = `Add at least one image for ${color}.`;
+        break;
+      }
     }
     if (!values.description.trim()) {
       errs.description = "Description is required.";
@@ -247,13 +374,14 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       price: result.product.price,
       discountPrice: result.product.discountPrice ?? null,
       images: result.product.images,
+      colorImages: result.product.colorImages ?? {},
       sizes: result.product.sizes,
       colors: result.product.colors,
+      variants: result.product.variants ?? [],
       fabric: result.product.fabric ?? "",
       description: result.product.description,
       isNew: result.product.isNew,
       isOnSale: result.product.isOnSale,
-      inStock: result.product.inStock,
       tags: result.product.tags ?? [],
     };
 
@@ -371,7 +499,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         <div className="flex flex-wrap items-end gap-4 pb-1">
           {(
             [
-              ["inStock", "In stock"],
               ["isNew", "New"],
               ["isOnSale", "On sale"],
             ] as const
@@ -398,116 +525,166 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         </p>
       )}
 
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-        {/* Gallery */}
-        <div className="space-y-3">
-          <div className="flex flex-col gap-3 lg:flex-row-reverse lg:gap-4">
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-border/30 lg:flex-1">
-              {images[safeActive] ? (
-                <Image
-                  src={images[safeActive]}
-                  alt={values.name || "Product image"}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center text-sm text-muted">
-                  <p>No images yet</p>
-                  <p className="text-xs">Add an image URL below</p>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
-              {images.map((src, i) => (
-                <div key={`${src}-${i}`} className="relative shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setActiveImage(i)}
-                    className={cn(
-                      "relative h-20 w-16 overflow-hidden border-2 lg:h-24 lg:w-full",
-                      safeActive === i
-                        ? "border-foreground"
-                        : "border-transparent",
-                    )}
-                    aria-label={`View image ${i + 1}`}
-                  >
-                    <Image
-                      src={src}
-                      alt=""
-                      fill
-                      sizes="80px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </button>
-                  <div className="absolute -right-1 -top-1 flex flex-col gap-0.5">
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                      className="flex h-5 w-5 items-center justify-center bg-foreground text-background"
-                      aria-label="Remove image"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <div className="mt-1 flex justify-center gap-0.5 lg:flex-col">
-                    <button
-                      type="button"
-                      onClick={() => moveImage(i, -1)}
-                      disabled={i === 0}
-                      className="flex h-6 w-6 items-center justify-center border border-border disabled:opacity-30"
-                      aria-label="Move up"
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => moveImage(i, 1)}
-                      disabled={i === images.length - 1}
-                      className="flex h-6 w-6 items-center justify-center border border-border disabled:opacity-30"
-                      aria-label="Move down"
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div className="flex items-center justify-between gap-3 border border-border bg-surface/60 px-3 py-2.5">
+          <div className="min-w-0">
+            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted">
+              Images
+            </p>
+            <p className="truncate text-sm">
+              {values.colors.length} color{values.colors.length === 1 ? "" : "s"}
+              · {totalImages} image{totalImages === 1 ? "" : "s"}
+            </p>
+            {fieldErrors.images && (
+              <p className={cn(fieldHint, "mt-0.5")}>{fieldErrors.images}</p>
+            )}
           </div>
-          <div className="flex gap-2">
-            <input
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addImage();
-                }
-              }}
-              className="min-h-11 flex-1 border border-border bg-background px-3 text-sm outline-none focus:border-accent"
-              placeholder="Paste image URL and add…"
-            />
-            <Button type="button" variant="outline" onClick={addImage}>
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          </div>
-          {fieldErrors.images && (
-            <p className={fieldHint}>{fieldErrors.images}</p>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => setImagesOpen(true)}
+          >
+            <ImageIcon className="h-4 w-4" />
+            Manage
+          </Button>
         </div>
 
-        {/* Info panel */}
+        <div className="flex items-center justify-between gap-3 border border-border bg-surface/60 px-3 py-2.5">
+          <div className="min-w-0">
+            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted">
+              Inventory
+            </p>
+            <p className="truncate text-sm">
+              {values.colors.length} color{values.colors.length === 1 ? "" : "s"}
+              · {values.sizes.length} size{values.sizes.length === 1 ? "" : "s"}
+              · {totalStock} in stock
+            </p>
+            {(fieldErrors.variants ||
+              fieldErrors.colors ||
+              fieldErrors.sizes) && (
+              <p className={cn(fieldHint, "mt-0.5")}>
+                {fieldErrors.variants ||
+                  fieldErrors.colors ||
+                  fieldErrors.sizes}
+              </p>
+            )}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => setInventoryOpen(true)}
+          >
+            <Layers className="h-4 w-4" />
+            Manage
+          </Button>
+        </div>
+      </div>
+
+      <ProductInventoryModal
+        open={inventoryOpen}
+        onClose={() => setInventoryOpen(false)}
+        values={values}
+        selectedColor={selectedColor}
+        selectedSize={selectedSize}
+        fieldErrors={fieldErrors}
+        fieldHint={fieldHint}
+        onSelectColor={setSelectedColor}
+        onSelectSize={setSelectedSize}
+        onToggleSize={toggleSize}
+        onVariantsChange={(variants) => setField("variants", variants)}
+      />
+
+      <ProductImagesModal
+        open={imagesOpen}
+        onClose={() => setImagesOpen(false)}
+        values={values}
+        selectedColor={selectedColor}
+        activeIndex={safeActive}
+        name={values.name}
+        newImageUrl={newImageUrl}
+        newColor={newColor}
+        uploading={uploading}
+        fieldErrors={fieldErrors}
+        fieldHint={fieldHint}
+        onSelectColor={(color) => {
+          setSelectedColor(color);
+          setActiveImage(0);
+        }}
+        onActiveChange={setActiveImage}
+        onNewUrlChange={setNewImageUrl}
+        onNewColorChange={setNewColor}
+        onAddColor={addColor}
+        onRemoveColor={removeColor}
+        onAddUrl={addImage}
+        onRemove={removeImage}
+        onMove={moveImage}
+        onUploadFiles={(files) => void uploadImages(files)}
+      />
+
+      <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+        <div className="space-y-3">
+          {values.colors.length > 0 ? (
+            <>
+              <p className="text-xs uppercase tracking-[0.15em] text-muted">
+                Preview — {previewColor || "select color"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {values.colors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setPreviewColor(color)}
+                    className={cn(
+                      "min-h-9 border px-3 text-sm transition-colors",
+                      previewColor === color
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border hover:border-foreground/50",
+                    )}
+                    aria-pressed={previewColor === color}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
+
+          <ProductGallery
+            key={previewColor || "empty"}
+            images={previewImages}
+            name={values.name || "Product"}
+            unoptimized
+            emptyLabel={
+              values.colors.length
+                ? `No images added for ${previewColor || "this color"}`
+                : "No images added — open Manage images by color to add colors"
+            }
+          />
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setImagesOpen(true)}
+          >
+            <ImageIcon className="h-4 w-4" />
+            Manage images by color
+          </Button>
+        </div>
+
         <div className="space-y-6 lg:pt-2">
           <div className="flex flex-wrap gap-2">
             {values.isNew && <Badge variant="new">New</Badge>}
             {(values.isOnSale || !!values.discountPrice.trim()) && (
               <Badge variant="sale">Sale</Badge>
             )}
-            {!values.inStock && <Badge variant="soldout">Sold Out</Badge>}
+            {(values.variants.some((v) => v.stockQty > 0) === false) && (
+              <Badge variant="soldout">Sold Out</Badge>
+            )}
           </div>
 
           <div>
@@ -623,102 +800,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Colors */}
-          <div>
-            <p className="mb-3 text-xs uppercase tracking-[0.15em] text-muted">
-              Color{selectedColor ? ` — ${selectedColor}` : ""}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {values.colors.map((color) => (
-                <div key={color} className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedColor(color)}
-                    className={cn(
-                      "min-h-11 border px-4 pr-9 text-sm transition-colors",
-                      selectedColor === color
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border hover:border-foreground/50",
-                    )}
-                  >
-                    {color}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeColor(color)}
-                    className={cn(
-                      "absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center",
-                      selectedColor === color
-                        ? "text-background/80 hover:text-background"
-                        : "text-muted hover:text-foreground",
-                    )}
-                    aria-label={`Remove ${color}`}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 flex max-w-sm gap-2">
-              <input
-                value={newColor}
-                onChange={(e) => setNewColor(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addColor();
-                  }
-                }}
-                className="min-h-11 flex-1 border border-border bg-background px-3 text-sm outline-none focus:border-accent"
-                placeholder="Add a color…"
-              />
-              <Button type="button" variant="outline" onClick={addColor}>
-                <Plus className="h-4 w-4" />
-                Add
-              </Button>
-            </div>
-            {fieldErrors.colors && (
-              <p className={fieldHint}>{fieldErrors.colors}</p>
-            )}
-          </div>
-
-          {/* Sizes */}
-          <div>
-            <p className="mb-3 text-xs uppercase tracking-[0.15em] text-muted">
-              Size{selectedSize ? ` — ${selectedSize}` : ""}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {SIZE_OPTIONS.map((size) => {
-                const active = values.sizes.includes(size);
-                return (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => toggleSize(size)}
-                    className={cn(
-                      "flex h-11 min-w-11 items-center justify-center border px-3 text-sm transition-colors",
-                      active
-                        ? selectedSize === size
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-foreground/60 bg-foreground/10"
-                        : "border-border text-muted hover:border-foreground/40",
-                    )}
-                    aria-pressed={active}
-                  >
-                    {size}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-2 text-xs text-muted">
-              Click a size to include or remove it. Highlighted sizes are
-              available to shoppers.
-            </p>
-            {fieldErrors.sizes && (
-              <p className={fieldHint}>{fieldErrors.sizes}</p>
-            )}
           </div>
 
           {/* Accordion */}

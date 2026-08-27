@@ -7,11 +7,28 @@ import { cn } from "@/lib/utils";
 interface ProductGalleryProps {
   images: string[];
   name: string;
+  unoptimized?: boolean;
+  emptyLabel?: string;
 }
 
-export function ProductGallery({ images, name }: ProductGalleryProps) {
+export function ProductGallery({
+  images,
+  name,
+  unoptimized = false,
+  emptyLabel = "No images added",
+}: ProductGalleryProps) {
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+
+  if (!images.length) {
+    return (
+      <div className="relative flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 border border-dashed border-border bg-border/20 px-6 text-center">
+        <p className="text-sm text-muted">{emptyLabel}</p>
+      </div>
+    );
+  }
+
+  const safeActive = Math.min(active, images.length - 1);
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row-reverse lg:gap-4">
@@ -21,8 +38,8 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
         onMouseLeave={() => setZoomed(false)}
       >
         <Image
-          src={images[active]}
-          alt={`${name} image ${active + 1}`}
+          src={images[safeActive]}
+          alt={`${name} image ${safeActive + 1}`}
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
@@ -30,6 +47,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             "object-cover transition-transform duration-500",
             zoomed && "scale-125",
           )}
+          unoptimized={unoptimized}
         />
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
@@ -51,6 +69,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
               fill
               sizes="80px"
               className="object-cover"
+              unoptimized={unoptimized}
             />
           </button>
         ))}

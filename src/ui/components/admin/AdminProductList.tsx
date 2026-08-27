@@ -10,6 +10,7 @@ import { deleteProduct, listPortalProducts } from "@/lib/catalog-api";
 import { useAuthStore } from "@/lib/auth-store";
 import { storeProductUrl } from "@/lib/urls";
 import type { Product } from "@/lib/types";
+import { getDefaultProductImage } from "@/lib/variants";
 
 function PortalContent() {
   const access = useAuthStore((s) => s.access);
@@ -100,9 +101,9 @@ function PortalContent() {
                 className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center"
               >
                 <div className="relative h-24 w-20 shrink-0 overflow-hidden bg-border/40 sm:h-28 sm:w-24">
-                  {product.images[0] ? (
+                  {getDefaultProductImage(product) ? (
                     <Image
-                      src={product.images[0]}
+                      src={getDefaultProductImage(product)}
                       alt={product.name}
                       fill
                       className="object-cover"

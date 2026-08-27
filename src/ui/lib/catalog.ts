@@ -1,5 +1,6 @@
-import type { Product } from "@/lib/types";
+import type { Product, ProductVariant } from "@/lib/types";
 import { products as seedProducts } from "@/data/products";
+import { syncVariantStock, flattenColorImages, normalizeColorImages } from "@/lib/variants";
 
 export const SIZE_OPTIONS = [
   "XS",
@@ -8,8 +9,28 @@ export const SIZE_OPTIONS = [
   "L",
   "XL",
   "XXL",
-  "One Size",
 ] as const;
+
+export const SIZE_SORT_ORDER = [
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "XXXL",
+] as const;
+
+export function sortSizes(sizes: string[]): string[] {
+  return [...sizes].sort((a, b) => {
+    const ai = SIZE_SORT_ORDER.indexOf(a as (typeof SIZE_SORT_ORDER)[number]);
+    const bi = SIZE_SORT_ORDER.indexOf(b as (typeof SIZE_SORT_ORDER)[number]);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}
 
 export const FABRIC_OPTIONS = [
   "Lawn",
@@ -61,13 +82,13 @@ export type ProductFormValues = {
   discountPrice: string;
   sizes: string[];
   colors: string[];
+  variants: ProductVariant[];
   fabric: string;
   description: string;
-  images: string[];
+  colorImages: Record<string, string[]>;
   tags: string;
   isNew: boolean;
   isOnSale: boolean;
-  inStock: boolean;
 };
 
 export function emptyProductForm(): ProductFormValues {
@@ -79,17 +100,26 @@ export function emptyProductForm(): ProductFormValues {
     discountPrice: "",
     sizes: ["M"],
     colors: [],
+    variants: syncVariantStock([], ["M"], []),
     fabric: "",
     description: "",
-    images: [],
+    colorImages: {},
     tags: "",
     isNew: true,
     isOnSale: false,
-    inStock: true,
   };
 }
 
 export function productToFormValues(product: Product): ProductFormValues {
+  const colors = [...product.colors];
+  const sizes = [...product.sizes].filter((s) => s !== "One Size");
+  const baseVariants =
+    product.variants?.length
+      ? product.variants
+          .filter((v) => v.size !== "One Size")
+          .map((v) => ({ ...v }))
+      : syncVariantStock(colors, sizes, []);
+
   return {
     name: product.name,
     category: product.category,
@@ -97,15 +127,15 @@ export function productToFormValues(product: Product): ProductFormValues {
     price: String(product.price),
     discountPrice:
       product.discountPrice != null ? String(product.discountPrice) : "",
-    sizes: [...product.sizes],
-    colors: [...product.colors],
+    sizes,
+    colors,
+    variants: syncVariantStock(colors, sizes, baseVariants),
     fabric: product.fabric ?? "",
     description: product.description,
-    images: [...product.images],
+    colorImages: normalizeColorImages(product),
     tags: (product.tags ?? []).join(", "),
     isNew: product.isNew,
     isOnSale: product.isOnSale,
-    inStock: product.inStock,
   };
 }
 
@@ -148,7 +178,23 @@ export function buildProductFromForm(
     return { error: "Add at least one color." };
   }
 
-  const images = values.images.map((u) => u.trim()).filter(Boolean);
+  const variants = syncVariantStock(colors, values.sizes, values.variants);
+  const hasStock = variants.some((v) => v.stockQty > 0);
+  if (!hasStock) {
+    return { error: "Set stock for at least one color and size combination." };
+  }
+
+  const colorImages: Record<string, string[]> = {};
+  for (const color of colors) {
+    colorImages[color] = (values.colorImages[color] ?? [])
+      .map((u) => u.trim())
+      .filter(Boolean);
+    if (!colorImages[color].length) {
+      return { error: `Add at least one image for color: ${color}.` };
+    }
+  }
+
+  const images = flattenColorImages(colors, colorImages);
   if (!images.length) {
     return { error: "Add at least one image." };
   }
@@ -168,13 +214,15 @@ export function buildProductFromForm(
     price,
     discountPrice,
     images,
+    colorImages,
     sizes: values.sizes,
     colors,
+    variants,
     fabric: values.fabric.trim() || undefined,
     description,
     isNew: values.isNew,
     isOnSale: values.isOnSale || discountPrice != null,
-    inStock: values.inStock,
+    inStock: hasStock,
     rating: 5,
     createdAt: options?.createdAt ?? new Date().toISOString(),
     tags: parseList(values.tags),

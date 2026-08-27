@@ -35,6 +35,7 @@ class Product(models.Model):
     images = models.JSONField(default=list)
     sizes = models.JSONField(default=list)
     colors = models.JSONField(default=list)
+    variant_stock = models.JSONField(default=list)
     fabric = models.CharField(max_length=64, blank=True)
     description = models.TextField()
     is_new = models.BooleanField(default=True)
@@ -65,3 +66,100 @@ class Product(models.Model):
         if self.discount_price is not None:
             self.is_on_sale = True
         super().save(*args, **kwargs)
+
+    def sync_denormalized_from_variants(self) -> None:
+        colors = list(
+            self.product_colors.order_by("sort_order", "id").values_list(
+                "name", flat=True
+            )
+        )
+        sizes = list(
+            self.product_sizes.order_by("sort_order", "id").values_list(
+                "label", flat=True
+            )
+        )
+        variant_rows = self.variants.select_related("color", "size").filter(
+            is_active=True
+        )
+        variant_stock = [
+            {
+                "color": v.color.name,
+                "size": v.size.label,
+                "stockQty": v.stock_qty,
+            }
+            for v in variant_rows
+        ]
+        self.colors = colors
+        self.sizes = sizes
+        self.variant_stock = variant_stock
+        self.in_stock = any(v.stock_qty > 0 for v in variant_rows)
+
+
+class ProductColor(models.Model):
+    product = models.ForeignKey(
+        Product, related_name="product_colors", on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=50)
+    hex_code = models.CharField(max_length=7, blank=True)
+    images = models.JSONField(default=list)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+    is_default = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "name"],
+                name="unique_product_color_name",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product_id}:{self.name}"
+
+
+class ProductSize(models.Model):
+    product = models.ForeignKey(
+        Product, related_name="product_sizes", on_delete=models.CASCADE
+    )
+    label = models.CharField(max_length=20)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "label"],
+                name="unique_product_size_label",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product_id}:{self.label}"
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(
+        Product, related_name="variants", on_delete=models.CASCADE
+    )
+    color = models.ForeignKey(
+        ProductColor, related_name="variants", on_delete=models.CASCADE
+    )
+    size = models.ForeignKey(
+        ProductSize, related_name="variants", on_delete=models.CASCADE
+    )
+    sku = models.CharField(max_length=64, unique=True)
+    stock_qty = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["color__sort_order", "size__sort_order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "color", "size"],
+                name="unique_product_color_size_variant",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.sku

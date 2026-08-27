@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem, Product } from "@/lib/types";
 import { getEffectivePrice } from "@/lib/services";
+import { getImagesForColor } from "@/lib/variants";
 
 interface StoreState {
   cart: CartItem[];
@@ -74,7 +75,7 @@ export const useStore = create<StoreState>()(
             productId: product.id,
             slug: product.slug,
             name: product.name,
-            image: product.images[0],
+            image: getImagesForColor(product, color)[0] ?? product.images[0] ?? "",
             price: getEffectivePrice(product),
             size,
             color,

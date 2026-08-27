@@ -10,6 +10,7 @@ import { searchProducts, formatPrice, getProducts } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import { useDebounce } from "@/lib/hooks";
 import type { Product } from "@/lib/types";
+import { getDefaultProductImage } from "@/lib/variants";
 
 export function SearchOverlay() {
   const { isSearchOpen, closeSearch } = useStore();
@@ -79,7 +80,7 @@ export function SearchOverlay() {
               >
                 <div className="relative h-16 w-12 shrink-0 overflow-hidden bg-border/40">
                   <Image
-                    src={product.images[0]}
+                    src={getDefaultProductImage(product)}
                     alt=""
                     fill
                     className="object-cover"

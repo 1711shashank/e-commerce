@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
     ],
   },
   async rewrites() {
@@ -36,6 +44,10 @@ const nextConfig: NextConfig = {
       {
         source: "/api/categories",
         destination: `${CATALOG_PROXY}/api/categories/`,
+      },
+      {
+        source: "/media/:path*",
+        destination: `${CATALOG_PROXY}/media/:path*`,
       },
     ];
   },

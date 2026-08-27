@@ -13,6 +13,8 @@ interface VariantSelectorProps {
   onColorChange: (color: string) => void;
   onQuantityChange: (qty: number) => void;
   maxQuantity?: number;
+  disabledColors?: string[];
+  disabledSizes?: string[];
 }
 
 export function VariantSelector({
@@ -25,7 +27,11 @@ export function VariantSelector({
   onColorChange,
   onQuantityChange,
   maxQuantity = 10,
+  disabledColors = [],
+  disabledSizes = [],
 }: VariantSelectorProps) {
+  const effectiveMax = Math.max(1, maxQuantity);
+
   return (
     <div className="space-y-6">
       <div>
@@ -33,22 +39,29 @@ export function VariantSelector({
           Color — {selectedColor}
         </p>
         <div className="flex flex-wrap gap-2">
-          {colors.map((color) => (
-            <button
-              key={color}
-              type="button"
-              onClick={() => onColorChange(color)}
-              className={cn(
-                "min-h-11 border px-4 text-sm transition-colors",
-                selectedColor === color
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border hover:border-foreground/50",
-              )}
-              aria-pressed={selectedColor === color}
-            >
-              {color}
-            </button>
-          ))}
+          {colors.map((color) => {
+            const disabled = disabledColors.includes(color);
+            return (
+              <button
+                key={color}
+                type="button"
+                disabled={disabled}
+                onClick={() => onColorChange(color)}
+                className={cn(
+                  "min-h-11 border px-4 text-sm transition-colors",
+                  disabled &&
+                    "cursor-not-allowed border-border/60 text-muted opacity-50",
+                  !disabled &&
+                    selectedColor === color
+                    ? "border-foreground bg-foreground text-background"
+                    : !disabled && "border-border hover:border-foreground/50",
+                )}
+                aria-pressed={selectedColor === color}
+              >
+                {color}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -57,22 +70,29 @@ export function VariantSelector({
           Size — {selectedSize}
         </p>
         <div className="flex flex-wrap gap-2">
-          {sizes.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => onSizeChange(size)}
-              className={cn(
-                "flex h-11 min-w-11 items-center justify-center border px-3 text-sm transition-colors",
-                selectedSize === size
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border hover:border-foreground/50",
-              )}
-              aria-pressed={selectedSize === size}
-            >
-              {size}
-            </button>
-          ))}
+          {sizes.map((size) => {
+            const disabled = disabledSizes.includes(size);
+            return (
+              <button
+                key={size}
+                type="button"
+                disabled={disabled}
+                onClick={() => onSizeChange(size)}
+                className={cn(
+                  "flex h-11 min-w-11 items-center justify-center border px-3 text-sm transition-colors",
+                  disabled &&
+                    "cursor-not-allowed border-border/60 text-muted opacity-50",
+                  !disabled &&
+                    selectedSize === size
+                    ? "border-foreground bg-foreground text-background"
+                    : !disabled && "border-border hover:border-foreground/50",
+                )}
+                aria-pressed={selectedSize === size}
+              >
+                {size}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -83,7 +103,8 @@ export function VariantSelector({
         <div className="inline-flex items-center border border-border">
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center hover:bg-border/40"
+            className="flex h-11 w-11 items-center justify-center hover:bg-border/40 disabled:opacity-40"
+            disabled={quantity <= 1}
             onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
             aria-label="Decrease quantity"
           >
@@ -94,15 +115,21 @@ export function VariantSelector({
           </span>
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center hover:bg-border/40"
+            className="flex h-11 w-11 items-center justify-center hover:bg-border/40 disabled:opacity-40"
+            disabled={quantity >= effectiveMax}
             onClick={() =>
-              onQuantityChange(Math.min(maxQuantity, quantity + 1))
+              onQuantityChange(Math.min(effectiveMax, quantity + 1))
             }
             aria-label="Increase quantity"
           >
             <Plus className="h-4 w-4" />
           </button>
         </div>
+        {effectiveMax < 10 && effectiveMax > 0 && (
+          <p className="mt-2 text-xs text-muted">
+            {effectiveMax} available for this color and size.
+          </p>
+        )}
       </div>
     </div>
   );

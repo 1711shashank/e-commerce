@@ -8,26 +8,23 @@ type PersistApi = {
 };
 
 export function usePersistHydrated(persist: PersistApi | undefined): boolean {
-  const [hydrated, setHydrated] = useState(
-    () => persist?.hasHydrated() ?? false,
-  );
+  // Always false on server and first client render — zustand may already
+  // have rehydrated from localStorage before React hydrates, which causes
+  // a mismatch if we read hasHydrated() in the useState initializer.
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!persist) {
       setHydrated(true);
       return;
     }
-    setHydrated(persist.hasHydrated());
-    const unsub = persist.onFinishHydration(() => {
+    if (persist.hasHydrated()) {
+      setHydrated(true);
+      return;
+    }
+    return persist.onFinishHydration(() => {
       setHydrated(true);
     });
-    const t = window.setTimeout(() => {
-      setHydrated(persist.hasHydrated());
-    }, 0);
-    return () => {
-      unsub();
-      window.clearTimeout(t);
-    };
   }, [persist]);
 
   return hydrated;

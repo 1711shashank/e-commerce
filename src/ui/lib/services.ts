@@ -186,7 +186,7 @@ export function searchProducts(
 export function getAllSizes(): string[] {
   const sizes = new Set<string>();
   products.forEach((p) => p.sizes.forEach((s) => sizes.add(s)));
-  const order = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+  const order = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   return Array.from(sizes).sort((a, b) => {
     const ai = order.indexOf(a);
     const bi = order.indexOf(b);

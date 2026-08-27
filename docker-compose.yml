@@ -178,6 +178,8 @@ services:
         NEXT_PUBLIC_API_BASE_PATH: ${NEXT_PUBLIC_API_BASE_PATH:-/api}
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
         NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-http://admin.localhost}
+        AUTH_SERVICE_URL: http://auth-service:8001
+        CATALOG_SERVICE_URL: http://catalog-service:8002
     container_name: ui
     ports:
       - "${UI_PORT:-3000}:3000"

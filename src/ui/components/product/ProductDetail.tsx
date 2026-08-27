@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Heart } from "lucide-react";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfoTabs } from "@/components/product/ProductInfoTabs";
@@ -17,6 +17,13 @@ import {
 } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import type { Product } from "@/lib/types";
+import {
+  colorsWithStock,
+  getImagesForColor,
+  getVariantStock,
+  productHasStock,
+  sizesWithStockForColor,
+} from "@/lib/variants";
 import { cn } from "@/lib/utils";
 
 export function ProductDetail({
@@ -28,12 +35,40 @@ export function ProductDetail({
 }) {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
-  const [size, setSize] = useState(product.sizes[0]);
-  const [color, setColor] = useState(product.colors[0]);
+
+  const stockedColors = useMemo(() => colorsWithStock(product), [product]);
+  const initialColor = stockedColors[0] ?? product.colors[0] ?? "";
+  const [color, setColor] = useState(initialColor);
+
+  const stockedSizes = useMemo(
+    () => sizesWithStockForColor(product, color),
+    [product, color],
+  );
+  const initialSize = stockedSizes[0] ?? product.sizes[0] ?? "";
+  const [size, setSize] = useState(initialSize);
   const [qty, setQty] = useState(1);
+
+  useEffect(() => {
+    const sizes = sizesWithStockForColor(product, color);
+    if (!sizes.includes(size)) {
+      setSize(sizes[0] ?? product.sizes[0] ?? "");
+      setQty(1);
+    }
+  }, [color, product, size]);
+
+  const variantStock = getVariantStock(product, color, size);
+  const canPurchase = productHasStock(product) && variantStock > 0;
   const wished = isInWishlist(product.id);
   const discount = getDiscountPercent(product);
   const price = getEffectivePrice(product);
+
+  const disabledColors = product.colors.filter((c) => !stockedColors.includes(c));
+  const disabledSizes = product.sizes.filter((s) => !stockedSizes.includes(s));
+
+  const displayImages = useMemo(
+    () => getImagesForColor(product, color),
+    [product, color],
+  );
 
   return (
     <>
@@ -51,13 +86,19 @@ export function ProductDetail({
         />
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-          <ProductGallery images={product.images} name={product.name} />
+          <ProductGallery
+            key={color}
+            images={displayImages}
+            name={product.name}
+          />
 
           <div className="space-y-6 lg:pt-2">
             <div className="flex flex-wrap gap-2">
               {product.isNew && <Badge variant="new">New</Badge>}
               {product.isOnSale && <Badge variant="sale">Sale</Badge>}
-              {!product.inStock && <Badge variant="soldout">Sold Out</Badge>}
+              {!productHasStock(product) && (
+                <Badge variant="soldout">Sold Out</Badge>
+              )}
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl">
@@ -94,15 +135,24 @@ export function ProductDetail({
               selectedSize={size}
               selectedColor={color}
               quantity={qty}
-              onSizeChange={setSize}
-              onColorChange={setColor}
+              onSizeChange={(next) => {
+                setSize(next);
+                setQty(1);
+              }}
+              onColorChange={(next) => {
+                setColor(next);
+                setQty(1);
+              }}
               onQuantityChange={setQty}
+              maxQuantity={variantStock}
+              disabledColors={disabledColors}
+              disabledSizes={disabledSizes}
             />
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 className="flex-1"
-                disabled={!product.inStock}
+                disabled={!canPurchase}
                 onClick={() => addToCart(product, size, color, qty)}
               >
                 Add to Cart
@@ -110,7 +160,7 @@ export function ProductDetail({
               <Button
                 variant="secondary"
                 className="flex-1"
-                disabled={!product.inStock}
+                disabled={!canPurchase}
                 onClick={() => {
                   addToCart(product, size, color, qty, { openCart: false });
                   router.push("/checkout");
