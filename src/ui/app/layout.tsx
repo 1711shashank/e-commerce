@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
-import { SiteShell } from "@/components/layout/SiteShell";
+import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${cormorant.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
-        <SiteShell>{children}</SiteShell>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

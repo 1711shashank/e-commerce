@@ -69,8 +69,9 @@ export function getSaleProducts(limit = 8): Product[] {
 export function getRelatedProducts(
   product: Product,
   limit = 4,
+  list: Product[] = products,
 ): Product[] {
-  return products
+  return list
     .filter(
       (p) =>
         p.id !== product.id &&
@@ -173,9 +174,13 @@ export function sortProducts(
   }
 }
 
-export function searchProducts(query: string, limit = 6): Product[] {
+export function searchProducts(
+  query: string,
+  limit = 6,
+  list: Product[] = products,
+): Product[] {
   if (!query.trim()) return [];
-  return filterProducts({ search: query }).slice(0, limit);
+  return filterProducts({ search: query }, list).slice(0, limit);
 }
 
 export function getAllSizes(): string[] {
@@ -206,8 +211,12 @@ export function getAllFabrics(): string[] {
   return Array.from(fabrics).sort();
 }
 
-export function getPriceRange(): { min: number; max: number } {
-  const prices = products.map(getEffectivePrice);
+export function getPriceRange(list: Product[] = products): {
+  min: number;
+  max: number;
+} {
+  const prices = list.map(getEffectivePrice);
+  if (!prices.length) return { min: 0, max: 0 };
   return {
     min: Math.floor(Math.min(...prices)),
     max: Math.ceil(Math.max(...prices)),

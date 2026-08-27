@@ -109,21 +109,87 @@ services:
     networks:
       - app_net
 
+  auth-service:
+    build:
+      context: ./src/backend
+      dockerfile: services/auth-service/Dockerfile
+    container_name: auth-service
+    environment:
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-change-me-auth-django-secret}
+      AUTH_DEBUG: ${AUTH_DEBUG:-True}
+      AUTH_ALLOWED_HOSTS: ${AUTH_ALLOWED_HOSTS:-localhost,127.0.0.1,auth-service,admin.localhost,www.localhost}
+      AUTH_DB_NAME: ${AUTH_DB_NAME:-auth_db}
+      AUTH_DB_USER: ${AUTH_DB_USER:-auth_user}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+      AUTH_DB_HOST: auth_db
+      AUTH_DB_PORT: "5432"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-to-a-long-random-secret}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ACCESS_TOKEN_LIFETIME_MINUTES: ${JWT_ACCESS_TOKEN_LIFETIME_MINUTES:-30}
+      JWT_REFRESH_TOKEN_LIFETIME_DAYS: ${JWT_REFRESH_TOKEN_LIFETIME_DAYS:-7}
+      STAFF_EMAIL: ${STAFF_EMAIL:-staff@aurelia.example}
+      STAFF_PASSWORD: ${STAFF_PASSWORD:-StaffPass123!}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+    ports:
+      - "${AUTH_SERVICE_PORT:-8001}:8001"
+    depends_on:
+      auth_db:
+        condition: service_healthy
+    networks:
+      - app_net
+    restart: unless-stopped
+
+  catalog-service:
+    build:
+      context: ./src/backend
+      dockerfile: services/catalog-service/Dockerfile
+    container_name: catalog-service
+    environment:
+      CATALOG_SECRET_KEY: ${CATALOG_SECRET_KEY:-change-me-catalog-django-secret}
+      CATALOG_DEBUG: ${CATALOG_DEBUG:-True}
+      CATALOG_ALLOWED_HOSTS: ${CATALOG_ALLOWED_HOSTS:-localhost,127.0.0.1,catalog-service,admin.localhost,www.localhost}
+      CATALOG_DB_NAME: ${CATALOG_DB_NAME:-catalog_db}
+      CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_user}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:-catalog_password}
+      CATALOG_DB_HOST: catalog_db
+      CATALOG_DB_PORT: "5432"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-to-a-long-random-secret}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+    ports:
+      - "${CATALOG_SERVICE_PORT:-8002}:8002"
+    depends_on:
+      catalog_db:
+        condition: service_healthy
+    networks:
+      - app_net
+    restart: unless-stopped
+
   ui:
     build:
       context: ./src/ui
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+        # Empty = same-origin /api (works on both localhost and admin.localhost via nginx)
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
         NEXT_PUBLIC_API_BASE_PATH: ${NEXT_PUBLIC_API_BASE_PATH:-/api}
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+        NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-http://admin.localhost}
     container_name: ui
     ports:
       - "${UI_PORT:-3000}:3000"
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
       NEXT_PUBLIC_API_BASE_PATH: ${NEXT_PUBLIC_API_BASE_PATH:-/api}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+      NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-http://admin.localhost}
+      ADMIN_HOST: ${ADMIN_HOST:-admin.localhost}
+      STORE_HOSTS: ${STORE_HOSTS:-localhost,127.0.0.1,www.localhost}
+      AUTH_SERVICE_URL: http://auth-service:8001
+      CATALOG_SERVICE_URL: http://catalog-service:8002
     networks:
       - app_net
     restart: unless-stopped
@@ -138,6 +204,8 @@ services:
     depends_on:
       - redis
       - ui
+      - auth-service
+      - catalog-service
     networks:
       - app_net
 

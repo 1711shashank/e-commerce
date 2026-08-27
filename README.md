@@ -1,50 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aurelia e-commerce
 
-## Getting Started
+Next.js storefront + staff catalog portal in `src/ui`. Django microservices in `src/backend`.
 
-The Next.js app lives in `src/ui`. Django microservices live in `src/backend`.
+## Store vs staff portal
 
-**Docker (recommended):** `make up` starts the UI container on [http://localhost:3000](http://localhost:3000) (also via Nginx on port 80).
+| Surface | Who | Local (easy) | Local (host split / Docker nginx) |
+|---|---|---|---|
+| **Store** | Customers | http://localhost:3000 | http://localhost |
+| **Staff portal** | Internal team | http://localhost:3000/admin | http://admin.localhost/admin |
 
-**Host dev server** (hot reload without rebuilding the image):
+Same Next.js app. Portal uses its own shell (no shop header/footer), login required, not linked from the public site.
+
+### Open the admin portal locally (recommended)
+
+1. Start the UI (and APIs if you need DB save/login):
 
 ```bash
-cd src/ui && npm run dev
+# Option A — UI only (hot reload)
+cd src/ui && cp -n .env.example .env.local
+npm run dev
 ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Open the portal:
 
-## Learn More
+**http://localhost:3000/admin**
 
-To learn more about Next.js, take a look at the following resources:
+- You’ll be redirected to `/admin/login` if not signed in.
+- Leave `ADMIN_HOST` empty in `.env.local` for this path-based local mode.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Sign in with:
+   - Email: `admin@gmail.com`
+   - Password: `admin`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Optional: local host split (closer to production)
 
-## Backend (Phase 0 — local infra)
+Modern browsers resolve `*.localhost` → `127.0.0.1` (no `/etc/hosts` needed).
 
-Microservices scaffolding lives alongside the frontend. UI + base infra (Postgres per service, Redis, Nginx gateway) run via Docker Compose.
+In `src/ui/.env.local`:
+
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_ADMIN_URL=http://admin.localhost:3000
+ADMIN_HOST=admin.localhost
+STORE_HOSTS=localhost,127.0.0.1,www.localhost
+```
+
+Then:
+
+- Store: http://localhost:3000  
+- Portal: http://admin.localhost:3000 → redirects to `/admin`  
+- Visiting `/admin` on the store host redirects to the admin host
+
+### Docker Compose
 
 ```bash
-cp src/backend/.env.example src/backend/.env   # backend / docker-compose
-cp src/ui/.env.example src/ui/.env             # Next.js UI (Docker)
+cp src/backend/.env.example src/backend/.env
+cp src/ui/.env.example src/ui/.env
 make up
-make ps
-curl http://localhost/health
-# UI: http://localhost:3000  or  http://localhost/
-make down
 ```
+
+| URL | Purpose |
+|---|---|
+| http://localhost | Public store (nginx) |
+| http://admin.localhost/admin | Staff portal (nginx) |
+| http://localhost:3000 | UI container direct |
+| http://localhost:8002/admin/ | Catalog Jazzmin admin (products) |
+| http://localhost:8001/admin/ | Auth Jazzmin admin (users) |
+
+
+Nginx sends store `/admin` → `admin.localhost`. Next middleware enforces host rules when `ADMIN_HOST` is set.
+
+## Common commands
 
 | Command | Purpose |
 |---|---|
-| `make up` | Start UI, Postgres ×5, Redis, Nginx |
+| `make up` | Start UI, Postgres ×5, Redis, Nginx, auth/catalog (when built) |
 | `make down` | Stop containers |
-| `make logs` | Tail all logs |
-| `make migrate-all` | Run Django migrations (once services exist) |
-| `make shared-install` | `pip install -e ./src/backend/shared/libs` |
+| `make logs` | Tail logs |
+| `make migrate-all` | Django migrations |
+| `make shared-install` | Install shared Python libs |
 
-Service apps live under `src/backend/services/` (auth, catalog, inventory, order, payment, notification). Shared JWT/event helpers are in `src/backend/shared/libs`.
-
-Architecture and phased build plan: see `ecommerce-microservices-backend-README.md`.
+Architecture plan: `ecommerce-microservices-backend-README.md`.

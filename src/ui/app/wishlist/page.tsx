@@ -1,16 +1,30 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/product/ProductCard";
-import { getProductById } from "@/lib/services";
+import { mergeCatalog } from "@/lib/catalog";
+import { listPublicDbProducts } from "@/lib/catalog-api";
+import { getProducts } from "@/lib/services";
 import { useStore } from "@/lib/store";
+import type { Product } from "@/lib/types";
 
 export default function WishlistPage() {
   const { wishlist } = useStore();
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    listPublicDbProducts().then(setDbProducts);
+  }, []);
+
+  const catalog = useMemo(
+    () => mergeCatalog(getProducts(), dbProducts),
+    [dbProducts],
+  );
   const products = wishlist
-    .map((id) => getProductById(id))
+    .map((id) => catalog.find((p) => p.id === id))
     .filter(Boolean);
 
   return (

@@ -2,17 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { searchProducts, formatPrice } from "@/lib/services";
+import { mergeCatalog } from "@/lib/catalog";
+import { listPublicDbProducts } from "@/lib/catalog-api";
+import { searchProducts, formatPrice, getProducts } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import { useDebounce } from "@/lib/hooks";
+import type { Product } from "@/lib/types";
 
 export function SearchOverlay() {
   const { isSearchOpen, closeSearch } = useStore();
   const [query, setQuery] = useState("");
   const debounced = useDebounce(query, 250);
-  const results = searchProducts(debounced, 8);
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+  const catalog = useMemo(
+    () => mergeCatalog(getProducts(), dbProducts),
+    [dbProducts],
+  );
+  const results = searchProducts(debounced, 8, catalog);
+
+  useEffect(() => {
+    listPublicDbProducts().then(setDbProducts);
+  }, []);
 
   useEffect(() => {
     if (!isSearchOpen) {
@@ -65,18 +77,18 @@ export function SearchOverlay() {
                 onClick={closeSearch}
                 className="flex items-center gap-4 py-3 hover:bg-background"
               >
-                <div className="relative h-16 w-12 overflow-hidden bg-border/40">
+                <div className="relative h-16 w-12 shrink-0 overflow-hidden bg-border/40">
                   <Image
                     src={product.images[0]}
                     alt=""
                     fill
-                    sizes="48px"
                     className="object-cover"
+                    sizes="48px"
                   />
                 </div>
-                <div>
-                  <p className="font-display text-lg">{product.name}</p>
-                  <p className="text-sm text-muted">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">{product.name}</p>
+                  <p className="text-xs text-muted">
                     {formatPrice(product.discountPrice ?? product.price)}
                   </p>
                 </div>
@@ -84,15 +96,6 @@ export function SearchOverlay() {
             </li>
           ))}
         </ul>
-        {debounced && results.length > 0 && (
-          <Link
-            href={`/products?search=${encodeURIComponent(debounced)}`}
-            onClick={closeSearch}
-            className="mt-4 block py-3 text-center text-sm underline-offset-4 hover:underline"
-          >
-            View all results
-          </Link>
-        )}
       </div>
       <button
         type="button"

@@ -10,6 +10,8 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { Drawer } from "@/components/ui/Drawer";
 import { Button } from "@/components/ui/Button";
+import { mergeCatalog } from "@/lib/catalog";
+import { listPublicDbProducts } from "@/lib/catalog-api";
 import { useDebounce } from "@/lib/hooks";
 import {
   filterProducts,
@@ -40,7 +42,23 @@ export function ProductListing({
   initialFilters = {},
   title,
 }: ProductListingProps) {
-  const priceRange = getPriceRange();
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+  const catalog = useMemo(
+    () => mergeCatalog(products, dbProducts),
+    [products, dbProducts],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    listPublicDbProducts().then((list) => {
+      if (!cancelled) setDbProducts(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const priceRange = useMemo(() => getPriceRange(catalog), [catalog]);
   const [filters, setFilters] = useState<ProductFilters>({
     inStock: null,
     minPrice: priceRange.min,
@@ -60,16 +78,30 @@ export function ProductListing({
     setPage(1);
   }, [debouncedSearch]);
 
+  useEffect(() => {
+    setFilters((f) => ({
+      ...f,
+      minPrice:
+        f.minPrice == null || f.minPrice < priceRange.min
+          ? priceRange.min
+          : f.minPrice,
+      maxPrice:
+        f.maxPrice == null || f.maxPrice > priceRange.max
+          ? priceRange.max
+          : f.maxPrice,
+    }));
+  }, [priceRange.min, priceRange.max]);
+
   const filtered = useMemo(
-    () => sortProducts(filterProducts(filters, products), sort),
-    [filters, products, sort],
+    () => sortProducts(filterProducts(filters, catalog), sort),
+    [filters, catalog, sort],
   );
 
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => setLoading(false), 280);
     return () => clearTimeout(t);
-  }, [filters, sort]);
+  }, [filters, sort, catalog]);
 
   const visible = filtered.slice(0, page * PAGE_SIZE);
   const hasMore = visible.length < filtered.length;
