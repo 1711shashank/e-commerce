@@ -17,7 +17,7 @@ export function ProductPreviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background animate-fade-in">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-surface/95 px-5 py-3 backdrop-blur sm:px-8">
+      {/* <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-surface/95 px-5 py-3 backdrop-blur sm:px-8">
         <div>
           <p className="text-xs uppercase tracking-[0.16em] text-muted">
             Preview
@@ -32,7 +32,7 @@ export function ProductPreviewModal({
         >
           <X className="h-5 w-5" />
         </button>
-      </div>
+      </div> */}
       <div className="flex-1 overflow-y-auto">
         <div className="border-b border-accent/20 bg-accent/5 px-5 py-3 text-center text-sm text-accent sm:px-8">
           This is how shoppers will see this product. Nothing has been saved yet.

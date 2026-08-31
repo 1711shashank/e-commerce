@@ -1,3 +1,6 @@
+# Active stack: auth + catalog + UI + nginx
+# Uncomment inventory/order/payment DBs (and their services) when those phases are built.
+
 services:
   auth_db:
     image: postgres:16-alpine
@@ -37,77 +40,81 @@ services:
     networks:
       - app_net
 
-  inventory_db:
-    image: postgres:16-alpine
-    container_name: inventory_db
-    environment:
-      POSTGRES_DB: ${INVENTORY_DB_NAME:-inventory_db}
-      POSTGRES_USER: ${INVENTORY_DB_USER:-inventory_user}
-      POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD:-inventory_password}
-    ports:
-      - "${INVENTORY_DB_PORT:-5434}:5432"
-    volumes:
-      - inventory_db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${INVENTORY_DB_USER:-inventory_user} -d ${INVENTORY_DB_NAME:-inventory_db}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_net
+  # --- Not in use yet (uncomment when inventory-service is added) ---
+  # inventory_db:
+  #   image: postgres:16-alpine
+  #   container_name: inventory_db
+  #   environment:
+  #     POSTGRES_DB: ${INVENTORY_DB_NAME:-inventory_db}
+  #     POSTGRES_USER: ${INVENTORY_DB_USER:-inventory_user}
+  #     POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD:-inventory_password}
+  #   ports:
+  #     - "${INVENTORY_DB_PORT:-5434}:5432"
+  #   volumes:
+  #     - inventory_db_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${INVENTORY_DB_USER:-inventory_user} -d ${INVENTORY_DB_NAME:-inventory_db}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - app_net
 
-  order_db:
-    image: postgres:16-alpine
-    container_name: order_db
-    environment:
-      POSTGRES_DB: ${ORDER_DB_NAME:-order_db}
-      POSTGRES_USER: ${ORDER_DB_USER:-order_user}
-      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order_password}
-    ports:
-      - "${ORDER_DB_PORT:-5435}:5432"
-    volumes:
-      - order_db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${ORDER_DB_USER:-order_user} -d ${ORDER_DB_NAME:-order_db}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_net
+  # --- Not in use yet (uncomment when order-service is added) ---
+  # order_db:
+  #   image: postgres:16-alpine
+  #   container_name: order_db
+  #   environment:
+  #     POSTGRES_DB: ${ORDER_DB_NAME:-order_db}
+  #     POSTGRES_USER: ${ORDER_DB_USER:-order_user}
+  #     POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order_password}
+  #   ports:
+  #     - "${ORDER_DB_PORT:-5435}:5432"
+  #   volumes:
+  #     - order_db_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${ORDER_DB_USER:-order_user} -d ${ORDER_DB_NAME:-order_db}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - app_net
 
-  payment_db:
-    image: postgres:16-alpine
-    container_name: payment_db
-    environment:
-      POSTGRES_DB: ${PAYMENT_DB_NAME:-payment_db}
-      POSTGRES_USER: ${PAYMENT_DB_USER:-payment_user}
-      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:-payment_password}
-    ports:
-      - "${PAYMENT_DB_PORT:-5436}:5432"
-    volumes:
-      - payment_db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PAYMENT_DB_USER:-payment_user} -d ${PAYMENT_DB_NAME:-payment_db}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_net
+  # --- Not in use yet (uncomment when payment-service is added) ---
+  # payment_db:
+  #   image: postgres:16-alpine
+  #   container_name: payment_db
+  #   environment:
+  #     POSTGRES_DB: ${PAYMENT_DB_NAME:-payment_db}
+  #     POSTGRES_USER: ${PAYMENT_DB_USER:-payment_user}
+  #     POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:-payment_password}
+  #   ports:
+  #     - "${PAYMENT_DB_PORT:-5436}:5432"
+  #   volumes:
+  #     - payment_db_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${PAYMENT_DB_USER:-payment_user} -d ${PAYMENT_DB_NAME:-payment_db}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - app_net
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_net
+  # --- Not in use yet (uncomment when services use Redis for events/cache) ---
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: redis
+  #   ports:
+  #     - "${REDIS_PORT:-6379}:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - app_net
 
   auth-service:
     build:
@@ -168,6 +175,53 @@ services:
       - app_net
     restart: unless-stopped
 
+  # --- Not in use yet (uncomment when inventory-service is implemented) ---
+  # inventory-service:
+  #   build:
+  #     context: ./src/backend
+  #     dockerfile: services/inventory-service/Dockerfile
+  #   container_name: inventory-service
+  #   depends_on:
+  #     inventory_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app_net
+
+  # --- Not in use yet (uncomment when order-service is implemented) ---
+  # order-service:
+  #   build:
+  #     context: ./src/backend
+  #     dockerfile: services/order-service/Dockerfile
+  #   container_name: order-service
+  #   depends_on:
+  #     order_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app_net
+
+  # --- Not in use yet (uncomment when payment-service is implemented) ---
+  # payment-service:
+  #   build:
+  #     context: ./src/backend
+  #     dockerfile: services/payment-service/Dockerfile
+  #   container_name: payment-service
+  #   depends_on:
+  #     payment_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app_net
+
+  # --- Not in use yet (uncomment when notification-service is implemented) ---
+  # notification-service:
+  #   build:
+  #     context: ./src/backend
+  #     dockerfile: services/notification-service/Dockerfile
+  #   container_name: notification-service
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - app_net
+
   ui:
     build:
       context: ./src/ui
@@ -204,7 +258,6 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - redis
       - ui
       - auth-service
       - catalog-service
@@ -214,10 +267,10 @@ services:
 volumes:
   auth_db_data:
   catalog_db_data:
-  inventory_db_data:
-  order_db_data:
-  payment_db_data:
-  redis_data:
+  # inventory_db_data:
+  # order_db_data:
+  # payment_db_data:
+  # redis_data:
 
 networks:
   app_net:

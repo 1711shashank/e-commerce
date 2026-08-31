@@ -11,6 +11,7 @@ import {
   buildProductFromForm,
   emptyProductForm,
   productToFormValues,
+  sortSizes,
   type ProductFormValues,
 } from "@/lib/catalog";
 import { syncVariantStock } from "@/lib/variants";
@@ -40,6 +41,9 @@ function discountPercent(price: string, sale: string): number | null {
   if (!Number.isFinite(s) || s <= 0 || s >= p) return null;
   return Math.round(((p - s) / p) * 100);
 }
+
+const variantToggleBase =
+  "inline-flex h-11 shrink-0 items-center justify-center border px-4 text-sm font-medium tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export function ProductForm({ categories, product }: ProductFormProps) {
   const router = useRouter();
@@ -71,6 +75,31 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     () => (product?.colors[0] ?? "") || "",
   );
 
+  const previewImages = useMemo(() => {
+    if (!previewColor) return [];
+    return (values.colorImages[previewColor] ?? []).filter(Boolean);
+  }, [previewColor, values.colorImages]);
+
+  const sizeStockByPreviewColor = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const size of values.sizes) {
+      if (previewColor) {
+        const variant = values.variants.find(
+          (v) => v.color === previewColor && v.size === size,
+        );
+        map.set(size, variant?.stockQty ?? 0);
+      } else {
+        map.set(
+          size,
+          values.variants
+            .filter((v) => v.size === size)
+            .reduce((sum, v) => sum + v.stockQty, 0),
+        );
+      }
+    }
+    return map;
+  }, [values.sizes, values.variants, previewColor]);
+
   useEffect(() => {
     if (values.colors.length && !values.colors.includes(selectedColor)) {
       setSelectedColor(values.colors[0]);
@@ -81,7 +110,24 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     if (values.sizes.length && !values.sizes.includes(selectedSize)) {
       setSelectedSize(values.sizes[0]);
     }
-  }, [values.colors, values.sizes, selectedColor, selectedSize, previewColor]);
+    const stockedSizes = sortSizes(values.sizes).filter(
+      (size) => (sizeStockByPreviewColor.get(size) ?? 0) > 0,
+    );
+    if (
+      values.sizes.length &&
+      stockedSizes.length &&
+      !stockedSizes.includes(selectedSize)
+    ) {
+      setSelectedSize(stockedSizes[0]);
+    }
+  }, [
+    values.colors,
+    values.sizes,
+    selectedColor,
+    selectedSize,
+    previewColor,
+    sizeStockByPreviewColor,
+  ]);
 
   const parents = useMemo(
     () => categories.filter((c) => !c.parentId && c.slug !== "sale"),
@@ -92,21 +138,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const subs = selectedParent
     ? categories.filter((c) => c.parentId === selectedParent.id)
     : [];
-
-  const totalStock = useMemo(
-    () => values.variants.reduce((sum, v) => sum + v.stockQty, 0),
-    [values.variants],
-  );
-
-  const totalImages = useMemo(
-    () =>
-      values.colors.reduce(
-        (sum, color) =>
-          sum + (values.colorImages[color] ?? []).filter(Boolean).length,
-        0,
-      ),
-    [values.colors, values.colorImages],
-  );
 
   const dirty = useMemo(
     () => JSON.stringify(values) !== JSON.stringify(initial),
@@ -124,11 +155,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const safeActive = colorImagesForSelected.length
     ? Math.min(activeImage, colorImagesForSelected.length - 1)
     : 0;
-
-  const previewImages = useMemo(() => {
-    if (!previewColor) return [];
-    return (values.colorImages[previewColor] ?? []).filter(Boolean);
-  }, [previewColor, values.colorImages]);
 
   const setColorImages = (color: string, images: string[]) => {
     setValues((prev) => ({
@@ -525,65 +551,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         </p>
       )}
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        <div className="flex items-center justify-between gap-3 border border-border bg-surface/60 px-3 py-2.5">
-          <div className="min-w-0">
-            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted">
-              Images
-            </p>
-            <p className="truncate text-sm">
-              {values.colors.length} color{values.colors.length === 1 ? "" : "s"}
-              · {totalImages} image{totalImages === 1 ? "" : "s"}
-            </p>
-            {fieldErrors.images && (
-              <p className={cn(fieldHint, "mt-0.5")}>{fieldErrors.images}</p>
-            )}
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={() => setImagesOpen(true)}
-          >
-            <ImageIcon className="h-4 w-4" />
-            Manage
-          </Button>
-        </div>
-
-        <div className="flex items-center justify-between gap-3 border border-border bg-surface/60 px-3 py-2.5">
-          <div className="min-w-0">
-            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted">
-              Inventory
-            </p>
-            <p className="truncate text-sm">
-              {values.colors.length} color{values.colors.length === 1 ? "" : "s"}
-              · {values.sizes.length} size{values.sizes.length === 1 ? "" : "s"}
-              · {totalStock} in stock
-            </p>
-            {(fieldErrors.variants ||
-              fieldErrors.colors ||
-              fieldErrors.sizes) && (
-              <p className={cn(fieldHint, "mt-0.5")}>
-                {fieldErrors.variants ||
-                  fieldErrors.colors ||
-                  fieldErrors.sizes}
-              </p>
-            )}
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={() => setInventoryOpen(true)}
-          >
-            <Layers className="h-4 w-4" />
-            Manage
-          </Button>
-        </div>
-      </div>
-
       <ProductInventoryModal
         open={inventoryOpen}
         onClose={() => setInventoryOpen(false)}
@@ -627,32 +594,6 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
         <div className="space-y-3">
-          {values.colors.length > 0 ? (
-            <>
-              <p className="text-xs uppercase tracking-[0.15em] text-muted">
-                Preview — {previewColor || "select color"}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {values.colors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setPreviewColor(color)}
-                    className={cn(
-                      "min-h-9 border px-3 text-sm transition-colors",
-                      previewColor === color
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border hover:border-foreground/50",
-                    )}
-                    aria-pressed={previewColor === color}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : null}
-
           <ProductGallery
             key={previewColor || "empty"}
             images={previewImages}
@@ -661,19 +602,9 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             emptyLabel={
               values.colors.length
                 ? `No images added for ${previewColor || "this color"}`
-                : "No images added — open Manage images by color to add colors"
+                : "No images added — use Manage images to add colors"
             }
           />
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setImagesOpen(true)}
-          >
-            <ImageIcon className="h-4 w-4" />
-            Manage images by color
-          </Button>
         </div>
 
         <div className="space-y-6 lg:pt-2">
@@ -783,6 +714,94 @@ export function ProductForm({ categories, product }: ProductFormProps) {
               <p className={fieldHint}>{fieldErrors.description}</p>
             )}
           </div>
+
+          <div className="flex flex-wrap items-start gap-3">
+            {values.colors.map((color) => (
+              <button
+                key={color}
+                type="button"
+                onClick={() => setPreviewColor(color)}
+                title={color}
+                className={cn(
+                  variantToggleBase,
+                  "w-28 truncate",
+                  previewColor === color
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-foreground/45 bg-background hover:border-foreground/75",
+                )}
+                aria-pressed={previewColor === color}
+              >
+                {color}
+              </button>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 self-start"
+              onClick={() => setImagesOpen(true)}
+            >
+              <ImageIcon className="h-4 w-4" />
+              Manage images
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-start gap-3">
+            {sortSizes(values.sizes).map((size) => {
+              const stock = sizeStockByPreviewColor.get(size) ?? 0;
+              const outOfStock = stock === 0;
+              const lowStock = stock > 0 && stock < 10;
+              return (
+                <div key={size} className="inline-flex shrink-0 flex-col items-center">
+                  <button
+                    type="button"
+                    disabled={outOfStock}
+                    onClick={() => setSelectedSize(size)}
+                    className={cn(
+                      variantToggleBase,
+                      "w-14",
+                      outOfStock &&
+                        "cursor-not-allowed border-foreground/25 text-muted opacity-50",
+                      !outOfStock &&
+                        selectedSize === size
+                        ? "border-foreground bg-foreground text-background"
+                        : !outOfStock &&
+                            "border-foreground/45 bg-background hover:border-foreground/75",
+                    )}
+                    aria-pressed={selectedSize === size}
+                  >
+                    {size}
+                  </button>
+                  {lowStock && (
+                    <span className="mt-1 block whitespace-nowrap text-center text-[10px] font-medium uppercase tracking-[0.08em] text-sale">
+                      {stock} left
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 self-start"
+              onClick={() => setInventoryOpen(true)}
+            >
+              <Layers className="h-4 w-4" />
+              Manage inventory
+            </Button>
+          </div>
+          {(fieldErrors.images ||
+            fieldErrors.variants ||
+            fieldErrors.colors ||
+            fieldErrors.sizes) && (
+            <p className={fieldHint}>
+              {fieldErrors.images ||
+                fieldErrors.variants ||
+                fieldErrors.colors ||
+                fieldErrors.sizes}
+            </p>
+          )}
 
           <div>
             <label className="mb-1.5 block text-xs uppercase tracking-[0.15em] text-muted">
