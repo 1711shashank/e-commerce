@@ -1,18 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
+import { validateCartAgainstCatalog } from "@/lib/cart-stock";
 import { formatPrice } from "@/lib/services";
 import { useStore } from "@/lib/store";
+import { useProductCatalog } from "@/lib/use-product-catalog";
 
 export default function CheckoutPage() {
-  const { cart, cartSubtotal, clearCart } = useStore();
+  const { cart, cartSubtotal, clearCart, reconcileCart } = useStore();
+  const { catalog, loaded } = useProductCatalog();
   const [placed, setPlaced] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const subtotal = cartSubtotal();
   const shipping = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
   const total = subtotal + shipping;
+
+  useEffect(() => {
+    if (loaded) reconcileCart(catalog);
+  }, [catalog, loaded, reconcileCart]);
+
+  const issues = loaded ? validateCartAgainstCatalog(cart, catalog) : [];
+  const hasIssues = issues.length > 0;
 
   if (placed) {
     return (
@@ -57,10 +68,40 @@ export default function CheckoutPage() {
             className="space-y-6"
             onSubmit={(e) => {
               e.preventDefault();
+              setCheckoutError(null);
+
+              if (!loaded) {
+                setCheckoutError("Still loading product availability. Try again.");
+                return;
+              }
+
+              reconcileCart(catalog);
+              const nextIssues = validateCartAgainstCatalog(
+                useStore.getState().cart,
+                catalog,
+              );
+              if (nextIssues.length > 0) {
+                setCheckoutError(
+                  "Some items in your bag are unavailable or exceed stock. Update your bag and try again.",
+                );
+                return;
+              }
+
               clearCart();
               setPlaced(true);
             }}
           >
+            {hasIssues && (
+              <p className="border border-sale/30 bg-sale/5 px-4 py-3 text-sm text-sale">
+                Some items are unavailable or exceed stock. Your bag was updated
+                — review quantities before placing the order.
+              </p>
+            )}
+            {checkoutError && (
+              <p className="text-sm text-sale" role="alert">
+                {checkoutError}
+              </p>
+            )}
             <fieldset className="space-y-4">
               <legend className="font-display text-2xl">Contact</legend>
               <input
@@ -130,7 +171,11 @@ export default function CheckoutPage() {
                 />
               </div>
             </fieldset>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={!loaded || hasIssues}
+            >
               Place order · {formatPrice(total)}
             </Button>
           </form>

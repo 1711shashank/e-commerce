@@ -1,16 +1,11 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo } from "react";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product/ProductDetail";
-import { mergeCatalog } from "@/lib/catalog";
-import { listPublicDbProducts } from "@/lib/catalog-api";
-import {
-  getProductBySlug,
-  getRelatedProducts,
-  getProducts,
-} from "@/lib/services";
-import type { Product } from "@/lib/types";
+import { getRelatedProducts } from "@/lib/services";
+import { useStore } from "@/lib/store";
+import { useProductCatalog } from "@/lib/use-product-catalog";
 
 export function ProductPageClient({
   params,
@@ -18,36 +13,19 @@ export function ProductPageClient({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const seed = getProductBySlug(slug);
-  const [dbProducts, setDbProducts] = useState<Product[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const { catalog, loaded } = useProductCatalog();
+  const reconcileCart = useStore((state) => state.reconcileCart);
 
-  useEffect(() => {
-    let cancelled = false;
-    listPublicDbProducts().then((list) => {
-      if (!cancelled) {
-        setDbProducts(list);
-        setLoaded(true);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const catalog = useMemo(
-    () => mergeCatalog(getProducts(), dbProducts),
-    [dbProducts],
+  const product = useMemo(
+    () => catalog.find((p) => p.slug === slug),
+    [catalog, slug],
   );
 
-  const product = seed ?? catalog.find((p) => p.slug === slug);
+  useEffect(() => {
+    if (loaded) reconcileCart(catalog);
+  }, [catalog, loaded, reconcileCart]);
 
-  if (seed) {
-    const related = getRelatedProducts(seed, 8, catalog);
-    return <ProductDetail product={seed} related={related} />;
-  }
-
-  if (!loaded) {
+  if (!product && !loaded) {
     return (
       <div className="mx-auto max-w-7xl px-5 py-16 text-sm text-muted">
         Loading product…

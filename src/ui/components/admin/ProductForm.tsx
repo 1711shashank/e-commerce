@@ -77,8 +77,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
   const previewImages = useMemo(() => {
     if (!previewColor) return [];
-    return (values.colorImages[previewColor] ?? []).filter(Boolean);
-  }, [previewColor, values.colorImages]);
+    return (values.imagesByColor[previewColor] ?? []).filter(Boolean);
+  }, [previewColor, values.imagesByColor]);
 
   const sizeStockByPreviewColor = useMemo(() => {
     const map = new Map<string, number>();
@@ -149,22 +149,22 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const sale = values.discountPrice.trim() ? Number(values.discountPrice) : null;
   const displayPrice =
     sale != null && Number.isFinite(sale) && sale > 0 ? sale : regular;
-  const colorImagesForSelected = selectedColor
-    ? (values.colorImages[selectedColor] ?? []).filter(Boolean)
+  const imagesForSelectedColor = selectedColor
+    ? (values.imagesByColor[selectedColor] ?? []).filter(Boolean)
     : [];
-  const safeActive = colorImagesForSelected.length
-    ? Math.min(activeImage, colorImagesForSelected.length - 1)
+  const safeActive = imagesForSelectedColor.length
+    ? Math.min(activeImage, imagesForSelectedColor.length - 1)
     : 0;
 
   const setColorImages = (color: string, images: string[]) => {
     setValues((prev) => ({
       ...prev,
-      colorImages: { ...prev.colorImages, [color]: images },
+      imagesByColor: { ...prev.imagesByColor, [color]: images },
     }));
     setFieldErrors((prev) => {
       const next = { ...prev };
       delete next.images;
-      delete next.colorImages;
+      delete next.imagesByColor;
       return next;
     });
   };
@@ -221,7 +221,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       }));
       return;
     }
-    const current = values.colorImages[selectedColor] ?? [];
+    const current = values.imagesByColor[selectedColor] ?? [];
     setColorImages(selectedColor, [...current, url]);
     setNewImageUrl("");
     setActiveImage(current.length);
@@ -229,7 +229,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
   const removeImage = (index: number) => {
     if (!selectedColor) return;
-    const current = values.colorImages[selectedColor] ?? [];
+    const current = values.imagesByColor[selectedColor] ?? [];
     setColorImages(
       selectedColor,
       current.filter((_, i) => i !== index),
@@ -241,7 +241,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
   const moveImage = (index: number, dir: -1 | 1) => {
     if (!selectedColor) return;
-    const current = values.colorImages[selectedColor] ?? [];
+    const current = values.imagesByColor[selectedColor] ?? [];
     const target = index + dir;
     if (target < 0 || target >= current.length) return;
     const next = [...current];
@@ -270,7 +270,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       for (const file of files) {
         uploaded.push(await uploadProductImage(file, access));
       }
-      const current = values.colorImages[selectedColor] ?? [];
+      const current = values.imagesByColor[selectedColor] ?? [];
       setColorImages(selectedColor, [...current, ...uploaded]);
       setActiveImage(current.length);
     } catch (err) {
@@ -299,7 +299,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         ...prev,
         colors,
         variants: syncVariantStock(colors, prev.sizes, prev.variants),
-        colorImages: { ...prev.colorImages, [name]: [] },
+        imagesByColor: { ...prev.imagesByColor, [name]: [] },
       };
     });
     setSelectedColor(name);
@@ -316,11 +316,11 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const removeColor = (color: string) => {
     setValues((prev) => {
       const colors = prev.colors.filter((c) => c !== color);
-      const { [color]: _removed, ...colorImages } = prev.colorImages;
+      const { [color]: _removed, ...imagesByColor } = prev.imagesByColor;
       return {
         ...prev,
         colors,
-        colorImages,
+        imagesByColor,
         variants: syncVariantStock(colors, prev.sizes, prev.variants),
       };
     });
@@ -356,7 +356,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       errs.variants = "Set stock for at least one color and size.";
     }
     for (const color of values.colors) {
-      if (!(values.colorImages[color] ?? []).some(Boolean)) {
+      if (!(values.imagesByColor[color] ?? []).some(Boolean)) {
         errs.images = `Add at least one image for ${color}.`;
         break;
       }
@@ -399,8 +399,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       subCategory: result.product.subCategory ?? "",
       price: result.product.price,
       discountPrice: result.product.discountPrice ?? null,
-      images: result.product.images,
-      colorImages: result.product.colorImages ?? {},
+      imagesByColor: result.product.imagesByColor,
       sizes: result.product.sizes,
       colors: result.product.colors,
       variants: result.product.variants ?? [],

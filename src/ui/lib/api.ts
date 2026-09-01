@@ -1,9 +1,28 @@
+import { isSessionExpiredError, notifySessionExpired } from "@/lib/auth-session";
+
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 const API_BASE_PATH = process.env.NEXT_PUBLIC_API_BASE_PATH ?? "/api";
+const CATALOG_SERVICE_URL = (process.env.CATALOG_SERVICE_URL ?? "").replace(
+  /\/$/,
+  "",
+);
 
 export function getApiBase(): string {
+  if (typeof window === "undefined" && CATALOG_SERVICE_URL) {
+    return `${CATALOG_SERVICE_URL}${API_BASE_PATH}`;
+  }
   if (API_URL) return `${API_URL}${API_BASE_PATH}`;
   return API_BASE_PATH;
+}
+
+function getRequestBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  if (CATALOG_SERVICE_URL) {
+    return CATALOG_SERVICE_URL;
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
 export class ApiError extends Error {
@@ -22,18 +41,17 @@ type RequestOptions = {
   body?: unknown;
   token?: string | null;
   params?: Record<string, string | number | boolean | undefined | null>;
+  skipSessionExpiry?: boolean;
 };
 
 export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, token, params } = options;
+  const { method = "GET", body, token, params, skipSessionExpiry } = options;
   const url = new URL(
     `${getApiBase()}${path.startsWith("/") ? path : `/${path}`}`,
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    getRequestBaseUrl(),
   );
 
   if (params) {
@@ -83,6 +101,9 @@ export async function apiRequest<T>(
       typeof (data as { detail: unknown }).detail === "string"
         ? (data as { detail: string }).detail
         : `Request failed (${res.status})`;
+    if (token && !skipSessionExpiry && isSessionExpiredError(res.status, message)) {
+      notifySessionExpired();
+    }
     throw new ApiError(message, res.status, data);
   }
 

@@ -10,6 +10,7 @@ import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { getMaxAddQuantity } from "@/lib/cart-stock";
 import {
   formatPrice,
   getDiscountPercent,
@@ -20,6 +21,7 @@ import type { Product } from "@/lib/types";
 import {
   colorsWithStock,
   getImagesForColor,
+  getSizeStockMap,
   getVariantStock,
   productHasStock,
   sizesWithStockForColor,
@@ -34,7 +36,10 @@ export function ProductDetail({
   related: Product[];
 }) {
   const router = useRouter();
-  const { addToCart, toggleWishlist, isInWishlist } = useStore();
+  const cart = useStore((state) => state.cart);
+  const addToCart = useStore((state) => state.addToCart);
+  const toggleWishlist = useStore((state) => state.toggleWishlist);
+  const isInWishlist = useStore((state) => state.isInWishlist);
 
   const stockedColors = useMemo(() => colorsWithStock(product), [product]);
   const initialColor = stockedColors[0] ?? product.colors[0] ?? "";
@@ -47,6 +52,26 @@ export function ProductDetail({
   const initialSize = stockedSizes[0] ?? product.sizes[0] ?? "";
   const [size, setSize] = useState(initialSize);
   const [qty, setQty] = useState(1);
+  const [cartError, setCartError] = useState<string | null>(null);
+
+  const variantStock = getVariantStock(product, color, size);
+  const maxAddQty = getMaxAddQuantity(product, color, size, cart);
+  const canPurchase = productHasStock(product) && maxAddQty > 0;
+  const wished = isInWishlist(product.id);
+  const discount = getDiscountPercent(product);
+  const price = getEffectivePrice(product);
+
+  const disabledColors = product.colors.filter((c) => !stockedColors.includes(c));
+  const disabledSizes = product.sizes.filter((s) => !stockedSizes.includes(s));
+  const sizeStock = useMemo(
+    () => getSizeStockMap(product, color),
+    [product, color],
+  );
+
+  const displayImages = useMemo(
+    () => getImagesForColor(product, color),
+    [product, color],
+  );
 
   useEffect(() => {
     const sizes = sizesWithStockForColor(product, color);
@@ -56,19 +81,23 @@ export function ProductDetail({
     }
   }, [color, product, size]);
 
-  const variantStock = getVariantStock(product, color, size);
-  const canPurchase = productHasStock(product) && variantStock > 0;
-  const wished = isInWishlist(product.id);
-  const discount = getDiscountPercent(product);
-  const price = getEffectivePrice(product);
+  useEffect(() => {
+    setQty((current) => {
+      if (maxAddQty <= 0) return 1;
+      return Math.min(current, maxAddQty);
+    });
+  }, [maxAddQty, color, size]);
 
-  const disabledColors = product.colors.filter((c) => !stockedColors.includes(c));
-  const disabledSizes = product.sizes.filter((s) => !stockedSizes.includes(s));
-
-  const displayImages = useMemo(
-    () => getImagesForColor(product, color),
-    [product, color],
-  );
+  const handleAddToCart = (openCart = true): boolean => {
+    setCartError(null);
+    const ok = addToCart(product, size, color, qty, { openCart });
+    if (!ok) {
+      setCartError("Not enough stock for this color and size.");
+      return false;
+    }
+    setQty(1);
+    return true;
+  };
 
   return (
     <>
@@ -138,22 +167,31 @@ export function ProductDetail({
               onSizeChange={(next) => {
                 setSize(next);
                 setQty(1);
+                setCartError(null);
               }}
               onColorChange={(next) => {
                 setColor(next);
                 setQty(1);
+                setCartError(null);
               }}
               onQuantityChange={setQty}
-              maxQuantity={variantStock}
+              maxQuantity={maxAddQty}
               disabledColors={disabledColors}
               disabledSizes={disabledSizes}
+              sizeStock={sizeStock}
             />
+
+            {cartError && (
+              <p className="text-sm text-sale" role="alert">
+                {cartError}
+              </p>
+            )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 className="flex-1"
                 disabled={!canPurchase}
-                onClick={() => addToCart(product, size, color, qty)}
+                onClick={() => handleAddToCart(true)}
               >
                 Add to Cart
               </Button>
@@ -162,7 +200,7 @@ export function ProductDetail({
                 className="flex-1"
                 disabled={!canPurchase}
                 onClick={() => {
-                  addToCart(product, size, color, qty, { openCart: false });
+                  if (!handleAddToCart(false)) return;
                   router.push("/checkout");
                 }}
               >

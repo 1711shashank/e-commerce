@@ -48,6 +48,14 @@ const nextConfig: NextConfig = {
         destination: `${CATALOG_PROXY}/api/categories/`,
       },
       {
+        source: "/api/banners/:path*",
+        destination: `${CATALOG_PROXY}/api/banners/:path*/`,
+      },
+      {
+        source: "/api/banners",
+        destination: `${CATALOG_PROXY}/api/banners/`,
+      },
+      {
         source: "/media/:path*",
         destination: `${CATALOG_PROXY}/media/:path*`,
       },

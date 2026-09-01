@@ -51,11 +51,11 @@ export function ProductImagesFields({
   onMove,
   onUploadFiles,
 }: ProductImagesFieldsProps) {
-  const colorImagesForSelected = selectedColor
-    ? (values.colorImages[selectedColor] ?? []).filter(Boolean)
+  const imagesForSelectedColor = selectedColor
+    ? (values.imagesByColor[selectedColor] ?? []).filter(Boolean)
     : [];
-  const safeActive = colorImagesForSelected.length
-    ? Math.min(activeIndex, colorImagesForSelected.length - 1)
+  const safeActive = imagesForSelectedColor.length
+    ? Math.min(activeIndex, imagesForSelectedColor.length - 1)
     : 0;
 
   return (
@@ -73,7 +73,7 @@ export function ProductImagesFields({
         {values.colors.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-2">
             {values.colors.map((color) => {
-              const count = (values.colorImages[color] ?? []).filter(Boolean)
+              const count = (values.imagesByColor[color] ?? []).filter(Boolean)
                 .length;
               return (
                 <div key={color} className="relative">
@@ -134,7 +134,7 @@ export function ProductImagesFields({
 
       {selectedColor ? (
         <ProductImageField
-          images={colorImagesForSelected}
+          images={imagesForSelectedColor}
           activeIndex={safeActive}
           name={name}
           newImageUrl={newImageUrl}

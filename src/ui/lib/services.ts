@@ -1,13 +1,13 @@
-import { banners, promoStrips } from "@/data/banners";
+import { promoStrips } from "@/data/banners";
 import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import type {
-  Banner,
   Category,
   Product,
   ProductFilters,
   SortOption,
 } from "@/lib/types";
+import { productHasStock } from "@/lib/variants";
 
 export function getProducts(): Product[] {
   return products;
@@ -37,10 +37,6 @@ export function getSubCategories(parentId: string): Category[] {
   return categories.filter((c) => c.parentId === parentId);
 }
 
-export function getBanners(): Banner[] {
-  return banners;
-}
-
 export function getPromoStrips() {
   return promoStrips;
 }
@@ -57,7 +53,7 @@ export function getFeaturedProducts(limit = 8): Product[] {
 
 export function getBestSellers(limit = 8): Product[] {
   return [...products]
-    .filter((p) => p.inStock)
+    .filter((p) => productHasStock(p))
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
     .slice(0, limit);
 }
@@ -121,8 +117,8 @@ export function filterProducts(
       }
     }
 
-    if (filters.inStock === true && !product.inStock) return false;
-    if (filters.inStock === false && product.inStock) return false;
+    if (filters.inStock === true && !productHasStock(product)) return false;
+    if (filters.inStock === false && productHasStock(product)) return false;
 
     if (filters.isNew && !product.isNew) return false;
     if (filters.isOnSale && !product.isOnSale) return false;

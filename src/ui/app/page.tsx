@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { HomeHeroCarousel } from "@/components/home/HomeHeroCarousel";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { PromoStrip } from "@/components/home/PromoStrip";
 import {
-  getBanners,
   getBestSellers,
   getFeaturedProducts,
   getParentCategories,
@@ -19,7 +18,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const banners = getBanners();
   const categories = getParentCategories();
   const featured = getFeaturedProducts(8);
   const bestsellers = getBestSellers(8);
@@ -28,7 +26,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroCarousel banners={banners} />
+      <HomeHeroCarousel />
       <CategoryGrid categories={categories} />
       <PromoStrip items={promos} />
       <FeaturedProducts

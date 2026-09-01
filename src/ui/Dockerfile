@@ -35,14 +35,21 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV ADMIN_HOST=
 ENV STORE_HOSTS=localhost,127.0.0.1,www.localhost
+ARG CATALOG_SERVICE_URL=http://127.0.0.1:8002
+ENV CATALOG_SERVICE_URL=$CATALOG_SERVICE_URL
 
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
+ARG AUTH_SERVICE_URL=http://127.0.0.1:8001
+ENV AUTH_SERVICE_URL=$AUTH_SERVICE_URL
+
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 
 USER nextjs
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["./docker-entrypoint.sh"]

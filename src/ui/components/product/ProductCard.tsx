@@ -11,7 +11,12 @@ import {
 } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import type { Product, ViewMode } from "@/lib/types";
-import { getDefaultProductImage, getImagesForColor } from "@/lib/variants";
+import {
+  getDefaultProductImage,
+  getFirstInStockVariant,
+  getImagesForColor,
+  productHasStock,
+} from "@/lib/variants";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -25,17 +30,16 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
   const discount = getDiscountPercent(product);
   const price = getEffectivePrice(product);
   const defaultColor = product.colors[0] ?? "";
-  const cardImages = defaultColor
-    ? getImagesForColor(product, defaultColor)
-    : product.images;
+  const cardImages = defaultColor ? getImagesForColor(product, defaultColor) : [];
   const primaryImage = cardImages[0] ?? getDefaultProductImage(product);
   const hoverImage = cardImages[1];
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.inStock) return;
-    addToCart(product, product.sizes[0], product.colors[0], 1);
+    const variant = getFirstInStockVariant(product);
+    if (!variant || !productHasStock(product)) return;
+    addToCart(product, variant.size, variant.color, 1);
   };
 
   if (view === "list") {
@@ -57,7 +61,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
           <div className="flex flex-wrap gap-2">
             {product.isNew && <Badge variant="new">New</Badge>}
             {product.isOnSale && <Badge variant="sale">Sale</Badge>}
-            {!product.inStock && <Badge variant="soldout">Sold Out</Badge>}
+            {!productHasStock(product) && <Badge variant="soldout">Sold Out</Badge>}
           </div>
           <Link href={`/products/${product.slug}`}>
             <h3 className="font-display text-xl sm:text-2xl hover:text-accent transition-colors">
@@ -77,7 +81,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             <button
               type="button"
               onClick={handleQuickAdd}
-              disabled={!product.inStock}
+              disabled={!productHasStock(product)}
               className="flex min-h-11 items-center gap-2 border border-border px-4 text-sm hover:border-foreground disabled:opacity-40"
             >
               <ShoppingBag className="h-4 w-4" />
@@ -124,7 +128,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             {product.isOnSale && discount && (
               <Badge variant="sale">-{discount}%</Badge>
             )}
-            {!product.inStock && <Badge variant="soldout">Sold Out</Badge>}
+            {!productHasStock(product) && <Badge variant="soldout">Sold Out</Badge>}
           </div>
         </div>
         <div className="mt-3 space-y-1">
@@ -153,7 +157,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         <button
           type="button"
           onClick={handleQuickAdd}
-          disabled={!product.inStock}
+          disabled={!productHasStock(product)}
           className="flex h-11 w-11 items-center justify-center bg-surface/95 shadow-sm backdrop-blur hover:bg-surface disabled:opacity-40"
           aria-label="Quick add to cart"
         >

@@ -32,7 +32,6 @@ class Product(models.Model):
     discount_price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
-    images = models.JSONField(default=list)
     sizes = models.JSONField(default=list)
     colors = models.JSONField(default=list)
     variant_stock = models.JSONField(default=list)
@@ -163,3 +162,33 @@ class ProductVariant(models.Model):
 
     def __str__(self) -> str:
         return self.sku
+
+
+class Banner(models.Model):
+    TEXT_LIGHT = "light"
+    TEXT_DARK = "dark"
+    TEXT_COLOR_CHOICES = [
+        (TEXT_LIGHT, "Light"),
+        (TEXT_DARK, "Dark"),
+    ]
+
+    eyebrow = models.CharField(max_length=60, blank=True)
+    title = models.CharField(max_length=80)
+    subtitle = models.CharField(max_length=160)
+    cta_label = models.CharField(max_length=40)
+    cta_href = models.CharField(max_length=500)
+    image = models.URLField()
+    image_alt = models.CharField(max_length=200, blank=True)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    text_color = models.CharField(
+        max_length=8, choices=TEXT_COLOR_CHOICES, default=TEXT_LIGHT
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self) -> str:
+        return self.title

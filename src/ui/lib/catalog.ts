@@ -1,6 +1,6 @@
 import type { Product, ProductVariant } from "@/lib/types";
 import { products as seedProducts } from "@/data/products";
-import { syncVariantStock, flattenColorImages, normalizeColorImages } from "@/lib/variants";
+import { syncVariantStock, normalizeImagesByColor } from "@/lib/variants";
 
 export const SIZE_OPTIONS = [
   "XS",
@@ -85,7 +85,7 @@ export type ProductFormValues = {
   variants: ProductVariant[];
   fabric: string;
   description: string;
-  colorImages: Record<string, string[]>;
+  imagesByColor: Record<string, string[]>;
   tags: string;
   isNew: boolean;
   isOnSale: boolean;
@@ -103,7 +103,7 @@ export function emptyProductForm(): ProductFormValues {
     variants: syncVariantStock([], ["M"], []),
     fabric: "",
     description: "",
-    colorImages: {},
+    imagesByColor: {},
     tags: "",
     isNew: true,
     isOnSale: false,
@@ -132,7 +132,7 @@ export function productToFormValues(product: Product): ProductFormValues {
     variants: syncVariantStock(colors, sizes, baseVariants),
     fabric: product.fabric ?? "",
     description: product.description,
-    colorImages: normalizeColorImages(product),
+    imagesByColor: normalizeImagesByColor(product),
     tags: (product.tags ?? []).join(", "),
     isNew: product.isNew,
     isOnSale: product.isOnSale,
@@ -184,19 +184,14 @@ export function buildProductFromForm(
     return { error: "Set stock for at least one color and size combination." };
   }
 
-  const colorImages: Record<string, string[]> = {};
+  const imagesByColor: Record<string, string[]> = {};
   for (const color of colors) {
-    colorImages[color] = (values.colorImages[color] ?? [])
+    imagesByColor[color] = (values.imagesByColor[color] ?? [])
       .map((u) => u.trim())
       .filter(Boolean);
-    if (!colorImages[color].length) {
+    if (!imagesByColor[color].length) {
       return { error: `Add at least one image for color: ${color}.` };
     }
-  }
-
-  const images = flattenColorImages(colors, colorImages);
-  if (!images.length) {
-    return { error: "Add at least one image." };
   }
 
   const description = values.description.trim();
@@ -213,8 +208,7 @@ export function buildProductFromForm(
     subCategory: values.subCategory || undefined,
     price,
     discountPrice,
-    images,
-    colorImages,
+    imagesByColor,
     sizes: values.sizes,
     colors,
     variants,

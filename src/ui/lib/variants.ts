@@ -1,5 +1,7 @@
 import type { Product, ProductVariant } from "@/lib/types";
 
+const LEGACY_SEED_STOCK = 999;
+
 export function normalizeVariants(product: Product): ProductVariant[] {
   if (product.variants?.length) {
     return product.variants;
@@ -9,7 +11,7 @@ export function normalizeVariants(product: Product): ProductVariant[] {
     product.sizes.map((size) => ({
       color,
       size,
-      stockQty: 10,
+      stockQty: LEGACY_SEED_STOCK,
     })),
   );
 }
@@ -47,6 +49,30 @@ export function productHasStock(product: Product): boolean {
   return normalizeVariants(product).some((v) => v.stockQty > 0);
 }
 
+export function getFirstInStockVariant(
+  product: Product,
+): { color: string; size: string } | null {
+  for (const color of product.colors) {
+    for (const size of product.sizes) {
+      if (getVariantStock(product, color, size) > 0) {
+        return { color, size };
+      }
+    }
+  }
+  return null;
+}
+
+export function getSizeStockMap(
+  product: Product,
+  color: string,
+): Record<string, number> {
+  const map: Record<string, number> = {};
+  for (const size of product.sizes) {
+    map[size] = getVariantStock(product, color, size);
+  }
+  return map;
+}
+
 export function syncVariantStock(
   colors: string[],
   sizes: string[],
@@ -69,48 +95,24 @@ export function variantKey(color: string, size: string): string {
 }
 
 export function getImagesForColor(product: Product, color: string): string[] {
-  const mapped = product.colorImages?.[color];
-  if (mapped?.length) return mapped;
-  return product.images;
+  return product.imagesByColor[color] ?? [];
 }
 
 export function getDefaultProductImage(product: Product): string {
   const defaultColor = product.colors[0];
   if (defaultColor) {
-    const imgs = getImagesForColor(product, defaultColor);
-    if (imgs[0]) return imgs[0];
+    const imgs = product.imagesByColor[defaultColor];
+    if (imgs?.[0]) return imgs[0];
   }
-  return product.images[0] ?? "";
+  return "";
 }
 
-export function flattenColorImages(
-  colors: string[],
-  colorImages: Record<string, string[]>,
-): string[] {
-  const flat: string[] = [];
-  const seen = new Set<string>();
-  for (const color of colors) {
-    for (const url of colorImages[color] ?? []) {
-      if (url && !seen.has(url)) {
-        seen.add(url);
-        flat.push(url);
-      }
-    }
-  }
-  return flat;
-}
-
-export function normalizeColorImages(
+export function normalizeImagesByColor(
   product: Product,
 ): Record<string, string[]> {
-  if (product.colorImages && Object.keys(product.colorImages).length > 0) {
-    return { ...product.colorImages };
-  }
-  const colors = product.colors;
-  if (!colors.length) return {};
-  const mapped: Record<string, string[]> = {};
-  for (const color of colors) {
-    mapped[color] = color === colors[0] ? [...product.images] : [];
+  const mapped: Record<string, string[]> = { ...product.imagesByColor };
+  for (const color of product.colors) {
+    if (!mapped[color]) mapped[color] = [];
   }
   return mapped;
 }

@@ -3,6 +3,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { apiRequest } from "@/lib/api";
+import {
+  redirectToAdminLogin,
+  registerSessionExpiredHandler,
+} from "@/lib/auth-session";
 
 export type AuthUser = {
   id: number;
@@ -18,6 +22,7 @@ type AuthState = {
   user: AuthUser | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  clearSession: () => void;
   isStaff: () => boolean;
 };
 
@@ -57,11 +62,16 @@ export const useAuthStore = create<AuthState>()(
               method: "POST",
               token: access,
               body: { refresh },
+              skipSessionExpiry: true,
             });
           }
         } catch {
           // clear local session even if logout API fails
         }
+        set({ access: null, refresh: null, user: null });
+      },
+
+      clearSession: () => {
         set({ access: null, refresh: null, user: null });
       },
 
@@ -80,3 +90,8 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+registerSessionExpiredHandler(() => {
+  useAuthStore.getState().clearSession();
+  redirectToAdminLogin();
+});

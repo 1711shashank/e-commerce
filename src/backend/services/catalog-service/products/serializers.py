@@ -2,7 +2,7 @@ from django.db import transaction
 from django.utils.text import slugify
 from rest_framework import serializers
 
-from .models import Category, Product, ProductColor, ProductSize, ProductVariant
+from .models import Banner, Category, Product, ProductColor, ProductSize, ProductVariant
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -50,9 +50,9 @@ class ProductSerializer(serializers.ModelSerializer):
     )
     isNew = serializers.BooleanField(source="is_new", required=False)
     isOnSale = serializers.BooleanField(source="is_on_sale", required=False)
-    inStock = serializers.BooleanField(source="in_stock", required=False)
+    inStock = serializers.BooleanField(source="in_stock", read_only=True)
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
-    colorImages = serializers.JSONField(required=False, write_only=True)
+    imagesByColor = serializers.JSONField(required=False, write_only=True)
     variants = ProductVariantInputSerializer(many=True, required=False, write_only=True)
     variantsRead = ProductVariantSerializer(
         source="variants", many=True, read_only=True
@@ -68,8 +68,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "subCategory",
             "price",
             "discountPrice",
-            "images",
-            "colorImages",
+            "imagesByColor",
             "sizes",
             "colors",
             "variants",
@@ -83,20 +82,13 @@ class ProductSerializer(serializers.ModelSerializer):
             "tags",
             "createdAt",
         )
-        read_only_fields = ("id", "slug", "createdAt", "variantsRead")
+        read_only_fields = ("id", "slug", "createdAt", "variantsRead", "inStock")
 
-    def validate_images(self, value):
-        if value is None:
-            return value
-        if not isinstance(value, list) or not value:
-            raise serializers.ValidationError("At least one image URL is required.")
-        return value
-
-    def validate_colorImages(self, value):
+    def validate_imagesByColor(self, value):
         if value is None:
             return value
         if not isinstance(value, dict):
-            raise serializers.ValidationError("colorImages must be an object.")
+            raise serializers.ValidationError("imagesByColor must be an object.")
         cleaned: dict[str, list[str]] = {}
         for color, urls in value.items():
             if not isinstance(color, str) or not color.strip():
@@ -109,19 +101,6 @@ class ProductSerializer(serializers.ModelSerializer):
                 str(url).strip() for url in urls if isinstance(url, str) and url.strip()
             ]
         return cleaned
-
-    @staticmethod
-    def _flatten_color_images(
-        colors: list[str], color_images: dict[str, list[str]]
-    ) -> list[str]:
-        flat: list[str] = []
-        seen: set[str] = set()
-        for color in colors:
-            for url in color_images.get(color, []):
-                if url not in seen:
-                    seen.add(url)
-                    flat.append(url)
-        return flat
 
     def validate_sizes(self, value):
         if not isinstance(value, list) or not value:
@@ -137,33 +116,28 @@ class ProductSerializer(serializers.ModelSerializer):
         variants = attrs.get("variants")
         colors = attrs.get("colors")
         sizes = attrs.get("sizes")
-        color_images = attrs.get("colorImages")
+        color_images = attrs.get("imagesByColor")
 
         if color_images is not None and colors is not None:
             color_set = set(colors)
             for color_name in color_images:
                 if color_name not in color_set:
                     raise serializers.ValidationError(
-                        {"colorImages": f"Unknown color: {color_name}"}
+                        {"imagesByColor": f"Unknown color: {color_name}"}
                     )
             for color_name in colors:
                 if not color_images.get(color_name):
                     raise serializers.ValidationError(
                         {
-                            "colorImages": (
+                            "imagesByColor": (
                                 f"Add at least one image for color: {color_name}"
                             )
                         }
                     )
-            flat = self._flatten_color_images(colors, color_images)
-            if flat:
-                attrs["images"] = flat
-        elif attrs.get("images") is None and self.instance is not None:
-            attrs.pop("images", None)
 
-        if self.instance is None and not color_images and not attrs.get("images"):
+        if self.instance is None and not color_images:
             raise serializers.ValidationError(
-                {"images": "Add at least one product image."}
+                {"imagesByColor": "Add at least one product image."}
             )
 
         if variants is not None:
@@ -195,7 +169,18 @@ class ProductSerializer(serializers.ModelSerializer):
                         )
                     }
                 )
+            if not any(entry["stockQty"] > 0 for entry in variants):
+                raise serializers.ValidationError(
+                    {"variants": "Set stock for at least one color and size."}
+                )
         return attrs
+
+    @staticmethod
+    def _ensure_has_stock(product: Product) -> None:
+        if not product.variants.filter(is_active=True, stock_qty__gt=0).exists():
+            raise serializers.ValidationError(
+                {"variants": "Set stock for at least one color and size."}
+            )
 
     def _build_variant_sku(self, product: Product, color: ProductColor, size: ProductSize) -> str:
         base = slugify(f"{product.slug}-{color.name}-{size.label}")[:50] or "variant"
@@ -231,10 +216,6 @@ class ProductSerializer(serializers.ModelSerializer):
             for color_name, color in color_objs.items():
                 color.images = color_images.get(color_name, [])
                 color.save(update_fields=["images"])
-            flat = self._flatten_color_images(colors, color_images)
-            if flat:
-                product.images = flat
-                product.save(update_fields=["images"])
 
         ProductColor.objects.filter(product=product).exclude(
             name__in=colors
@@ -296,18 +277,12 @@ class ProductSerializer(serializers.ModelSerializer):
                 continue
             color.images = color_images.get(color_name, [])
             color.save(update_fields=["images"])
-        flat = self._flatten_color_images(colors, color_images)
-        if flat:
-            product.images = flat
-            product.save(update_fields=["images"])
 
     def create(self, validated_data):
         variants = validated_data.pop("variants", None)
-        color_images = validated_data.pop("colorImages", None)
+        color_images = validated_data.pop("imagesByColor", None)
         colors = validated_data.get("colors", [])
         sizes = validated_data.get("sizes", [])
-        if color_images is None and colors and validated_data.get("images"):
-            color_images = {colors[0]: list(validated_data["images"])}
         product = Product.objects.create(**validated_data)
         if variants is not None:
             self._sync_variants(product, colors, sizes, variants, color_images)
@@ -323,11 +298,12 @@ class ProductSerializer(serializers.ModelSerializer):
                 ],
                 color_images,
             )
+        self._ensure_has_stock(product)
         return product
 
     def update(self, instance, validated_data):
         variants = validated_data.pop("variants", None)
-        color_images = validated_data.pop("colorImages", None)
+        color_images = validated_data.pop("imagesByColor", None)
         colors = validated_data.get("colors", instance.colors)
         sizes = validated_data.get("sizes", instance.sizes)
         for attr, value in validated_data.items():
@@ -335,6 +311,7 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
         if variants is not None:
             self._sync_variants(instance, colors, sizes, variants, color_images)
+            self._ensure_has_stock(instance)
         elif color_images is not None:
             self._sync_color_images(instance, colors, color_images)
         return instance
@@ -353,5 +330,70 @@ class ProductSerializer(serializers.ModelSerializer):
         for color in instance.product_colors.all():
             imgs = color.images if isinstance(color.images, list) else []
             color_images[color.name] = [str(url) for url in imgs if url]
-        data["colorImages"] = color_images
+        data["imagesByColor"] = color_images
+        return data
+
+
+def _validate_cta_href(value: str) -> str:
+    value = value.strip()
+    if not value:
+        raise serializers.ValidationError("Redirect URL is required.")
+    lower = value.lower()
+    if lower.startswith("javascript:") or lower.startswith("data:"):
+        raise serializers.ValidationError("Invalid URL scheme.")
+    if value.startswith("/"):
+        return value
+    if value.startswith("https://"):
+        return value
+    raise serializers.ValidationError(
+        "Use an internal path (/collections/sale) or https:// URL."
+    )
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    ctaLabel = serializers.CharField(source="cta_label")
+    ctaHref = serializers.CharField(source="cta_href")
+    imageAlt = serializers.CharField(
+        source="image_alt", required=False, allow_blank=True
+    )
+    sortOrder = serializers.IntegerField(source="sort_order", required=False)
+    isActive = serializers.BooleanField(source="is_active", required=False)
+    textColor = serializers.ChoiceField(
+        source="text_color",
+        choices=[Banner.TEXT_LIGHT, Banner.TEXT_DARK],
+        required=False,
+    )
+    createdAt = serializers.DateTimeField(source="created_at", read_only=True)
+    updatedAt = serializers.DateTimeField(source="updated_at", read_only=True)
+
+    class Meta:
+        model = Banner
+        fields = (
+            "id",
+            "eyebrow",
+            "title",
+            "subtitle",
+            "ctaLabel",
+            "ctaHref",
+            "image",
+            "imageAlt",
+            "sortOrder",
+            "isActive",
+            "textColor",
+            "createdAt",
+            "updatedAt",
+        )
+
+    def validate_ctaHref(self, value):
+        return _validate_cta_href(value)
+
+    def validate_image(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Background image is required.")
+        return value
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["id"] = str(instance.id)
         return data

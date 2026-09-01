@@ -1,5 +1,6 @@
 "use client";
 
+import { isSessionExpiredError, notifySessionExpired } from "@/lib/auth-session";
 import { apiRequest, getApiBase, ApiError } from "@/lib/api";
 import type { Product, ProductVariant } from "@/lib/types";
 
@@ -16,8 +17,7 @@ export type ProductPayload = {
   subCategory?: string;
   price: number;
   discountPrice?: number | null;
-  images: string[];
-  colorImages: Record<string, string[]>;
+  imagesByColor: Record<string, string[]>;
   sizes: string[];
   colors: string[];
   variants: ProductVariant[];
@@ -123,6 +123,9 @@ export async function uploadProductImage(
       typeof (data as { detail: unknown }).detail === "string"
         ? (data as { detail: string }).detail
         : `Upload failed (${res.status})`;
+    if (isSessionExpiredError(res.status, message)) {
+      notifySessionExpired();
+    }
     throw new ApiError(message, res.status, data);
   }
 

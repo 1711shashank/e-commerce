@@ -14,11 +14,10 @@ export interface Product {
   subCategory?: string;
   price: number;
   discountPrice?: number;
-  images: string[];
+  imagesByColor: Record<string, string[]>;
   sizes: string[];
   colors: string[];
   variants?: ProductVariant[];
-  colorImages?: Record<string, string[]>;
   fabric?: string;
   description: string;
   isNew: boolean;
@@ -40,11 +39,18 @@ export interface Category {
 
 export interface Banner {
   id: string;
+  eyebrow: string;
   title: string;
   subtitle: string;
   ctaLabel: string;
   ctaHref: string;
   image: string;
+  imageAlt?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  textColor?: "light" | "dark";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type SortOption =

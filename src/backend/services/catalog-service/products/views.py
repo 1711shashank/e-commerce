@@ -10,9 +10,9 @@ from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
-from .models import Category, Product, ProductVariant
+from .models import Banner, Category, Product, ProductVariant
 from .permissions import IsStaffOrReadOnly
-from .serializers import CategorySerializer, ProductSerializer
+from .serializers import BannerSerializer, CategorySerializer, ProductSerializer
 
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {
@@ -128,3 +128,113 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
     lookup_field = "slug"
     pagination_class = None
+
+
+MAX_BANNERS = 10
+
+
+class BannerViewSet(viewsets.ModelViewSet):
+    serializer_class = BannerSerializer
+    permission_classes = [IsStaffOrReadOnly]
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = Banner.objects.all()
+        is_staff = getattr(self.request.user, "is_staff_user", False)
+        if self.action == "list":
+            show_all = self.request.query_params.get("all") == "true"
+            if not is_staff or not show_all:
+                qs = qs.filter(is_active=True)
+        elif self.action == "retrieve" and not is_staff:
+            qs = qs.filter(is_active=True)
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        if Banner.objects.count() >= MAX_BANNERS:
+            return Response(
+                {"detail": f"Maximum of {MAX_BANNERS} slides allowed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        if "sort_order" not in serializer.validated_data:
+            max_order = (
+                Banner.objects.order_by("-sort_order")
+                .values_list("sort_order", flat=True)
+                .first()
+            )
+            serializer.save(sort_order=(max_order or 0) + 1)
+        else:
+            serializer.save()
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="reorder",
+        permission_classes=[IsStaffOrReadOnly],
+    )
+    def reorder(self, request):
+        if not getattr(request.user, "is_staff_user", False):
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        ids = request.data.get("ids")
+        if not isinstance(ids, list) or not ids:
+            return Response(
+                {"detail": "Provide a non-empty ids array."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        banners = {str(b.id): b for b in Banner.objects.filter(id__in=ids)}
+        if len(banners) != len(ids):
+            return Response(
+                {"detail": "One or more banner ids are invalid."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        for index, banner_id in enumerate(ids):
+            banner = banners[str(banner_id)]
+            banner.sort_order = index
+            banner.save(update_fields=["sort_order", "updated_at"])
+
+        ordered = Banner.objects.filter(id__in=ids).order_by("sort_order")
+        serializer = self.get_serializer(ordered, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="upload-image",
+        parser_classes=[MultiPartParser, FormParser],
+        permission_classes=[IsStaffOrReadOnly],
+    )
+    def upload_image(self, request):
+        if not getattr(request.user, "is_staff_user", False):
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        uploaded = request.FILES.get("file")
+        if not uploaded:
+            return Response(
+                {"detail": "No file provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        content_type = uploaded.content_type or ""
+        ext = ALLOWED_IMAGE_TYPES.get(content_type)
+        if not ext:
+            return Response(
+                {"detail": "Unsupported image type. Use JPEG, PNG, WebP, or GIF."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if uploaded.size > MAX_UPLOAD_BYTES:
+            return Response(
+                {"detail": "Image must be 8 MB or smaller."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        filename = f"banners/{uuid.uuid4().hex}{ext}"
+        saved_path = default_storage.save(filename, uploaded)
+        media_url = settings.MEDIA_URL.rstrip("/")
+        url = f"{media_url}/{saved_path}"
+        return Response({"url": url})
