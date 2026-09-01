@@ -95,19 +95,22 @@ function PortalContent() {
             </Link>
           </div>
           <ul className="divide-y divide-border border border-border bg-surface">
-            {products.map((product) => (
+            {products.map((product) => {
+              const thumbnail = getDefaultProductImage(product);
+              return (
               <li
                 key={product.id}
                 className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center"
               >
                 <div className="relative h-24 w-20 shrink-0 overflow-hidden bg-border/40 sm:h-28 sm:w-24">
-                  {getDefaultProductImage(product) ? (
+                  {thumbnail ? (
                     <Image
-                      src={getDefaultProductImage(product)}
+                      src={thumbnail}
                       alt={product.name}
                       fill
                       className="object-cover"
                       sizes="96px"
+                      unoptimized
                     />
                   ) : null}
                 </div>
@@ -152,7 +155,8 @@ function PortalContent() {
                   </button>
                 </div>
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
       )}

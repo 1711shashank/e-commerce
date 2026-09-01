@@ -99,10 +99,9 @@ export function getImagesForColor(product: Product, color: string): string[] {
 }
 
 export function getDefaultProductImage(product: Product): string {
-  const defaultColor = product.colors[0];
-  if (defaultColor) {
-    const imgs = product.imagesByColor[defaultColor];
-    if (imgs?.[0]) return imgs[0];
+  for (const imgs of Object.values(product.imagesByColor ?? {})) {
+    const url = imgs.find(Boolean);
+    if (url) return url;
   }
   return "";
 }
