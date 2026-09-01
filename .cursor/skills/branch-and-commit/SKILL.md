@@ -1,10 +1,9 @@
 ---
 name: branch-and-commit
 description: >-
-  Create a new git branch, commit scoped changes, run local lint/CI checks, and
-  always write an untracked PR description from the repo PR template. Use when
-  the user asks to create a branch, commit work, prepare a PR, run eslint/CI
-  locally, or commit without Cursor attribution.
+  Create a new git branch, commit scoped changes, and run local lint/CI checks.
+  Use when the user asks to create a branch, commit work, prepare a PR, run
+  eslint/CI locally, or commit without Cursor attribution.
 ---
 
 # Branch and Commit
@@ -21,8 +20,6 @@ Prepare a clean branch + commit from the current work. Do not push or open a PR 
 •⁠  ⁠*No ⁠ --no-verify ⁠* unless the user explicitly requests it.
 •⁠  ⁠*Stage only relevant files* — no ⁠ git add . ⁠ / ⁠ git add -A ⁠ unless the user asks to commit everything.
 •⁠  ⁠*Never commit secrets* — warn if ⁠ .env ⁠, credentials, or keys are staged.
-•⁠  ⁠*Always write ⁠ PR_DESCRIPTION.md ⁠* at the repo root after a successful commit (see step 6).
-•⁠  ⁠*Never commit ⁠ PR_DESCRIPTION.md ⁠* — leave it untracked; do not ⁠ git add ⁠ it.
 
 ## Workflow
 
