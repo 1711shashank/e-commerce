@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { CheckoutButton } from "@/components/auth/CheckoutButton";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import {
@@ -169,11 +170,7 @@ export default function CartPage() {
                 <span>{formatPrice(subtotal)}</span>
               </div>
             </div>
-            <Button className="mt-6 w-full">
-              <Link href="/checkout" className="w-full text-center">
-                Checkout
-              </Link>
-            </Button>
+            <CheckoutButton className="mt-6 w-full">Checkout</CheckoutButton>
           </aside>
         </div>
       )}

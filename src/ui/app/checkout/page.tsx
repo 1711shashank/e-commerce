@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { RequireCustomerAuth } from "@/components/auth/RequireCustomerAuth";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { validateCartAgainstCatalog } from "@/lib/cart-stock";
+import { useCustomerAuthStore } from "@/lib/customer-auth-store";
 import { formatPrice } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import { useProductCatalog } from "@/lib/use-product-catalog";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const { cart, cartSubtotal, clearCart, reconcileCart } = useStore();
+  const user = useCustomerAuthStore((s) => s.user);
   const { catalog, loaded } = useProductCatalog();
   const [placed, setPlaced] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -108,6 +111,7 @@ export default function CheckoutPage() {
                 required
                 type="email"
                 placeholder="Email"
+                defaultValue={user?.email ?? ""}
                 className="min-h-12 w-full border border-border bg-surface px-4 text-sm"
               />
             </fieldset>
@@ -117,11 +121,13 @@ export default function CheckoutPage() {
                 <input
                   required
                   placeholder="First name"
+                  defaultValue={user?.first_name ?? ""}
                   className="min-h-12 border border-border bg-surface px-4 text-sm"
                 />
                 <input
                   required
                   placeholder="Last name"
+                  defaultValue={user?.last_name ?? ""}
                   className="min-h-12 border border-border bg-surface px-4 text-sm"
                 />
               </div>
@@ -216,5 +222,13 @@ export default function CheckoutPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <RequireCustomerAuth>
+      <CheckoutContent />
+    </RequireCustomerAuth>
   );
 }

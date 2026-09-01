@@ -11,6 +11,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { getMaxAddQuantity } from "@/lib/cart-stock";
+import { useCustomerAuthStore } from "@/lib/customer-auth-store";
 import {
   formatPrice,
   getDiscountPercent,
@@ -26,6 +27,7 @@ import {
   productHasStock,
   sizesWithStockForColor,
 } from "@/lib/variants";
+import { usePersistHydrated } from "@/lib/use-persist-hydrated";
 import { cn } from "@/lib/utils";
 
 export function ProductDetail({
@@ -40,6 +42,9 @@ export function ProductDetail({
   const addToCart = useStore((state) => state.addToCart);
   const toggleWishlist = useStore((state) => state.toggleWishlist);
   const isInWishlist = useStore((state) => state.isInWishlist);
+  const authHydrated = usePersistHydrated(useCustomerAuthStore.persist);
+  const customerAccess = useCustomerAuthStore((s) => s.access);
+  const customerUser = useCustomerAuthStore((s) => s.user);
 
   const stockedColors = useMemo(() => colorsWithStock(product), [product]);
   const initialColor = stockedColors[0] ?? product.colors[0] ?? "";
@@ -201,6 +206,17 @@ export function ProductDetail({
                 disabled={!canPurchase}
                 onClick={() => {
                   if (!handleAddToCart(false)) return;
+                  const isCustomer = Boolean(
+                    authHydrated &&
+                      customerAccess &&
+                      customerUser?.role === "customer",
+                  );
+                  if (!isCustomer) {
+                    router.push(
+                      `/login?next=${encodeURIComponent("/checkout")}`,
+                    );
+                    return;
+                  }
                   router.push("/checkout");
                 }}
               >

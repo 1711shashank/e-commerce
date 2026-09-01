@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
+import { AccountMenu } from "@/components/auth/AccountMenu";
 import { useStore } from "@/lib/store";
+import { useCustomerAuthStore } from "@/lib/customer-auth-store";
+import { usePersistHydrated } from "@/lib/use-persist-hydrated";
 import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +35,9 @@ export function Header({ categories }: { categories: Category[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const authHydrated = usePersistHydrated(useCustomerAuthStore.persist);
+  const customerAccess = useCustomerAuthStore((s) => s.access);
+  const customerUser = useCustomerAuthStore((s) => s.user);
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +49,10 @@ export function Header({ categories }: { categories: Category[] }) {
 
   const bags = mounted ? cartCount() : 0;
   const wishes = mounted ? wishlistCount() : 0;
+  const isCustomerLoggedIn =
+    mounted &&
+    authHydrated &&
+    Boolean(customerAccess && customerUser?.role === "customer");
 
   return (
     <header
@@ -126,6 +136,26 @@ export function Header({ categories }: { categories: Category[] }) {
         </nav>
 
         <div className="flex items-center gap-0.5">
+          <div className="hidden items-center gap-1 sm:flex">
+            {isCustomerLoggedIn ? (
+              <AccountMenu />
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="flex h-11 items-center px-2 text-xs uppercase tracking-[0.12em] hover:text-accent"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="flex h-11 items-center px-2 text-xs uppercase tracking-[0.12em] hover:text-accent"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
           <button
             type="button"
             onClick={openSearch}

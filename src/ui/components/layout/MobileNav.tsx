@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Drawer } from "@/components/ui/Drawer";
+import { buildLoginUrl, buildSignupUrl } from "@/lib/auth-redirect";
+import { useCustomerAuthStore } from "@/lib/customer-auth-store";
 import { useStore } from "@/lib/store";
+import { usePersistHydrated } from "@/lib/use-persist-hydrated";
 import type { Category } from "@/lib/types";
 
 const links = [
@@ -25,6 +28,12 @@ export function MobileNav({
 }) {
   const { isMobileNavOpen, closeMobileNav } = useStore();
   const [openId, setOpenId] = useState<string | null>(null);
+  const authHydrated = usePersistHydrated(useCustomerAuthStore.persist);
+  const access = useCustomerAuthStore((s) => s.access);
+  const user = useCustomerAuthStore((s) => s.user);
+  const logout = useCustomerAuthStore((s) => s.logout);
+  const isCustomerLoggedIn =
+    authHydrated && Boolean(access && user?.role === "customer");
 
   const parents = categories.filter((c) => !c.parentId);
 
@@ -99,6 +108,41 @@ export function MobileNav({
               </li>
             ))}
         </ul>
+        <div className="mt-4 border-t border-border px-3 py-4">
+          {isCustomerLoggedIn ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted truncate">{user?.email}</p>
+              <button
+                type="button"
+                onClick={async () => {
+                  await logout();
+                  closeMobileNav();
+                }}
+                className="flex min-h-12 w-full items-center gap-2 text-sm uppercase tracking-[0.1em]"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link
+                href={buildLoginUrl()}
+                onClick={closeMobileNav}
+                className="flex min-h-12 items-center text-sm uppercase tracking-[0.1em]"
+              >
+                Sign in
+              </Link>
+              <Link
+                href={buildSignupUrl()}
+                onClick={closeMobileNav}
+                className="flex min-h-12 items-center text-sm uppercase tracking-[0.1em]"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
+        </div>
       </nav>
     </Drawer>
   );
