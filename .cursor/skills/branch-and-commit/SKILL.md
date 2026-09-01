@@ -31,7 +31,6 @@ Copy this checklist and track progress:
 - [ ] 3. Run local checks
 - [ ] 4. Commit
 - [ ] 5. Verify commit (no Cursor trailer)
-- [ ] 6. Write PR_DESCRIPTION.md (always; never commit)
 
 
 ### 1. Inspect changes
@@ -44,5 +43,3 @@ git diff
 git diff --staged
 git log -5 --oneline
  ⁠
-
-Summarize what will be committed. Exclude unrelated or generated files unless the user wants them.
