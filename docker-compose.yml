@@ -1,5 +1,37 @@
-# Active stack: auth + catalog + UI + nginx
+# Active stack: auth + catalog + UI + nginx + Redis + Celery worker
 # Uncomment inventory/order/payment DBs (and their services) when those phases are built.
+
+x-auth-service-env: &auth-service-env
+  AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:-change-me-auth-django-secret}
+  AUTH_DEBUG: ${AUTH_DEBUG:-True}
+  AUTH_ALLOWED_HOSTS: ${AUTH_ALLOWED_HOSTS:-localhost,127.0.0.1,auth-service,admin.localhost,www.localhost}
+  AUTH_DB_NAME: ${AUTH_DB_NAME:-auth_db}
+  AUTH_DB_USER: ${AUTH_DB_USER:-auth_user}
+  AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+  AUTH_DB_HOST: auth_db
+  AUTH_DB_PORT: "5432"
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-to-a-long-random-secret}
+  JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+  JWT_ACCESS_TOKEN_LIFETIME_MINUTES: ${JWT_ACCESS_TOKEN_LIFETIME_MINUTES:-30}
+  JWT_REFRESH_TOKEN_LIFETIME_DAYS: ${JWT_REFRESH_TOKEN_LIFETIME_DAYS:-7}
+  STAFF_EMAIL: ${STAFF_EMAIL:-staff@aurelia.example}
+  STAFF_PASSWORD: ${STAFF_PASSWORD:-StaffPass123!}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gmail.com}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  AUTH_EMAIL_BACKEND: ${AUTH_EMAIL_BACKEND:-django_ses.SESBackend}
+  AUTH_EMAIL_HOST: ${AUTH_EMAIL_HOST:-}
+  AUTH_EMAIL_PORT: ${AUTH_EMAIL_PORT:-587}
+  AUTH_EMAIL_USE_TLS: ${AUTH_EMAIL_USE_TLS:-True}
+  AUTH_EMAIL_HOST_USER: ${AUTH_EMAIL_HOST_USER:-}
+  AUTH_EMAIL_HOST_PASSWORD: ${AUTH_EMAIL_HOST_PASSWORD:-}
+  AUTH_DEFAULT_FROM_EMAIL: ${AUTH_DEFAULT_FROM_EMAIL:-noreply@aurelia.example}
+  AUTH_PASSWORD_RESET_URL: ${AUTH_PASSWORD_RESET_URL:-http://localhost:3000/reset-password}
+  AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES: ${AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES:-30}
+  AWS_SES_REGION_NAME: ${AWS_SES_REGION_NAME:-ap-south-1}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+  AWS_SES_CONFIGURATION_SET: ${AWS_SES_CONFIGURATION_SET:-}
 
 services:
   auth_db:
@@ -100,33 +132,34 @@ services:
   #   networks:
   #     - app_net
 
-  # --- Not in use yet (uncomment when services use Redis for events/cache) ---
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: redis
-  #   ports:
-  #     - "${REDIS_PORT:-6379}:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
-  #   networks:
-  #     - app_net
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_net
 
   auth-service:
     build:
       context: ./src/backend
       dockerfile: services/auth-service/Dockerfile
     container_name: auth-service
-    env_file:
-      - src/backend/.env
+    environment:
+      <<: *auth-service-env
     ports:
       - "${AUTH_SERVICE_PORT:-8001}:8001"
     depends_on:
       auth_db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test:
@@ -142,16 +175,53 @@ services:
       - app_net
     restart: unless-stopped
 
+  auth-worker:
+    build:
+      context: ./src/backend
+      dockerfile: services/auth-service/Dockerfile
+    container_name: auth-worker
+    command:
+      [
+        "celery",
+        "-A",
+        "auth_service",
+        "worker",
+        "-l",
+        "info",
+        "--concurrency=2",
+      ]
+    environment:
+      <<: *auth-service-env
+    depends_on:
+      auth_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - app_net
+    restart: unless-stopped
+
   catalog-service:
     build:
       context: ./src/backend
       dockerfile: services/catalog-service/Dockerfile
     container_name: catalog-service
-    env_file:
-      - src/backend/.env
     environment:
-      # CATALOG_DB_PORT in .env is the host-mapped port (5433); inside the network postgres listens on 5432.
+      CATALOG_SECRET_KEY: ${CATALOG_SECRET_KEY:-change-me-catalog-django-secret}
+      CATALOG_DEBUG: ${CATALOG_DEBUG:-True}
+      CATALOG_ALLOWED_HOSTS: ${CATALOG_ALLOWED_HOSTS:-localhost,127.0.0.1,catalog-service,admin.localhost,www.localhost}
+      CATALOG_DB_NAME: ${CATALOG_DB_NAME:-catalog_db}
+      CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_user}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:-catalog_password}
+      CATALOG_DB_HOST: catalog_db
       CATALOG_DB_PORT: "5432"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-to-a-long-random-secret}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
     ports:
       - "${CATALOG_SERVICE_PORT:-8002}:8002"
     depends_on:
@@ -274,7 +344,7 @@ volumes:
   # inventory_db_data:
   # order_db_data:
   # payment_db_data:
-  # redis_data:
+  redis_data:
 
 networks:
   app_net:

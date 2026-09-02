@@ -90,21 +90,69 @@ class Address(models.Model):
 
 
 class PasswordResetToken(models.Model):
-    MAX_FAILED_ATTEMPTS = 5
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="password_reset_tokens",
     )
     token_hash = models.CharField(max_length=64, unique=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     used_at = models.DateTimeField(null=True, blank=True)
     failed_attempts = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Reset token for {self.user.email}"
+        status = "used" if self.used_at else "active"
+        return f"Reset token for {self.user.email} ({status})"
+
+
+class EmailJob(models.Model):
+    class EmailType(models.TextChoices):
+        PASSWORD_RESET = "password_reset", "Password reset"
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        SENT = "sent", "Sent"
+        FAILED = "failed", "Failed"
+        DEAD = "dead", "Dead"
+
+    MAX_ATTEMPTS = 3
+
+    email_type = models.CharField(max_length=32, choices=EmailType.choices)
+    recipient = models.EmailField()
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="email_jobs",
+    )
+    password_reset_token = models.ForeignKey(
+        PasswordResetToken,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="email_jobs",
+    )
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    attempts = models.PositiveSmallIntegerField(default=0)
+    celery_task_id = models.CharField(max_length=255, blank=True, default="")
+    last_error = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.get_email_type_display()} → {self.recipient} ({self.get_status_display()})"

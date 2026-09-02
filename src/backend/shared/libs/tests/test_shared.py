@@ -1,12 +1,13 @@
 """Tests for ecommerce_shared."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 import jwt
 import pytest
 
 from ecommerce_shared.events import BaseEvent
 from ecommerce_shared.jwt_utils import TokenValidationError, decode_token, validate_token
+from ecommerce_shared.timezone_utils import format_iso, now as ist_now
 
 SECRET = "test-secret-key-at-least-32-bytes!!"
 
@@ -16,8 +17,8 @@ def _make_token(**extra):
         "sub": "user-1",
         "email": "a@b.com",
         "role": "customer",
-        "iat": datetime.now(tz=timezone.utc),
-        "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=15),
+        "iat": ist_now(),
+        "exp": ist_now() + timedelta(minutes=15),
         **extra,
     }
     return jwt.encode(payload, SECRET, algorithm="HS256")
@@ -31,7 +32,7 @@ def test_decode_token_ok():
 
 
 def test_decode_token_expired():
-    token = _make_token(exp=datetime.now(tz=timezone.utc) - timedelta(minutes=1))
+    token = _make_token(exp=ist_now() - timedelta(minutes=1))
     with pytest.raises(TokenValidationError, match="expired"):
         decode_token(token, secret=SECRET)
 
@@ -53,3 +54,10 @@ def test_base_event_roundtrip():
     assert restored.payload["order_id"] == "ord_1"
     assert restored.source_service == "order-service"
     assert restored.event_id == event.event_id
+    assert format_iso(restored.timestamp).endswith("+05:30")
+
+
+def test_ist_now_and_format_iso():
+    current = ist_now()
+    assert current.tzinfo is not None
+    assert format_iso(current).endswith("+05:30")

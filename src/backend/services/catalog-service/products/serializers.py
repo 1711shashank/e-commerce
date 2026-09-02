@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils.text import slugify
+from ecommerce_shared.timezone_utils import format_iso
 from rest_framework import serializers
 
 from .models import Banner, Category, Product, ProductColor, ProductSize, ProductVariant
@@ -324,7 +325,7 @@ class ProductSerializer(serializers.ModelSerializer):
             data["discountPrice"] = float(instance.discount_price)
         else:
             data["discountPrice"] = None
-        data["createdAt"] = instance.created_at.isoformat().replace("+00:00", "Z")
+        data["createdAt"] = format_iso(instance.created_at)
         data["variants"] = data.pop("variantsRead", [])
         color_images: dict[str, list[str]] = {}
         for color in instance.product_colors.all():
@@ -396,4 +397,6 @@ class BannerSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["id"] = str(instance.id)
+        data["createdAt"] = format_iso(instance.created_at)
+        data["updatedAt"] = format_iso(instance.updated_at)
         return data

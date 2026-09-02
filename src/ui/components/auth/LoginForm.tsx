@@ -80,7 +80,7 @@ export function LoginForm({
           />
         </div>
         <div>
-          <div className="mb-1.5 flex items-center justify-between">
+          <div className="mb-1.5 flex items-center justify-between gap-3">
             <label
               className="block text-xs uppercase tracking-[0.14em] text-muted"
               htmlFor="customer-password"

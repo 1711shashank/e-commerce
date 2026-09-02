@@ -2,7 +2,7 @@
 
 help:
 	@echo "E-commerce — common commands"
-	@echo "  make up             Bring up UI + infra (Postgres x5, Redis, Nginx)"
+	@echo "  make up             Bring up UI + infra (Postgres, Redis, Celery worker, Nginx)"
 	@echo "  make down           Stop and remove containers"
 	@echo "  make logs           Tail logs for all services"
 	@echo "  make ps             Show running containers"

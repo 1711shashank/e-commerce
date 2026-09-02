@@ -76,7 +76,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
 USE_TZ = True
 
@@ -120,60 +120,65 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "password_reset_request": os.environ.get("PASSWORD_RESET_REQUEST_RATE", "10/hour"),
-        "password_reset_email": os.environ.get("PASSWORD_RESET_EMAIL_RATE", "3/hour"),
-        "password_reset_confirm": os.environ.get("PASSWORD_RESET_CONFIRM_RATE", "20/hour"),
+        "password_reset_request": "5/hour",
+        "password_reset_confirm": "20/hour",
     },
 }
 
-EMAIL_BACKEND = os.environ.get(
-    "AUTH_EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend",
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TIMEZONE = TIME_ZONE
+
+
+def _resolve_email_backend() -> str:
+    backend = os.environ.get(
+        "AUTH_EMAIL_BACKEND",
+        "django.core.mail.backends.console.EmailBackend",
+    )
+    if "SESBackend" not in backend:
+        return backend
+
+    access_key = os.environ.get("AWS_ACCESS_KEY_ID", "").strip()
+    secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY", "").strip()
+    if DEBUG and not access_key and not secret_key:
+        return "django.core.mail.backends.console.EmailBackend"
+
+    return "django_ses.SESBackend"
+
+
+EMAIL_BACKEND = _resolve_email_backend()
+EMAIL_HOST = os.environ.get("AUTH_EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("AUTH_EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("AUTH_EMAIL_USE_TLS", "True").lower() in (
+    "1",
+    "true",
+    "yes",
 )
-DEFAULT_FROM_EMAIL = os.environ.get(
-    "AUTH_DEFAULT_FROM_EMAIL",
-    "noreply@aurelia.example",
-)
-PASSWORD_RESET_URL = os.environ.get(
+EMAIL_HOST_USER = os.environ.get("AUTH_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("AUTH_EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("AUTH_DEFAULT_FROM_EMAIL", "noreply@aurelia.example")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+AWS_SES_REGION_NAME = os.environ.get("AWS_SES_REGION_NAME", "ap-south-1")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_SES_CONFIGURATION_SET = os.environ.get("AWS_SES_CONFIGURATION_SET", "")
+AUTH_PASSWORD_RESET_URL = os.environ.get(
     "AUTH_PASSWORD_RESET_URL",
     "http://localhost:3000/reset-password",
 )
-PASSWORD_RESET_TOKEN_LIFETIME_MINUTES = int(
+AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES = int(
     os.environ.get("AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES", "30")
 )
-
-if EMAIL_BACKEND == "django_ses.SESBackend":
-    AWS_SES_REGION_NAME = os.environ.get("AWS_SES_REGION_NAME", "ap-south-1")
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
-    USE_SES_V2 = os.environ.get("AWS_SES_USE_V2", "True").lower() in (
-        "1",
-        "true",
-        "yes",
-    )
-    _ses_endpoint = os.environ.get("AWS_SES_REGION_ENDPOINT", "").strip()
-    if _ses_endpoint:
-        AWS_SES_REGION_ENDPOINT = _ses_endpoint
-    _ses_config_set = os.environ.get("AWS_SES_CONFIGURATION_SET", "").strip()
-    if _ses_config_set:
-        AWS_SES_CONFIGURATION_SET = _ses_config_set
-else:
-    EMAIL_HOST = os.environ.get("AUTH_EMAIL_HOST", "")
-    EMAIL_PORT = int(os.environ.get("AUTH_EMAIL_PORT", "587"))
-    EMAIL_USE_TLS = os.environ.get("AUTH_EMAIL_USE_TLS", "True").lower() in (
-        "1",
-        "true",
-        "yes",
-    )
-    EMAIL_HOST_USER = os.environ.get("AUTH_EMAIL_HOST_USER", "")
-    EMAIL_HOST_PASSWORD = os.environ.get("AUTH_EMAIL_HOST_PASSWORD", "")
-
-if not DEBUG and EMAIL_BACKEND.endswith("console.EmailBackend"):
-    import logging
-
-    logging.getLogger(__name__).warning(
-        "AUTH_EMAIL_BACKEND is console in production; password reset emails will not be delivered."
-    )
 
 # Jazzmin 3.0.1 — classic AdminLTE look (dark sidebar, white navbar)
 JAZZMIN_SETTINGS = {

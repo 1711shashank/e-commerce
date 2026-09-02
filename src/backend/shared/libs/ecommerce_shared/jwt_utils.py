@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 import jwt
+
+from ecommerce_shared.timezone_utils import APP_TIMEZONE, now as ist_now
 
 
 class TokenValidationError(Exception):
@@ -79,8 +81,8 @@ def validate_token(
 
     exp = claims.get("exp")
     if exp is not None:
-        exp_dt = datetime.fromtimestamp(exp, tz=timezone.utc)
-        if exp_dt < datetime.now(tz=timezone.utc):
+        exp_dt = datetime.fromtimestamp(exp, tz=APP_TIMEZONE)
+        if exp_dt < ist_now():
             raise TokenValidationError("Token has expired")
 
     return claims

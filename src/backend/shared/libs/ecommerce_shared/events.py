@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
-
-def _utc_now() -> datetime:
-    return datetime.now(tz=timezone.utc)
+from ecommerce_shared.timezone_utils import now as ist_now
 
 
 class BaseEvent(BaseModel):
@@ -22,7 +20,7 @@ class BaseEvent(BaseModel):
     event_id: str = Field(default_factory=lambda: str(uuid4()))
     event_type: str
     payload: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=_utc_now)
+    timestamp: datetime = Field(default_factory=ist_now)
     source_service: str
 
     model_config = {"extra": "forbid"}

@@ -1,166 +1,147 @@
 import hashlib
-import logging
 import secrets
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils import timezone
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
-from rest_framework_simplejwt.token_blacklist.models import (
-    BlacklistedToken,
-    OutstandingToken,
-)
-
-from .models import PasswordResetToken
+from .models import EmailJob, PasswordResetToken
+from .tasks import send_password_reset_email
 
 User = get_user_model()
-logger = logging.getLogger(__name__)
-
-GENERIC_RESET_MESSAGE = (
-    "If an account exists with that email, a reset link has been sent."
-)
 
 
-def hash_token(raw_token: str) -> str:
-    return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+class PasswordResetError(Exception):
+    def __init__(self, message: str, field: str = "non_field_errors"):
+        self.message = message
+        self.field = field
+        super().__init__(message)
 
 
-def normalize_reset_email(email: str) -> str:
-    return User.objects.normalize_email(email.strip())
+def _token_lifetime() -> timedelta:
+    minutes = int(getattr(settings, "AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES", 30))
+    return timedelta(minutes=minutes)
 
 
-def _reset_lifetime_minutes() -> int:
-    return int(getattr(settings, "PASSWORD_RESET_TOKEN_LIFETIME_MINUTES", 30))
+def build_reset_url(token: str) -> str:
+    base = settings.AUTH_PASSWORD_RESET_URL.rstrip("/")
+    return f"{base}?token={token}"
 
 
-def _reset_base_url() -> str:
-    return getattr(settings, "PASSWORD_RESET_URL", "http://localhost:3000/reset-password").rstrip("/")
+def _hash_token(raw_token: str) -> str:
+    return hashlib.sha256(raw_token.encode()).hexdigest()
 
 
-def blacklist_user_refresh_tokens(user) -> None:
-    for outstanding in OutstandingToken.objects.filter(user_id=user.id):
-        BlacklistedToken.objects.get_or_create(token=outstanding)
-
-
-def invalidate_unused_tokens(user) -> None:
-    now = timezone.now()
-    PasswordResetToken.objects.filter(
-        user=user,
-        used_at__isnull=True,
-        expires_at__gt=now,
-    ).update(used_at=now)
-
-
-def create_reset_token(user) -> str:
-    invalidate_unused_tokens(user)
-    raw_token = secrets.token_urlsafe(32)
-    PasswordResetToken.objects.create(
-        user=user,
-        token_hash=hash_token(raw_token),
-        expires_at=timezone.now() + timezone.timedelta(minutes=_reset_lifetime_minutes()),
-    )
-    return raw_token
-
-
-def send_password_reset_email(user, raw_token: str) -> None:
-    reset_url = f"{_reset_base_url()}?token={raw_token}"
-    lifetime = _reset_lifetime_minutes()
-    subject = "Reset your Aurelia password"
-    message = (
-        f"Hi,\n\n"
-        f"We received a request to reset the password for your Aurelia account.\n\n"
-        f"Reset your password:\n{reset_url}\n\n"
-        f"This link expires in {lifetime} minutes and can only be used once.\n\n"
-        f"If you did not request this, you can ignore this email.\n"
-    )
-    from_email = settings.DEFAULT_FROM_EMAIL
-    try:
-        send_mail(subject, message, from_email, [user.email], fail_silently=False)
-    except Exception:
-        logger.exception("Failed to send password reset email for user_id=%s", user.id)
-        raise
-
-
-def request_password_reset(email: str) -> str:
-    normalized = normalize_reset_email(email)
+def request_password_reset(email: str) -> None:
+    normalized = User.objects.normalize_email(email.strip())
     user = User.objects.filter(email__iexact=normalized).first()
-    if (
-        user is None
-        or not user.is_active
-        or user.role != User.Role.CUSTOMER
-    ):
-        return GENERIC_RESET_MESSAGE
+    if not user or not user.is_active or user.role != User.Role.CUSTOMER:
+        return
 
-    raw_token = create_reset_token(user)
-    try:
-        send_password_reset_email(user, raw_token)
-    except Exception:
-        PasswordResetToken.objects.filter(
-            user=user,
-            token_hash=hash_token(raw_token),
-            used_at__isnull=True,
-        ).update(used_at=timezone.now())
-    return GENERIC_RESET_MESSAGE
+    token_obj, raw_token = _create_password_reset_token(user)
+    _enqueue_password_reset_email(user, token_obj, build_reset_url(raw_token))
+
+
+def _enqueue_password_reset_email(
+    user: User,
+    token_obj: PasswordResetToken,
+    reset_url: str,
+) -> EmailJob:
+    job = EmailJob.objects.create(
+        email_type=EmailJob.EmailType.PASSWORD_RESET,
+        recipient=user.email,
+        user=user,
+        password_reset_token=token_obj,
+        status=EmailJob.Status.PENDING,
+    )
+    async_result = send_password_reset_email.delay(job.id, user.email, reset_url)
+    if async_result.id:
+        job.celery_task_id = async_result.id
+        job.save(update_fields=["celery_task_id", "updated_at"])
+    return job
+
+
+@transaction.atomic
+def _create_password_reset_token(user: User) -> tuple[PasswordResetToken, str]:
+    now = timezone.now()
+    PasswordResetToken.objects.filter(user=user, used_at__isnull=True).update(used_at=now)
+    raw_token = secrets.token_urlsafe(32)
+    token_obj = PasswordResetToken.objects.create(
+        user=user,
+        token_hash=_hash_token(raw_token),
+        expires_at=now + _token_lifetime(),
+    )
+    return token_obj, raw_token
 
 
 def get_valid_reset_token(raw_token: str) -> PasswordResetToken | None:
-    if not raw_token or len(raw_token) > 128:
+    token = raw_token.strip()
+    if not token or len(token) > 128:
         return None
-    token_hash = hash_token(raw_token.strip())
-    now = timezone.now()
-    return (
+    token_hash = _hash_token(token)
+    token_obj = (
         PasswordResetToken.objects.select_related("user")
-        .filter(
-            token_hash=token_hash,
-            used_at__isnull=True,
-            expires_at__gt=now,
-            failed_attempts__lt=PasswordResetToken.MAX_FAILED_ATTEMPTS,
-        )
+        .filter(token_hash=token_hash, used_at__isnull=True)
         .first()
     )
-
-
-def record_failed_reset_attempt(raw_token: str) -> None:
-    if not raw_token:
-        return
-    token_hash = hash_token(raw_token.strip())
-    token = PasswordResetToken.objects.filter(
-        token_hash=token_hash,
-        used_at__isnull=True,
-    ).first()
-    if token is None:
-        return
-    token.failed_attempts += 1
-    token.save(update_fields=["failed_attempts"])
+    if not token_obj:
+        return None
+    if token_obj.expires_at <= timezone.now():
+        return None
+    user = token_obj.user
+    if not user.is_active or user.role != User.Role.CUSTOMER:
+        return None
+    return token_obj
 
 
 @transaction.atomic
 def confirm_password_reset(raw_token: str, new_password: str) -> None:
-    reset_token = get_valid_reset_token(raw_token)
-    if reset_token is None:
-        record_failed_reset_attempt(raw_token)
-        raise ValueError("invalid_token")
+    token = raw_token.strip()
+    token_hash = _hash_token(token)
+    token_obj = (
+        PasswordResetToken.objects.select_for_update()
+        .select_related("user")
+        .filter(token_hash=token_hash, used_at__isnull=True)
+        .first()
+    )
+    if not token_obj or token_obj.expires_at <= timezone.now():
+        raise PasswordResetError(
+            "This reset link is invalid or has expired.",
+            field="token",
+        )
 
-    user = reset_token.user
+    user = token_obj.user
     if not user.is_active or user.role != User.Role.CUSTOMER:
-        record_failed_reset_attempt(raw_token)
-        raise ValueError("invalid_token")
+        raise PasswordResetError(
+            "This reset link is invalid or has expired.",
+            field="token",
+        )
 
     if user.check_password(new_password):
-        raise ValueError("same_password")
+        raise PasswordResetError(
+            "New password must be different from the current password.",
+            field="new_password",
+        )
+
+    try:
+        validate_password(new_password, user)
+    except DjangoValidationError as exc:
+        raise PasswordResetError(exc.messages[0], field="new_password") from exc
 
     user.set_password(new_password)
     user.save(update_fields=["password"])
 
-    now = timezone.now()
-    updated = PasswordResetToken.objects.filter(
-        pk=reset_token.pk,
-        used_at__isnull=True,
-    ).update(used_at=now)
-    if updated == 0:
-        raise ValueError("invalid_token")
+    token_obj.used_at = timezone.now()
+    token_obj.save(update_fields=["used_at"])
 
-    invalidate_unused_tokens(user)
-    blacklist_user_refresh_tokens(user)
+    _blacklist_user_refresh_tokens(user)
+
+
+def _blacklist_user_refresh_tokens(user: User) -> None:
+    for outstanding in OutstandingToken.objects.filter(user_id=user.id):
+        BlacklistedToken.objects.get_or_create(token=outstanding)

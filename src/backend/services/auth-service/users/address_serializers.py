@@ -1,3 +1,4 @@
+from ecommerce_shared.timezone_utils import format_iso
 from rest_framework import serializers
 
 from .address_services import promote_next_default, set_default_address, validate_mobile
@@ -27,6 +28,13 @@ class AddressSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = ("id", "display_label", "created_at", "updated_at")
+
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["created_at"] = format_iso(instance.created_at)
+        data["updated_at"] = format_iso(instance.updated_at)
+        return data
 
 
 class AddressWriteSerializer(serializers.ModelSerializer):

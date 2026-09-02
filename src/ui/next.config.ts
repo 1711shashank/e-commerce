@@ -9,18 +9,6 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // Django APIs require trailing slashes; without this, POST /api/auth/login/ → 308 → 500
   skipTrailingSlashRedirect: true,
-  async headers() {
-    return [
-      {
-        source: "/reset-password",
-        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
-      },
-      {
-        source: "/forgot-password",
-        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {
