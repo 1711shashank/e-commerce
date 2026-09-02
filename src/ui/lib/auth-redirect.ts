@@ -8,6 +8,9 @@ export function sanitizeNextPath(
   if (!next.startsWith("/") || next.startsWith("//")) return fallback;
   if (next.startsWith("/admin")) return fallback;
   if (next.startsWith("/login") || next.startsWith("/signup")) return fallback;
+  if (next.startsWith("/forgot-password") || next.startsWith("/reset-password")) {
+    return fallback;
+  }
 
   try {
     const url = new URL(next, "http://localhost");

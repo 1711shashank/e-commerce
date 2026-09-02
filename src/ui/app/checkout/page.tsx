@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RequireCustomerAuth } from "@/components/auth/RequireCustomerAuth";
+import {
+  CheckoutShipping,
+  validateShippingFields,
+  type ShippingFields,
+} from "@/components/checkout/CheckoutShipping";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { validateCartAgainstCatalog } from "@/lib/cart-stock";
@@ -17,9 +22,18 @@ function CheckoutContent() {
   const { catalog, loaded } = useProductCatalog();
   const [placed, setPlaced] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [shippingAddress, setShippingAddress] = useState<ShippingFields>({
+    fullName: "",
+    mobile: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+  });
   const subtotal = cartSubtotal();
-  const shipping = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
-  const total = subtotal + shipping;
+  const shippingCost = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
+  const total = subtotal + shippingCost;
 
   useEffect(() => {
     if (loaded) reconcileCart(catalog);
@@ -90,6 +104,12 @@ function CheckoutContent() {
                 return;
               }
 
+              const shippingError = validateShippingFields(shippingAddress);
+              if (shippingError) {
+                setCheckoutError(shippingError);
+                return;
+              }
+
               clearCart();
               setPlaced(true);
             }}
@@ -115,45 +135,7 @@ function CheckoutContent() {
                 className="min-h-12 w-full border border-border bg-surface px-4 text-sm"
               />
             </fieldset>
-            <fieldset className="space-y-4">
-              <legend className="font-display text-2xl">Shipping</legend>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <input
-                  required
-                  placeholder="First name"
-                  defaultValue={user?.first_name ?? ""}
-                  className="min-h-12 border border-border bg-surface px-4 text-sm"
-                />
-                <input
-                  required
-                  placeholder="Last name"
-                  defaultValue={user?.last_name ?? ""}
-                  className="min-h-12 border border-border bg-surface px-4 text-sm"
-                />
-              </div>
-              <input
-                required
-                placeholder="Address"
-                className="min-h-12 w-full border border-border bg-surface px-4 text-sm"
-              />
-              <div className="grid gap-4 sm:grid-cols-3">
-                <input
-                  required
-                  placeholder="City"
-                  className="min-h-12 border border-border bg-surface px-4 text-sm"
-                />
-                <input
-                  required
-                  placeholder="State"
-                  className="min-h-12 border border-border bg-surface px-4 text-sm"
-                />
-                <input
-                  required
-                  placeholder="ZIP"
-                  className="min-h-12 border border-border bg-surface px-4 text-sm"
-                />
-              </div>
-            </fieldset>
+            <CheckoutShipping value={shippingAddress} onChange={setShippingAddress} />
             <fieldset className="space-y-4">
               <legend className="font-display text-2xl">Payment</legend>
               <p className="text-sm text-muted">
@@ -211,7 +193,7 @@ function CheckoutContent() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
-                <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
+                <span>{shippingCost === 0 ? "Free" : formatPrice(shippingCost)}</span>
               </div>
               <div className="flex justify-between text-base font-medium">
                 <span>Total</span>

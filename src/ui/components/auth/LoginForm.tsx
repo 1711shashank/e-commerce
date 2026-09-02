@@ -80,12 +80,20 @@ export function LoginForm({
           />
         </div>
         <div>
-          <label
-            className="mb-1.5 block text-xs uppercase tracking-[0.14em] text-muted"
-            htmlFor="customer-password"
-          >
-            Password
-          </label>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label
+              className="block text-xs uppercase tracking-[0.14em] text-muted"
+              htmlFor="customer-password"
+            >
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-muted underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <input
             id="customer-password"
             type="password"

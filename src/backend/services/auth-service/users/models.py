@@ -38,6 +38,7 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.CUSTOMER,
     )
+    mobile = models.CharField(max_length=20, blank=True, default="")
 
     objects = UserManager()
 
@@ -46,3 +47,64 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+
+class Address(models.Model):
+    class AddressType(models.TextChoices):
+        HOME = "home", "Home"
+        OFFICE = "office", "Office"
+        OTHER = "other", "Other"
+
+    MAX_PER_USER = 10
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="addresses",
+    )
+    full_name = models.CharField(max_length=150)
+    mobile = models.CharField(max_length=20)
+    address_type = models.CharField(max_length=20, choices=AddressType.choices)
+    custom_label = models.CharField(max_length=50, blank=True, default="")
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, blank=True, default="")
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=2, default="IN")
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-is_default", "-updated_at"]
+
+    def __str__(self) -> str:
+        return f"{self.full_name} — {self.city}"
+
+    @property
+    def display_label(self) -> str:
+        if self.address_type == self.AddressType.OTHER and self.custom_label:
+            return self.custom_label
+        return self.get_address_type_display()
+
+
+class PasswordResetToken(models.Model):
+    MAX_FAILED_ATTEMPTS = 5
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens",
+    )
+    token_hash = models.CharField(max_length=64, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Reset token for {self.user.email}"

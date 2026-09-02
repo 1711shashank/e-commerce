@@ -29,6 +29,7 @@ type CustomerAuthState = {
   logout: () => Promise<void>;
   clearSession: () => void;
   isCustomer: () => boolean;
+  setUser: (user: AuthUser) => void;
 };
 
 export const useCustomerAuthStore = create<CustomerAuthState>()(
@@ -92,6 +93,10 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
       isCustomer: () => {
         const user = get().user;
         return user?.role === "customer" && Boolean(get().access);
+      },
+
+      setUser: (user: AuthUser) => {
+        set({ user });
       },
     }),
     {

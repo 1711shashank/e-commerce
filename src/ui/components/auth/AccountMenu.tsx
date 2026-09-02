@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, User } from "lucide-react";
+import { LogOut, MapPin, User } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCustomerAuthStore } from "@/lib/customer-auth-store";
@@ -67,6 +68,22 @@ export function AccountMenu() {
         )}
       >
         <p className="px-4 py-2 text-xs text-muted truncate">{user?.email}</p>
+        <Link
+          href="/account"
+          onClick={() => setOpen(false)}
+          className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-background"
+        >
+          <User className="h-4 w-4" />
+          Profile
+        </Link>
+        <Link
+          href="/account/addresses"
+          onClick={() => setOpen(false)}
+          className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-background"
+        >
+          <MapPin className="h-4 w-4" />
+          Saved addresses
+        </Link>
         <button
           type="button"
           onClick={handleLogout}

@@ -14,6 +14,7 @@ export type AuthUser = {
   role: "customer" | "staff" | "admin";
   first_name?: string;
   last_name?: string;
+  mobile?: string;
 };
 
 type AuthState = {
