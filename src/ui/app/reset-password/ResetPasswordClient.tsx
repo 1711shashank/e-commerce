@@ -1,15 +1,15 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 
 export default function ResetPasswordClient() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? undefined;
+  const [token] = useState(() => searchParams.get("token")?.trim() ?? "");
 
   useEffect(() => {
-    if (token && typeof window !== "undefined") {
+    if (token) {
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, [token]);

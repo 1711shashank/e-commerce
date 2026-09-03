@@ -8,6 +8,12 @@ import {
   registerCustomerSessionExpiredHandler,
 } from "@/lib/auth-session";
 import type { AuthUser } from "@/lib/auth-store";
+import {
+  registerCustomer,
+  resendVerificationOtp,
+  verifyEmailOtp,
+  type VerifyEmailResponse,
+} from "@/lib/email-verification-api";
 
 type LoginResponse = {
   access: string;
@@ -25,12 +31,30 @@ type CustomerAuthState = {
     password: string,
     firstName?: string,
     lastName?: string,
-  ) => Promise<void>;
+  ) => Promise<string>;
+  verifyEmail: (email: string, otp: string) => Promise<void>;
+  resendVerificationOtp: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   clearSession: () => void;
   isCustomer: () => boolean;
   setUser: (user: AuthUser) => void;
 };
+
+function applyAuthSession(
+  set: (partial: Partial<CustomerAuthState>) => void,
+  data: VerifyEmailResponse | LoginResponse,
+) {
+  if (data.user.role !== "customer") {
+    throw new Error(
+      "This account is for staff access. Use the admin portal to sign in.",
+    );
+  }
+  set({
+    access: data.access,
+    refresh: data.refresh,
+    user: data.user,
+  });
+}
 
 export const useCustomerAuthStore = create<CustomerAuthState>()(
   persist(
@@ -44,29 +68,26 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
           method: "POST",
           body: { email, password },
         });
-        if (data.user.role !== "customer") {
-          throw new Error(
-            "This account is for staff access. Use the admin portal to sign in.",
-          );
-        }
-        set({
-          access: data.access,
-          refresh: data.refresh,
-          user: data.user,
-        });
+        applyAuthSession(set, data);
       },
 
       register: async (email, password, firstName, lastName) => {
-        await apiRequest("/auth/register/", {
-          method: "POST",
-          body: {
-            email,
-            password,
-            first_name: firstName ?? "",
-            last_name: lastName ?? "",
-          },
+        const data = await registerCustomer({
+          email,
+          password,
+          firstName,
+          lastName,
         });
-        await get().customerLogin(email, password);
+        return data.email;
+      },
+
+      verifyEmail: async (email, otp) => {
+        const data = await verifyEmailOtp(email, otp);
+        applyAuthSession(set, data);
+      },
+
+      resendVerificationOtp: async (email) => {
+        await resendVerificationOtp(email);
       },
 
       logout: async () => {

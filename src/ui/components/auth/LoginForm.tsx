@@ -6,8 +6,22 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { ApiError } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { buildSignupUrl } from "@/lib/auth-redirect";
+import { buildSignupUrl, buildVerifyEmailUrl } from "@/lib/auth-redirect";
 import { useCustomerAuthStore } from "@/lib/customer-auth-store";
+
+function firstErrorValue(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value) && value.length > 0) return String(value[0]);
+  return null;
+}
+
+function isEmailNotVerifiedError(err: ApiError): boolean {
+  if (typeof err.body !== "object" || !err.body) return false;
+  const body = err.body as Record<string, unknown>;
+  if (firstErrorValue(body.code) === "email_not_verified") return true;
+  const detail = firstErrorValue(body.detail);
+  return Boolean(detail?.toLowerCase().includes("verify your email"));
+}
 
 export function LoginForm({
   nextPath = "/",
@@ -28,11 +42,16 @@ export function LoginForm({
     e.preventDefault();
     setLoading(true);
     setError(null);
+    const trimmedEmail = email.trim();
     try {
-      await customerLogin(email.trim(), password);
+      await customerLogin(trimmedEmail, password);
       router.replace(nextPath);
       router.refresh();
     } catch (err) {
+      if (err instanceof ApiError && isEmailNotVerifiedError(err)) {
+        router.push(buildVerifyEmailUrl(trimmedEmail, nextPath));
+        return;
+      }
       if (err instanceof ApiError) {
         setError(
           err.status === 401

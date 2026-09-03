@@ -20,6 +20,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("email_verified", True)
         extra_fields.setdefault("role", User.Role.ADMIN)
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
@@ -43,6 +45,7 @@ class User(AbstractUser):
         default=Role.CUSTOMER,
     )
     mobile = models.CharField(max_length=20, blank=True, default="")
+    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -113,9 +116,32 @@ class PasswordResetToken(UUIDPrimaryKeyModel):
         return f"Reset token for {self.user.email} ({status})"
 
 
+class EmailVerificationOTP(UUIDPrimaryKeyModel):
+    MAX_FAILED_ATTEMPTS = 5
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="email_verification_otps",
+    )
+    otp_hash = models.CharField(max_length=64, db_index=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        status = "used" if self.used_at else "active"
+        return f"Email OTP for {self.user.email} ({status})"
+
+
 class EmailJob(UUIDPrimaryKeyModel):
     class EmailType(models.TextChoices):
         PASSWORD_RESET = "password_reset", "Password reset"
+        EMAIL_VERIFICATION = "email_verification", "Email verification"
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
@@ -137,6 +163,13 @@ class EmailJob(UUIDPrimaryKeyModel):
     )
     password_reset_token = models.ForeignKey(
         PasswordResetToken,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="email_jobs",
+    )
+    email_verification_otp = models.ForeignKey(
+        EmailVerificationOTP,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

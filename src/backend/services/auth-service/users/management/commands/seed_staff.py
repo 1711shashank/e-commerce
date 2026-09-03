@@ -45,11 +45,15 @@ class Command(BaseCommand):
                 "role": role,
                 "is_staff": True,
                 "is_superuser": is_superuser,
+                "is_active": True,
+                "email_verified": True,
             },
         )
         user.role = role
         user.is_staff = True
         user.is_superuser = is_superuser
+        user.is_active = True
+        user.email_verified = True
         user.set_password(password)
         user.save()
         action = "Created" if created else "Updated"

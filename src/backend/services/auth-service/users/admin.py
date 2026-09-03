@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.html import format_html
 
-from .models import Address, EmailJob, PasswordResetToken, User
+from .models import Address, EmailJob, EmailVerificationOTP, PasswordResetToken, User
 
 STATUS_COLORS = {
     EmailJob.Status.PENDING: "#6c757d",
@@ -49,20 +49,41 @@ class EmailJobInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     ordering = ("email",)
-    list_display = ("email", "role", "is_staff", "is_active")
+    list_display = ("email", "role", "email_verified", "is_staff", "is_active")
+    list_filter = ("role", "email_verified", "is_active", "is_staff")
     search_fields = ("email",)
     inlines = [AddressInline]
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Profile", {"fields": ("first_name", "last_name", "mobile")}),
-        ("Permissions", {"fields": ("role", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "role",
+                    "email_verified",
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
     )
     add_fieldsets = (
         (
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "password1", "password2", "role", "is_staff"),
+                "fields": (
+                    "email",
+                    "password1",
+                    "password2",
+                    "role",
+                    "email_verified",
+                    "is_staff",
+                ),
             },
         ),
     )
@@ -74,6 +95,23 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
     list_filter = ("used_at",)
     search_fields = ("user__email",)
     readonly_fields = ("user", "token_hash", "expires_at", "used_at", "failed_attempts", "created_at")
+    ordering = ("-created_at",)
+    inlines = [EmailJobInline]
+
+
+@admin.register(EmailVerificationOTP)
+class EmailVerificationOTPAdmin(admin.ModelAdmin):
+    list_display = ("user", "expires_at", "used_at", "failed_attempts", "created_at")
+    list_filter = ("used_at",)
+    search_fields = ("user__email",)
+    readonly_fields = (
+        "user",
+        "otp_hash",
+        "expires_at",
+        "used_at",
+        "failed_attempts",
+        "created_at",
+    )
     ordering = ("-created_at",)
     inlines = [EmailJobInline]
 
@@ -96,6 +134,7 @@ class EmailJobAdmin(admin.ModelAdmin):
         "recipient",
         "user",
         "password_reset_token",
+        "email_verification_otp",
         "status_badge",
         "attempts",
         "celery_task_id",

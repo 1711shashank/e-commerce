@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { ApiError } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { buildLoginUrl } from "@/lib/auth-redirect";
+import { buildLoginUrl, buildVerifyEmailUrl } from "@/lib/auth-redirect";
 import { useCustomerAuthStore } from "@/lib/customer-auth-store";
 
 export function SignupForm({
@@ -40,14 +40,13 @@ export function SignupForm({
 
     setLoading(true);
     try {
-      await register(
+      const registeredEmail = await register(
         email.trim(),
         password,
         firstName.trim(),
         lastName.trim(),
       );
-      router.replace(nextPath);
-      router.refresh();
+      router.replace(buildVerifyEmailUrl(registeredEmail, nextPath));
     } catch (err) {
       if (err instanceof ApiError) {
         setError(

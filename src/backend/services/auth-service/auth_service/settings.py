@@ -122,6 +122,8 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "password_reset_request": "5/hour",
         "password_reset_confirm": "20/hour",
+        "email_verification_verify": "20/hour",
+        "email_verification_resend": "5/hour",
     },
 }
 
@@ -178,6 +180,12 @@ AUTH_PASSWORD_RESET_URL = os.environ.get(
 )
 AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES = int(
     os.environ.get("AUTH_PASSWORD_RESET_TOKEN_LIFETIME_MINUTES", "30")
+)
+AUTH_EMAIL_VERIFICATION_OTP_LIFETIME_MINUTES = int(
+    os.environ.get("AUTH_EMAIL_VERIFICATION_OTP_LIFETIME_MINUTES", "10")
+)
+AUTH_EMAIL_VERIFICATION_OTP_LENGTH = int(
+    os.environ.get("AUTH_EMAIL_VERIFICATION_OTP_LENGTH", "6")
 )
 
 # Jazzmin 3.0.1 — classic AdminLTE look (dark sidebar, white navbar)

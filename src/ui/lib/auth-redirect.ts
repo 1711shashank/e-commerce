@@ -8,6 +8,7 @@ export function sanitizeNextPath(
   if (!next.startsWith("/") || next.startsWith("//")) return fallback;
   if (next.startsWith("/admin")) return fallback;
   if (next.startsWith("/login") || next.startsWith("/signup")) return fallback;
+  if (next.startsWith("/verify-email")) return fallback;
   if (next.startsWith("/forgot-password") || next.startsWith("/reset-password")) {
     return fallback;
   }
@@ -30,4 +31,17 @@ export function buildSignupUrl(nextPath?: string): string {
   const next = sanitizeNextPath(nextPath);
   if (next === DEFAULT_NEXT) return "/signup";
   return `/signup?next=${encodeURIComponent(next)}`;
+}
+
+export function buildVerifyEmailUrl(
+  email: string,
+  nextPath?: string,
+): string {
+  const params = new URLSearchParams();
+  params.set("email", email.trim());
+  const next = sanitizeNextPath(nextPath);
+  if (next !== DEFAULT_NEXT) {
+    params.set("next", next);
+  }
+  return `/verify-email?${params.toString()}`;
 }

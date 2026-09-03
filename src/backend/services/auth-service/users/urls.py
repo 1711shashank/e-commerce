@@ -1,11 +1,18 @@
 from django.urls import path
 
 from .address_views import AddressDetailView, AddressListCreateView, AddressSetDefaultView
+from .email_verification_views import ResendVerificationOTPView, VerifyEmailView
 from .password_reset_views import PasswordResetConfirmView, PasswordResetRequestView
 from .views import ChangePasswordView, LoginView, LogoutView, MeView, RefreshView, RegisterView
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="auth-register"),
+    path("verify-email/", VerifyEmailView.as_view(), name="auth-verify-email"),
+    path(
+        "resend-verification-otp/",
+        ResendVerificationOTPView.as_view(),
+        name="auth-resend-verification-otp",
+    ),
     path("login/", LoginView.as_view(), name="auth-login"),
     path("token/refresh/", RefreshView.as_view(), name="auth-refresh"),
     path("logout/", LogoutView.as_view(), name="auth-logout"),

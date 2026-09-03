@@ -68,13 +68,48 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("email", "password", "first_name", "last_name")
 
     def create(self, validated_data):
-        return User.objects.create_user(
-            email=validated_data["email"],
-            password=validated_data["password"],
-            first_name=validated_data.get("first_name", ""),
-            last_name=validated_data.get("last_name", ""),
+        from .email_verification_services import issue_and_send_verification_otp
+
+        email = User.objects.normalize_email(validated_data["email"])
+        password = validated_data["password"]
+        first_name = validated_data.get("first_name", "")
+        last_name = validated_data.get("last_name", "")
+
+        existing = User.objects.filter(
+            email__iexact=email,
             role=User.Role.CUSTOMER,
-        )
+            email_verified=False,
+        ).first()
+
+        if existing:
+            existing.set_password(password)
+            existing.first_name = first_name
+            existing.last_name = last_name
+            existing.is_active = False
+            existing.email_verified = False
+            existing.save(
+                update_fields=[
+                    "password",
+                    "first_name",
+                    "last_name",
+                    "is_active",
+                    "email_verified",
+                ]
+            )
+            user = existing
+        else:
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role=User.Role.CUSTOMER,
+                is_active=False,
+                email_verified=False,
+            )
+
+        issue_and_send_verification_otp(user)
+        return user
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -96,6 +131,23 @@ class LoginSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
+        email = attrs.get(self.username_field, "")
+        password = attrs.get("password", "")
+        normalized = User.objects.normalize_email(str(email).strip())
+        candidate = User.objects.filter(email__iexact=normalized).first()
+        if (
+            candidate
+            and candidate.check_password(password)
+            and candidate.role == User.Role.CUSTOMER
+            and not candidate.email_verified
+        ):
+            raise serializers.ValidationError(
+                {
+                    "detail": "Please verify your email before signing in.",
+                    "code": "email_not_verified",
+                }
+            )
+
         data = super().validate(attrs)
         data["user"] = UserSerializer(self.user).data
         return data
