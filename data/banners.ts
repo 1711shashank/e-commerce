@@ -3,52 +3,53 @@ import type { Banner } from "@/lib/types";
 export const banners: Banner[] = [
   {
     id: "banner-1",
-    title: "Spring Lawn Collection",
-    subtitle: "Light fabrics, bold prints — new season arrivals",
-    ctaLabel: "Shop New Arrivals",
-    ctaHref: "/collections/women",
+    title: "Luxury Lawn Collection '26",
+    subtitle: "Exquisite hand-embroidery, pure silk dupattas & breezy unstitched 3-piece sets",
+    ctaLabel: "Shop Unstitched Lawn",
+    ctaHref: "/collections/unstitched",
     image:
-      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80",
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1600&q=80",
   },
   {
     id: "banner-2",
-    title: "Mid-Season Sale",
-    subtitle: "Up to 40% off selected ready-to-wear",
-    ctaLabel: "Shop Sale",
-    ctaHref: "/collections/sale",
+    title: "The Modest Abaya & Kaftan Edit",
+    subtitle: "Graceful cuts, rich crepe textures & embroidered kaftans complete with matching Sheila",
+    ctaLabel: "Explore Modest Wear",
+    ctaHref: "/collections/abayas-kaftans",
     image:
-      "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1600&q=80",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=1600&q=80",
   },
   {
     id: "banner-3",
-    title: "Menswear Essentials",
-    subtitle: "Tailored shirts and everyday kurtas",
-    ctaLabel: "Explore Men",
-    ctaHref: "/collections/men",
+    title: "Shehnai Festive & Wedding Formals",
+    subtitle: "Opulent zari, sequins & gotta craftsmanship designed for celebratory moments",
+    ctaLabel: "Discover Formals",
+    ctaHref: "/collections/luxury-formals",
     image:
-      "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=1600&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1600&q=80",
   },
 ];
 
 export const promoStrips = [
   {
     id: "promo-1",
-    title: "Free Shipping",
-    description: "On orders over ₹7,199",
+    title: "Complimentary UAE Delivery",
+    description: "On all orders above AED 350",
   },
   {
     id: "promo-2",
-    title: "Easy Returns",
-    description: "30-day hassle-free returns",
+    title: "Expert Custom Stitching",
+    description: "Master tailored to your size",
   },
   {
     id: "promo-3",
-    title: "Secure Checkout",
-    description: "Encrypted payment processing",
+    title: "Worldwide Express Shipping",
+    description: "Delivering across GCC, UK, US & worldwide",
   },
   {
     id: "promo-4",
-    title: "New Drops Weekly",
-    description: "Fresh styles every Friday",
+    title: "100% Authentic Designer Wear",
+    description: "Heirloom fabrics & genuine craftsmanship",
   },
 ];
+

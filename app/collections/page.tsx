@@ -6,26 +6,25 @@ import { getParentCategories } from "@/lib/services";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Browse all Aurelia clothing collections.",
+  description: "Browse all Kusum ethnic and modest clothing collections.",
 };
 
 export default function CollectionsPage() {
   const categories = getParentCategories();
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+    <div className="mx-auto max-w-[1536px] px-4 py-8 sm:px-8 xl:px-12 lg:py-10">
       <Breadcrumb
         className="mb-8"
         items={[{ label: "Home", href: "/" }, { label: "Collections" }]}
       />
-      <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl">
+      <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium">
         Collections
       </h1>
       <p className="mt-3 max-w-xl text-sm text-muted sm:text-base">
-        Explore our full catalog — from lawn and unstitched to ready-to-wear and
-        menswear.
+        Explore our signature collections — from luxury unstitched lawn and festive pret to royal wedding formals and modest abayas.
       </p>
-      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {categories.map((category) => (
           <Link
             key={category.id}

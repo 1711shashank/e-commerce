@@ -16,14 +16,20 @@ interface StoreState {
     size: string,
     color: string,
     quantity?: number,
-    options?: { openCart?: boolean },
+    options?: { openCart?: boolean; stitchingType?: "unstitched" | "stitched" },
   ) => void;
-  removeFromCart: (productId: string, size: string, color: string) => void;
+  removeFromCart: (
+    productId: string,
+    size: string,
+    color: string,
+    stitchingType?: string,
+  ) => void;
   updateQuantity: (
     productId: string,
     size: string,
     color: string,
     quantity: number,
+    stitchingType?: string,
   ) => void;
   clearCart: () => void;
   toggleWishlist: (productId: string) => void;
@@ -51,19 +57,22 @@ export const useStore = create<StoreState>()(
 
       addToCart: (product, size, color, quantity = 1, options) => {
         const shouldOpen = options?.openCart !== false;
+        const stitchingType = options?.stitchingType;
         set((state) => {
           const existing = state.cart.find(
             (item) =>
               item.productId === product.id &&
               item.size === size &&
-              item.color === color,
+              item.color === color &&
+              item.stitchingType === stitchingType,
           );
           if (existing) {
             return {
               cart: state.cart.map((item) =>
                 item.productId === product.id &&
                 item.size === size &&
-                item.color === color
+                item.color === color &&
+                item.stitchingType === stitchingType
                   ? { ...item, quantity: item.quantity + quantity }
                   : item,
               ),
@@ -79,6 +88,7 @@ export const useStore = create<StoreState>()(
             size,
             color,
             quantity,
+            stitchingType,
           };
           return {
             cart: [...state.cart, item],
@@ -87,29 +97,31 @@ export const useStore = create<StoreState>()(
         });
       },
 
-      removeFromCart: (productId, size, color) => {
+      removeFromCart: (productId, size, color, stitchingType) => {
         set((state) => ({
           cart: state.cart.filter(
             (item) =>
               !(
                 item.productId === productId &&
                 item.size === size &&
-                item.color === color
+                item.color === color &&
+                (stitchingType === undefined || item.stitchingType === stitchingType)
               ),
           ),
         }));
       },
 
-      updateQuantity: (productId, size, color, quantity) => {
+      updateQuantity: (productId, size, color, quantity, stitchingType) => {
         if (quantity < 1) {
-          get().removeFromCart(productId, size, color);
+          get().removeFromCart(productId, size, color, stitchingType);
           return;
         }
         set((state) => ({
           cart: state.cart.map((item) =>
             item.productId === productId &&
             item.size === size &&
-            item.color === color
+            item.color === color &&
+            (stitchingType === undefined || item.stitchingType === stitchingType)
               ? { ...item, quantity }
               : item,
           ),
@@ -143,7 +155,7 @@ export const useStore = create<StoreState>()(
       wishlistCount: () => get().wishlist.length,
     }),
     {
-      name: "aurelia-store",
+      name: "kusum-store",
       partialize: (state) => ({
         cart: state.cart,
         wishlist: state.wishlist,
@@ -151,3 +163,4 @@ export const useStore = create<StoreState>()(
     },
   ),
 );
+

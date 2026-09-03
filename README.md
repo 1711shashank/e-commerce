@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KUSUM — THE PREMIUM DESIGNER WEAR
 
-## Getting Started
+A high-end luxury e-commerce platform for women's couture ethnic wear, royal Pakistani lawn, bridal lehengas, festive formals, abayas, and kaftans.
 
-First, run the development server:
+> **Design System & Architecture**: For the full architectural specifications, UX decisions, brand guidelines, and verification rules, refer to [PROJECT_BLUEPRINT.md](./PROJECT_BLUEPRINT.md).
+
+---
+
+## ✦ Key Features
+
+* **Unified Modern Luxury Header**:
+  * Official Kusum circular ring logo with magenta pink ring.
+  * Centered brand wordmark stack: `KUSUM` in geometric black sans on top of `THE PREMIUM DESIGNER WEAR` in serif with guaranteed zero glyph collisions.
+  * Glossy translucent glass capsule navigation buttons with left/right glass borders and generous padding for all 7 main categories (`UNSTITCHED`, `READY TO WEAR`, `LUXURY FORMALS`, `ABAYAS & KAFTANS`, `BRIDAL`, `MOMMY & ME`, `SALE`).
+  * Sliding search input that smoothly expands into the exact same middle navigation space on click.
+* **Live 3-Layout Client Comparison Suite**:
+  * **Option 1: The Royal Atelier** (Recommended): Soft 12px rounded frame, pearl border, hover silk shine sweep animation, and floating bottom-right Add to Cart bag button.
+  * **Option 2: The Maria.B Runway**: Minimalist 8px frame, slow zoom, and slide-up frosted glass bar with unstitched/stitched quick-add.
+  * **Option 3: The Heritage Trousseau**: Padded champagne canvas, gold handcrafted zari ribbon, and dual hover action buttons (Bag + WhatsApp Bespoke Stylist).
+  * Interactive switcher active on all collection pages and side-by-side showcase section on the homepage.
+* **High-Fashion Editorial Typography**:
+  * Headings & Display: `Playfair Display` (bold weights 600/700, -0.01em tracking).
+  * Taglines: `Cinzel` imperial Roman serif.
+  * Brand Wordmark: `Montserrat` black 900.
+  * Body & Interface: `Outfit` modern legible sans.
+* **Dedicated Destinations**:
+  * `/bridal`: Bespoke Bridal Atelier & consultation booking.
+  * `/track-order`: Live shipment tracking simulator.
+  * `/size-guide`: Comprehensive unstitched fabric cuts and stitched size matrices.
+  * `/collections/[category]`: Dynamic collection routes.
+
+---
+
+## ✦ Tech Stack
+
+* **Framework**: Next.js 16.3.2 (App Router & Turbopack)
+* **React**: React 19.2.8
+* **Styling**: Tailwind CSS v4
+* **State Management**: Zustand 5
+* **Carousels**: Embla Carousel React 8.6.0
+* **Testing**: Vitest 4.1.11
+* **Linting**: ESLint 9 (Next.js config)
+
+---
+
+## ✦ Development & Testing
 
 ```bash
+# Install dependencies
+npm install
+
+# Run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Run unit tests
+npm test
+
+# Run linter
+npm run lint
+
+# Build for production
+npm run build
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

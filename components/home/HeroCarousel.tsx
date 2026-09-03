@@ -8,7 +8,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { Banner } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
 
 export function HeroCarousel({ banners }: { banners: Banner[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -35,34 +34,40 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
         <div className="flex">
           {banners.map((banner) => (
             <div key={banner.id} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="relative h-[360px] sm:h-[440px] lg:h-[560px]">
+              <div className="relative h-[520px] sm:h-[660px] lg:h-[780px] xl:h-[840px]">
                 <Image
                   src={banner.image}
                   alt=""
                   fill
                   priority
                   sizes="100vw"
-                  className="object-cover opacity-70"
+                  className="object-cover opacity-80"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
                 <div className="absolute inset-0 flex items-end sm:items-center">
-                  <div className="mx-auto w-full max-w-7xl px-5 pb-12 pt-20 sm:px-8 sm:pb-0 lg:px-10">
-                    <p className="mb-3 text-xs uppercase tracking-[0.25em] text-white/70 animate-fade-up">
-                      Aurelia Collection
+                  <div className="mx-auto w-full max-w-[1536px] px-4 pb-14 pt-20 sm:px-8 sm:pb-0 xl:px-12">
+                    <p className="mb-4 text-xs sm:text-sm uppercase tracking-[0.35em] text-[#fdf0f6] font-semibold animate-fade-up">
+                      Kusum Designer Wear · The Haute Couture Edit
                     </p>
-                    <h1 className="max-w-xl font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl animate-fade-up [animation-delay:80ms]">
+                    <h1 className="max-w-2xl font-[family-name:var(--font-heading)] text-4xl leading-[1.08] text-white sm:text-6xl lg:text-7xl xl:text-8xl animate-fade-up [animation-delay:80ms] drop-shadow-md">
                       {banner.title}
                     </h1>
-                    <p className="mt-4 max-w-md text-sm text-white/85 sm:text-base animate-fade-up [animation-delay:140ms]">
+                    <p className="mt-5 max-w-lg text-sm text-white/90 sm:text-lg animate-fade-up [animation-delay:140ms] font-light">
                       {banner.subtitle}
                     </p>
-                    <div className="mt-7 animate-fade-up [animation-delay:200ms]">
-                      <Button
-                        variant="secondary"
-                        className="bg-white text-foreground hover:bg-white/90"
+                    <div className="mt-8 flex flex-wrap items-center gap-4 animate-fade-up [animation-delay:200ms]">
+                      <Link
+                        href={banner.ctaHref}
+                        className="flex h-12 items-center justify-center rounded-full bg-[#e00075] px-8 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#c20065] hover:scale-105"
                       >
-                        <Link href={banner.ctaHref}>{banner.ctaLabel}</Link>
-                      </Button>
+                        {banner.ctaLabel}
+                      </Link>
+                      <Link
+                        href="/bridal"
+                        className="flex h-12 items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:bg-white/25 hover:scale-105"
+                      >
+                        Bridal Bespoke
+                      </Link>
                     </div>
                   </div>
                 </div>

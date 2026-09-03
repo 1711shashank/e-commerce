@@ -32,7 +32,7 @@ export default function CartPage() {
           <ul className="divide-y divide-border border-y border-border">
             {cart.map((item) => (
               <li
-                key={`${item.productId}-${item.size}-${item.color}`}
+                key={`${item.productId}-${item.size}-${item.color}-${item.stitchingType ?? "std"}`}
                 className="flex gap-4 py-6 sm:gap-6"
               >
                 <Link
@@ -56,9 +56,14 @@ export default function CartPage() {
                       >
                         {item.name}
                       </Link>
-                      <p className="mt-1 text-sm text-muted">
-                        {item.color} / {item.size}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
+                        <span>{item.color} / {item.size}</span>
+                        {item.stitchingType && (
+                          <span className="border border-border bg-background px-2 py-0.5 text-[10px] uppercase tracking-wider text-foreground font-medium">
+                            {item.stitchingType}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <p className="text-sm font-medium">
                       {formatPrice(item.price * item.quantity)}
@@ -75,13 +80,14 @@ export default function CartPage() {
                             item.size,
                             item.color,
                             item.quantity - 1,
+                            item.stitchingType,
                           )
                         }
                         aria-label="Decrease"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="min-w-8 text-center text-sm">
+                      <span className="min-w-8 text-center text-sm font-medium">
                         {item.quantity}
                       </span>
                       <button
@@ -93,6 +99,7 @@ export default function CartPage() {
                             item.size,
                             item.color,
                             item.quantity + 1,
+                            item.stitchingType,
                           )
                         }
                         aria-label="Increase"
@@ -103,7 +110,12 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        removeFromCart(item.productId, item.size, item.color)
+                        removeFromCart(
+                          item.productId,
+                          item.size,
+                          item.color,
+                          item.stitchingType,
+                        )
                       }
                       className="flex h-11 items-center gap-2 px-2 text-sm text-muted hover:text-sale"
                     >

@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { LayoutGrid, List, SlidersHorizontal } from "lucide-react";
 import { ActiveFilters } from "@/components/filters/ActiveFilters";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
 import { SearchBar } from "@/components/filters/SearchBar";
 import { SortDropdown } from "@/components/filters/SortDropdown";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { Drawer } from "@/components/ui/Drawer";
 import { Button } from "@/components/ui/Button";
 import { useDebounce } from "@/lib/hooks";
@@ -22,6 +21,7 @@ import type {
   ProductFilters,
   SortOption,
   ViewMode,
+  CardLayoutStyle,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -51,25 +51,22 @@ export function ProductListing({
   const debouncedSearch = useDebounce(searchInput, 300);
   const [sort, setSort] = useState<SortOption>("newest");
   const [view, setView] = useState<ViewMode>("grid");
+  const [cardStyle, setCardStyle] = useState<CardLayoutStyle>("atelier");
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setFilters((f) => ({ ...f, search: debouncedSearch }));
-    setPage(1);
-  }, [debouncedSearch]);
-
-  const filtered = useMemo(
-    () => sortProducts(filterProducts(filters, products), sort),
-    [filters, products, sort],
+  const activeFilters = useMemo(
+    () => ({
+      ...filters,
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
+    }),
+    [filters, debouncedSearch],
   );
 
-  useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => setLoading(false), 280);
-    return () => clearTimeout(t);
-  }, [filters, sort]);
+  const filtered = useMemo(
+    () => sortProducts(filterProducts(activeFilters, products), sort),
+    [activeFilters, products, sort],
+  );
 
   const visible = filtered.slice(0, page * PAGE_SIZE);
   const hasMore = visible.length < filtered.length;
@@ -86,9 +83,9 @@ export function ProductListing({
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+    <div className="mx-auto max-w-[1536px] px-4 py-8 sm:px-8 xl:px-12 lg:py-10">
       {title && (
-        <h1 className="mb-6 font-display text-3xl sm:text-4xl lg:text-5xl">
+        <h1 className="mb-6 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
           {title}
         </h1>
       )}
@@ -108,6 +105,52 @@ export function ProductListing({
             <SearchBar value={searchInput} onChange={setSearchInput} />
           </div>
           <SortDropdown value={sort} onChange={setSort} />
+          {/* Client Design Studio: 3-Layout Live Switcher */}
+          <div className="flex items-center gap-1 rounded-full border border-border/90 bg-[#faf8f5] p-1 shadow-2xs">
+            <span className="hidden xl:inline text-[9.5px] uppercase tracking-wider font-bold text-muted pl-2.5 pr-1">
+              Card Style:
+            </span>
+            <button
+              type="button"
+              onClick={() => setCardStyle("atelier")}
+              className={cn(
+                "h-8 px-3 rounded-full text-[11px] font-semibold transition-all",
+                cardStyle === "atelier"
+                  ? "bg-[#141414] text-white shadow-xs"
+                  : "text-muted hover:text-foreground",
+              )}
+              title="Option 1: The Royal Atelier"
+            >
+              👑 Atelier
+            </button>
+            <button
+              type="button"
+              onClick={() => setCardStyle("runway")}
+              className={cn(
+                "h-8 px-3 rounded-full text-[11px] font-semibold transition-all",
+                cardStyle === "runway"
+                  ? "bg-[#141414] text-white shadow-xs"
+                  : "text-muted hover:text-foreground",
+              )}
+              title="Option 2: The Maria.B Runway"
+            >
+              ⚡ Runway
+            </button>
+            <button
+              type="button"
+              onClick={() => setCardStyle("heritage")}
+              className={cn(
+                "h-8 px-3 rounded-full text-[11px] font-semibold transition-all",
+                cardStyle === "heritage"
+                  ? "bg-[#141414] text-white shadow-xs"
+                  : "text-muted hover:text-foreground",
+              )}
+              title="Option 3: The Heritage Trousseau"
+            >
+              🏰 Heritage
+            </button>
+          </div>
+
           <div className="hidden items-center border border-border sm:flex">
             <button
               type="button"
@@ -166,17 +209,9 @@ export function ProductListing({
         </div>
 
         <div className="min-w-0 flex-1">
-          {loading ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <ProductGrid products={visible} view={view} />
-          )}
+          <ProductGrid products={visible} view={view} layoutStyle={cardStyle} />
 
-          {hasMore && !loading && (
+          {hasMore && (
             <div className="mt-10 flex justify-center">
               <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
                 Load more

@@ -8,25 +8,19 @@ import { searchProducts, formatPrice } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import { useDebounce } from "@/lib/hooks";
 
-export function SearchOverlay() {
-  const { isSearchOpen, closeSearch } = useStore();
+function SearchOverlayModal() {
+  const { closeSearch } = useStore();
   const [query, setQuery] = useState("");
   const debounced = useDebounce(query, 250);
   const results = searchProducts(debounced, 8);
 
   useEffect(() => {
-    if (!isSearchOpen) {
-      setQuery("");
-      return;
-    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeSearch();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isSearchOpen, closeSearch]);
-
-  if (!isSearchOpen) return null;
+  }, [closeSearch]);
 
   return (
     <div className="fixed inset-0 z-50 bg-foreground/40 animate-fade-in">
@@ -38,7 +32,7 @@ export function SearchOverlay() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for dresses, kurtas, lawn…"
+            placeholder="Search luxury lawn, stitched pret, abayas, bridal…"
             className="min-h-12 w-full bg-transparent text-base outline-none placeholder:text-muted"
             aria-label="Search"
           />
@@ -54,7 +48,7 @@ export function SearchOverlay() {
       <div className="mx-auto max-h-[70vh] max-w-3xl overflow-y-auto bg-surface px-5 py-4 sm:px-8">
         {debounced && results.length === 0 && (
           <p className="py-8 text-center text-sm text-muted">
-            No matches for “{debounced}”
+            No matches found for “{debounced}”
           </p>
         )}
         <ul className="divide-y divide-border">
@@ -63,7 +57,7 @@ export function SearchOverlay() {
               <Link
                 href={`/products/${product.slug}`}
                 onClick={closeSearch}
-                className="flex items-center gap-4 py-3 hover:bg-background"
+                className="flex items-center gap-4 py-3 hover:bg-background transition-colors"
               >
                 <div className="relative h-16 w-12 overflow-hidden bg-border/40">
                   <Image
@@ -75,10 +69,11 @@ export function SearchOverlay() {
                   />
                 </div>
                 <div>
-                  <p className="font-display text-lg">{product.name}</p>
-                  <p className="text-sm text-muted">
-                    {formatPrice(product.discountPrice ?? product.price)}
-                  </p>
+                  <p className="font-display text-base font-medium">{product.name}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted">
+                    <span>{formatPrice(product.discountPrice ?? product.price)}</span>
+                    {product.fabric && <span>· {product.fabric}</span>}
+                  </div>
                 </div>
               </Link>
             </li>
@@ -88,9 +83,9 @@ export function SearchOverlay() {
           <Link
             href={`/products?search=${encodeURIComponent(debounced)}`}
             onClick={closeSearch}
-            className="mt-4 block py-3 text-center text-sm underline-offset-4 hover:underline"
+            className="mt-4 block py-3 text-center text-xs uppercase tracking-wider font-semibold text-accent underline-offset-4 hover:underline"
           >
-            View all results
+            View all results ({results.length}) →
           </Link>
         )}
       </div>
@@ -103,3 +98,10 @@ export function SearchOverlay() {
     </div>
   );
 }
+
+export function SearchOverlay() {
+  const { isSearchOpen } = useStore();
+  if (!isSearchOpen) return null;
+  return <SearchOverlayModal />;
+}
+

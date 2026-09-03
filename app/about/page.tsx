@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "About Us",
-  description: "Learn about Aurelia — contemporary clothing with timeless ease.",
+  title: "About Us · The House of Kusum",
+  description: "Learn about Kusum — The Premium Designer Wear specializing in luxury ethnic and Islamic modest fashion.",
 };
 
 export default function AboutPage() {
@@ -11,25 +11,27 @@ export default function AboutPage() {
     <div className="mx-auto max-w-3xl px-5 py-8 sm:px-8 lg:py-16">
       <Breadcrumb
         className="mb-8"
-        items={[{ label: "Home", href: "/" }, { label: "About" }]}
+        items={[{ label: "Home", href: "/" }, { label: "About Us" }]}
       />
-      <h1 className="font-display text-4xl sm:text-5xl">About Aurelia</h1>
-      <div className="mt-8 space-y-5 text-sm leading-relaxed text-muted sm:text-base">
+      <div className="mb-8">
+        <span className="text-[10px] uppercase tracking-[0.25em] text-accent font-semibold">
+          Our Heritage & Craft
+        </span>
+        <h1 className="font-display text-4xl sm:text-5xl mt-1">About Kusum</h1>
+        <p className="text-xs uppercase tracking-[0.2em] text-muted mt-1">
+          The Premium Designer Wear
+        </p>
+      </div>
+
+      <div className="space-y-5 text-sm leading-relaxed text-muted sm:text-base">
         <p>
-          Aurelia is a contemporary clothing house inspired by the ease of
-          everyday dressing and the craft of seasonal collections — lawn,
-          ready-to-wear, menswear, and pieces made for celebration.
+          Founded on the values of modesty, luxury, and meticulous South Asian &amp; Middle Eastern textile craftsmanship, <strong>Kusum — The Premium Designer Wear</strong> is dedicated exclusively to women&apos;s ethnic apparel and Islamic modest fashion.
         </p>
         <p>
-          We design with soft neutrals, thoughtful silhouettes, and fabrics that
-          feel good to wear. Our collections blend modern cuts with familiar
-          wardrobe staples so you can build looks that last beyond a single
-          season.
+          Inspired by the timeless elegance of heritage fashion houses like Maria.B., Kusum brings together airy pure luxury lawn, delicate embroidered chiffons, royal wedding formals, and fluid modest abayas crafted with matching sheilas.
         </p>
         <p>
-          This storefront is powered by static sample data for now, structured
-          so a real catalog and checkout can plug in later without rewriting the
-          shopping experience.
+          Headquartered with an atelier presence in the UAE and serving clients globally across the GCC, UK, North America, and beyond, we offer both raw unstitched 3-piece designer fabrics and bespoke master tailoring with custom sleeve linings, modesty slips, and handcrafted finishes.
         </p>
       </div>
     </div>

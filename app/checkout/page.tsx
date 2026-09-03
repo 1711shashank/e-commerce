@@ -4,30 +4,34 @@ import Link from "next/link";
 import { useState } from "react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
-import { formatPrice } from "@/lib/services";
+import { formatPrice, FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_FEE } from "@/lib/services";
 import { useStore } from "@/lib/store";
 
 export default function CheckoutPage() {
   const { cart, cartSubtotal, clearCart } = useStore();
   const [placed, setPlaced] = useState(false);
   const subtotal = cartSubtotal();
-  const shipping = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : STANDARD_SHIPPING_FEE;
   const total = subtotal + shipping;
 
   if (placed) {
     return (
       <div className="mx-auto max-w-lg px-5 py-24 text-center sm:px-8">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted">
-          Order confirmed
+        <p className="text-xs uppercase tracking-[0.2em] text-accent font-medium">
+          Order confirmed · KB-84192
         </p>
-        <h1 className="mt-3 font-display text-4xl">Thank you</h1>
+        <h1 className="mt-3 font-display text-4xl">Thank you for your order</h1>
         <p className="mt-4 text-sm text-muted">
-          This is a demo checkout — no payment was processed. Your bag has been
-          cleared.
+          Your order has been received at the Kusum atelier. We will prepare your garments with exquisite care.
         </p>
-        <Button className="mt-8">
-          <Link href="/collections">Continue shopping</Link>
-        </Button>
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <Button>
+            <Link href="/track-order">Track Your Order</Link>
+          </Button>
+          <Button variant="outline">
+            <Link href="/collections">Continue shopping</Link>
+          </Button>
+        </div>
       </div>
     );
   }

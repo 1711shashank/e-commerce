@@ -17,6 +17,17 @@ export interface Product {
   rating?: number;
   createdAt: string;
   tags?: string[];
+  stitchingOptions?: Array<"unstitched" | "stitched">;
+  pieces?: 1 | 2 | 3 | "abaya-set";
+  fabricBreakdown?: {
+    shirt?: string;
+    dupatta?: string;
+    trouser?: string;
+    abaya?: string;
+    slip?: string;
+  };
+  embellishments?: string[];
+  includesSlip?: boolean;
 }
 
 export interface Category {
@@ -52,6 +63,8 @@ export interface ProductFilters {
   sizes?: string[];
   colors?: string[];
   fabrics?: string[];
+  pieces?: (1 | 2 | 3 | "abaya-set")[];
+  stitchingType?: "unstitched" | "stitched" | null;
   inStock?: boolean | null;
   search?: string;
   isNew?: boolean;
@@ -67,6 +80,9 @@ export interface CartItem {
   size: string;
   color: string;
   quantity: number;
+  stitchingType?: "unstitched" | "stitched";
 }
 
 export type ViewMode = "grid" | "list";
+export type CardLayoutStyle = "atelier" | "runway" | "heritage";
+

@@ -1,648 +1,1238 @@
 import type { Product } from "@/lib/types";
 
-const img = (id: string, w = 800) =>
-  `https://images.unsplash.com/${id}?w=${w}&q=80`;
-
 export const products: Product[] = [
   {
-    id: "p1",
-    slug: "floral-lawn-kurta-set",
-    name: "Floral Lawn Kurta Set",
-    category: "women",
-    subCategory: "lawn",
-    price: 11499,
-    discountPrice: 9199,
-    images: [
-      img("photo-1594633312681-425c7b97ccd1"),
-      img("photo-1515886657613-9f3515b0c78f"),
+    "id": "kb-u01",
+    "slug": "chintz-rose-luxury-lawn",
+    "name": "Chintz Rose Luxury Lawn 3-Piece",
+    "category": "unstitched",
+    "subCategory": "luxury-lawn",
+    "price": 380,
+    "discountPrice": 320,
+    "images": [
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80",
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Ivory", "Blush", "Sage"],
-    fabric: "Lawn",
-    description:
-      "A breezy three-piece lawn set with hand-inspired floral motifs, soft cotton lining, and a relaxed silhouette made for warm days.",
-    isNew: true,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.7,
-    createdAt: "2026-07-20T10:00:00Z",
-    tags: ["lawn", "floral", "summer"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Dusty Rose",
+      "Ivory",
+      "Sage"
+    ],
+    "fabric": "Luxury Lawn",
+    "description": "A quintessential Maria B-inspired 3-piece unstitched luxury lawn ensemble. Features intricate chickenkari and schiffli embroidered front, heavy organza embroidered hem border, paired with an ethereal digital printed pure silk dupatta and dyed cambric cotton trouser.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-15T10:00:00Z",
+    "tags": [
+      "lawn",
+      "unstitched",
+      "summer",
+      "chiffon",
+      "silk"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Schiffli Embroidered Lawn Front (1.25m) + Dyed Lawn Back & Sleeves (2m)",
+      "dupatta": "Digital Printed Pure Medium Silk Dupatta (2.5m)",
+      "trouser": "Dyed Cambric Cotton Trouser (2.5m)",
+      "slip": "Includes Dyed Lawn Inner Slip Fabric"
+    },
+    "embellishments": [
+      "Schiffli Embroidery",
+      "Organza Laser Cut Border",
+      "Pearl Tassels"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p2",
-    slug: "embroidered-chiffon-gown",
-    name: "Embroidered Chiffon Gown",
-    category: "women",
-    subCategory: "formals",
-    price: 26899,
-    images: [
-      img("photo-1595777457583-95e059d581b8"),
-      img("photo-1566174053879-31528523f8ae"),
+    "id": "kb-u02",
+    "slug": "zaffran-embroidered-chiffon",
+    "name": "Zaffran Embroidered Chiffon 3-Piece",
+    "category": "unstitched",
+    "subCategory": "embroidered-chiffon",
+    "price": 680,
+    "discountPrice": 590,
+    "images": [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
     ],
-    sizes: ["S", "M", "L"],
-    colors: ["Champagne", "Midnight"],
-    fabric: "Chiffon",
-    description:
-      "Floor-length chiffon gown with delicate embroidery on the bodice and flowing sleeves for evening occasions.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.9,
-    createdAt: "2026-08-01T10:00:00Z",
-    tags: ["formal", "gown", "evening"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Saffron Gold",
+      "Emerald",
+      "Maroon"
+    ],
+    "fabric": "Pure Chiffon",
+    "description": "Heavily embroidered pure chiffon 3-piece suit adorned with gold tilla, delicate sequins, and panni embroidery. The shirt features an ornate embroidered neckline and ghera patch, completed with a four-sided embroidered organza dupatta.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.8,
+    "createdAt": "2026-08-20T10:00:00Z",
+    "tags": [
+      "chiffon",
+      "formal",
+      "wedding",
+      "festive",
+      "zari"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Embroidered Chiffon Front, Back & Sleeves (3.2m)",
+      "dupatta": "Embroidered Chiffon Dupatta with 4-Side Satin Border (2.5m)",
+      "trouser": "Dyed Raw Silk Trouser with Embroidered Bunches (2.5m)",
+      "slip": "Dyed Cotton Silk Inner Slip (2m)"
+    },
+    "embellishments": [
+      "Tilla Work",
+      "Sequins",
+      "Resham Threadwork",
+      "Cutwork Patches"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p3",
-    slug: "linen-wrap-dress",
-    name: "Linen Wrap Dress",
-    category: "women",
-    subCategory: "casual",
-    price: 9399,
-    discountPrice: 7499,
-    images: [
-      img("photo-1434389677669-e08b4cac3105"),
-      img("photo-1496747611176-843222e1e57c"),
+    "id": "kb-u03",
+    "slug": "mbroidered-velvet-festive",
+    "name": "Mbroidered Royal Velvet 3-Piece",
+    "category": "unstitched",
+    "subCategory": "mbroidered-wedding",
+    "price": 890,
+    "images": [
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["Sand", "Olive", "White"],
-    fabric: "Linen",
-    description:
-      "Effortless wrap dress in washed linen with adjustable ties and side pockets for everyday ease.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-05-12T10:00:00Z",
-    tags: ["casual", "linen", "dress"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Midnight Blue",
+      "Plum",
+      "Jet Black"
+    ],
+    "fabric": "Micro Velvet",
+    "description": "A masterpiece from our Mbroidered festive collection. Luxurious micro-velvet shirt embellished with intricate antique gold zari, kora dabka, and pearl spray. Paired with a tissue organza gold jacquard dupatta and raw silk trouser.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 5,
+    "createdAt": "2026-08-25T10:00:00Z",
+    "tags": [
+      "velvet",
+      "winter",
+      "wedding",
+      "mbroidered",
+      "luxury"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Embellished Micro Velvet Front & Back (3m)",
+      "dupatta": "Tissue Gold Organza Jacquard Dupatta (2.5m)",
+      "trouser": "Dyed Rawaan Silk Trouser (2.5m)"
+    },
+    "embellishments": [
+      "Antique Zari",
+      "Dabka",
+      "Kora Handwork",
+      "Pearl Drops"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p4",
-    slug: "silk-blouse-pearl",
-    name: "Pearl Silk Blouse",
-    category: "women",
-    subCategory: "casual",
-    price: 10599,
-    images: [
-      img("photo-1564257631407-4deb1f99d992"),
-      img("photo-1591047139829-d91aecb6caea"),
+    "id": "kb-u04",
+    "slug": "mehtab-printed-lawn-suit",
+    "name": "Mehtab Digital Printed Lawn 3-Piece",
+    "category": "unstitched",
+    "subCategory": "luxury-lawn",
+    "price": 260,
+    "images": [
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80",
+      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80"
     ],
-    sizes: ["S", "M", "L"],
-    colors: ["Pearl", "Black"],
-    fabric: "Silk",
-    description:
-      "Fluid silk blouse with a soft drape, mother-of-pearl buttons, and a flattering slightly cropped hem.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.6,
-    createdAt: "2026-07-28T10:00:00Z",
-    tags: ["silk", "blouse", "workwear"],
+    "sizes": [
+      "Unstitched",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Aqua Mint",
+      "Peach Cream",
+      "Lilac"
+    ],
+    "fabric": "Premium Lawn",
+    "description": "Daily luxury unstitched 3-piece featuring soft pastel digital print with embroidered neckline appliqué on organza, paired with an airy crinkle chiffon dupatta and cambric trouser.",
+    "isNew": false,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.6,
+    "createdAt": "2026-07-15T10:00:00Z",
+    "tags": [
+      "printed",
+      "lawn",
+      "summer",
+      "casual",
+      "daily"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Digital Printed Lawn (3m) with Embroidered Neckline Patch",
+      "dupatta": "Digital Printed Crinkle Chiffon Dupatta (2.5m)",
+      "trouser": "Dyed Cotton Trouser (2.5m)"
+    },
+    "embellishments": [
+      "Embroidered Neck Patch",
+      "Lace Finishings"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p5",
-    slug: "printed-lawn-dupatta-set",
-    name: "Printed Lawn Dupatta Set",
-    category: "women",
-    subCategory: "lawn",
-    price: 12999,
-    images: [
-      img("photo-1581044777550-4cfa60707c03"),
-      img("photo-1509631179647-0177331693ae"),
+    "id": "kb-p01",
+    "slug": "amber-luxe-embroidered-kurta-set",
+    "name": "Amber Embroidered 2-Piece Pret Set",
+    "category": "ready-to-wear",
+    "subCategory": "casual-pret",
+    "price": 340,
+    "discountPrice": 285,
+    "images": [
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80",
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Indigo", "Rose", "Mustard"],
-    fabric: "Lawn",
-    description:
-      "Vibrant printed lawn set complete with matching dupatta and contrast piping details.",
-    isNew: false,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.4,
-    createdAt: "2026-04-18T10:00:00Z",
-    tags: ["lawn", "printed", "dupatta"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Warm Ochre",
+      "Pistachio",
+      "Charcoal"
+    ],
+    "fabric": "Pure Linen",
+    "description": "A ready-to-wear modest 2-piece stitched ensemble with delicate tone-on-tone embroidery along the front placket, band collar, and bell sleeves. Paired with tailored cigarette trousers with pin-tuck detailing.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.7,
+    "createdAt": "2026-08-10T10:00:00Z",
+    "tags": [
+      "pret",
+      "stitched",
+      "casual",
+      "linen",
+      "2piece"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 2,
+    "fabricBreakdown": {
+      "shirt": "Stitched Embroidered Linen Shirt",
+      "trouser": "Tailored Straight Cigarette Trouser"
+    },
+    "embellishments": [
+      "Tonal Threadwork",
+      "Lace Insets",
+      "Pearl Buttons"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p6",
-    slug: "tailored-cotton-shirt",
-    name: "Tailored Cotton Shirt",
-    category: "men",
-    subCategory: "shirts",
-    price: 8199,
-    images: [
-      img("photo-1596755094514-f87e34085b2c"),
-      img("photo-1602810318383-e386cc2a3ccf"),
+    "id": "kb-p02",
+    "slug": "gul-e-noor-festive-pret-suit",
+    "name": "Gul-e-Noor 3-Piece Stitched Festive Suit",
+    "category": "ready-to-wear",
+    "subCategory": "festive-pret",
+    "price": 540,
+    "images": [
+      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["White", "Sky", "Navy"],
-    fabric: "Cotton",
-    description:
-      "Crisp cotton shirt with a tailored fit, mother-of-pearl buttons, and a classic collar.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.8,
-    createdAt: "2026-08-05T10:00:00Z",
-    tags: ["shirt", "cotton", "formal"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Pearl White",
+      "Blush Pink",
+      "Lavender"
+    ],
+    "fabric": "Organza & Raw Silk",
+    "description": "Stitched 3-piece festive outfit crafted on embroidered sheer organza with an attached soft malmal inner lining. Features a flared silhouette with gotta patti accents, paired with a matching scalloped dupatta and silk culottes.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-18T10:00:00Z",
+    "tags": [
+      "festive",
+      "stitched",
+      "eid",
+      "organza",
+      "3piece"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Stitched Flared Organza Kurta with Cotton Silk Slip",
+      "dupatta": "Embroidered Scalloped Border Organza Dupatta",
+      "trouser": "Dyed Raw Silk Culottes",
+      "slip": "Full Attached Lining"
+    },
+    "embellishments": [
+      "Gotta Patti",
+      "Resham Flowers",
+      "Cutwork Scallops"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p7",
-    slug: "linen-band-collar-kurta",
-    name: "Linen Band Collar Kurta",
-    category: "men",
-    subCategory: "kurtas",
-    price: 9099,
-    discountPrice: 7299,
-    images: [
-      img("photo-1583743814966-8936f5b7be1a"),
-      img("photo-1617137968427-85924c800a22"),
+    "id": "kb-p03",
+    "slug": "darakhshan-embroidered-kurti",
+    "name": "Darakhshan Embroidered Silk Tunic",
+    "category": "ready-to-wear",
+    "subCategory": "casual-pret",
+    "price": 210,
+    "discountPrice": 175,
+    "images": [
+      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Ivory", "Charcoal", "Olive"],
-    fabric: "Linen",
-    description:
-      "Breathable linen kurta with a modern band collar and side slits for easy movement.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-06-02T10:00:00Z",
-    tags: ["kurta", "linen", "ethnic"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Teal",
+      "Beige",
+      "Black"
+    ],
+    "fabric": "Raw Silk",
+    "description": "A versatile 1-piece stitched kurta tunic crafted in premium raw silk with contemporary ethnic motifs on the neckline, cuffs, and hem. Modest high-low cut that pairs effortlessly with trousers or culottes.",
+    "isNew": false,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.5,
+    "createdAt": "2026-07-28T10:00:00Z",
+    "tags": [
+      "kurti",
+      "tunic",
+      "1piece",
+      "stitched",
+      "silk"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 1,
+    "fabricBreakdown": {
+      "shirt": "Stitched 1-Piece Raw Silk Kurti"
+    },
+    "embellishments": [
+      "Zari Cuffs",
+      "Mandarin Collar Work"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p8",
-    slug: "structured-blazer",
-    name: "Structured Wool Blazer",
-    category: "men",
-    subCategory: "shirts",
-    price: 21099,
-    images: [
-      img("photo-1507679799987-c73779587ccf"),
-      img("photo-1594938298603-c8148c4dae35"),
+    "id": "kb-f01",
+    "slug": "shehnai-regal-anarkali-gown",
+    "name": "Shehnai Regal Embroidered Anarkali Set",
+    "category": "luxury-formals",
+    "subCategory": "wedding-formals",
+    "price": 1250,
+    "discountPrice": 1090,
+    "images": [
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
-    sizes: ["M", "L", "XL"],
-    colors: ["Charcoal", "Navy"],
-    fabric: "Wool Blend",
-    description:
-      "Sharp single-breasted blazer with structured shoulders and a soft half-canvas construction.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.7,
-    createdAt: "2026-07-15T10:00:00Z",
-    tags: ["blazer", "formal", "wool"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Burgundy Gold",
+      "Royal Emerald",
+      "Champagne"
+    ],
+    "fabric": "Net & Jamawar",
+    "description": "A show-stopping heirloom wedding formal. 16-kali kalidar anarkali frock crafted on fine net with dense zardozi, naqshi, tilla, and sequin hand embroidery. Accompanied by a heavy jamawar churidar and an embellished organza dupatta with four-sided kiran border.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 5,
+    "createdAt": "2026-08-22T10:00:00Z",
+    "tags": [
+      "wedding",
+      "shehnai",
+      "anarkali",
+      "formal",
+      "zardozi"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Embroidered 16-Kali Net Peshwas Panels with Handwork Bodice",
+      "dupatta": "Embellished Organza Dupatta with Kiran Lace Border (2.75m)",
+      "trouser": "Woven Gold Jamawar Churidar Fabric (2.5m)",
+      "slip": "Dyed Cotton Silk Lining (3m)"
+    },
+    "embellishments": [
+      "Zardozi",
+      "Naqshi Handwork",
+      "Kiran Lace",
+      "Sequins"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p9",
-    slug: "relaxed-oxford-shirt",
-    name: "Relaxed Oxford Shirt",
-    category: "men",
-    subCategory: "shirts",
-    price: 6899,
-    discountPrice: 5599,
-    images: [
-      img("photo-1598033129183-c4f50c736f10"),
-      img("photo-1603252109303-2751441dd157"),
+    "id": "kb-f02",
+    "slug": "firdaus-embroidered-gharara-suit",
+    "name": "Firdaus Embroidered Organza Gharara Suit",
+    "category": "luxury-formals",
+    "subCategory": "wedding-formals",
+    "price": 980,
+    "images": [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Blue", "White", "Pink"],
-    fabric: "Oxford Cotton",
-    description:
-      "Soft oxford cotton shirt with a relaxed cut and button-down collar for weekend wear.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.3,
-    createdAt: "2026-03-22T10:00:00Z",
-    tags: ["oxford", "casual", "shirt"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Powder Blue",
+      "Dusty Pink",
+      "Ivory"
+    ],
+    "fabric": "Tissue Organza",
+    "description": "Traditional elegance reinvented. A short embroidered kurti with heavy silver and gold gota and mirror-work embellishments, matched with an expansive crushed gharara and net dupatta with mirror lace.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-26T10:00:00Z",
+    "tags": [
+      "gharara",
+      "festive",
+      "wedding",
+      "mirrorwork",
+      "organza"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Embellished Tissue Organza Short Kurti Fabric (2.5m)",
+      "dupatta": "Mirror Embellished Net Dupatta (2.5m)",
+      "trouser": "Crushed Tissue Organza & Satin Gharara Panels",
+      "slip": "Full Silk Inner Slip (2m)"
+    },
+    "embellishments": [
+      "Mirror-work",
+      "Silver Gota",
+      "Sequins",
+      "Pearl Edging"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p10",
-    slug: "embroidered-festive-kurta",
-    name: "Embroidered Festive Kurta",
-    category: "men",
-    subCategory: "kurtas",
-    price: 13899,
-    images: [
-      img("photo-1552374196-1ab2a1c593e8"),
-      img("photo-1617127365659-c47fa864d8bc"),
+    "id": "kb-f03",
+    "slug": "noor-e-chashm-eid-festive-suit",
+    "name": "Noor-e-Chashm Festive Eid Suit 3-Piece",
+    "category": "luxury-formals",
+    "subCategory": "eid-drops",
+    "price": 720,
+    "discountPrice": 620,
+    "images": [
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80",
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
     ],
-    sizes: ["M", "L", "XL", "XXL"],
-    colors: ["Ivory", "Maroon"],
-    fabric: "Cotton Silk",
-    description:
-      "Festive kurta with tonal embroidery along the placket and cuff, finished with covered buttons.",
-    isNew: false,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.6,
-    createdAt: "2026-05-30T10:00:00Z",
-    tags: ["kurta", "festive", "embroidery"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Emerald Green",
+      "Crimson",
+      "Navy"
+    ],
+    "fabric": "Raw Silk",
+    "description": "Celebrate Eid in timeless modest luxury. Featuring a raw silk shirt with resham floral embroideries along the front panels, paired with a pure organza dupatta with intricate gold scalloped tilla borders and matching straight silk trousers.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.8,
+    "createdAt": "2026-08-14T10:00:00Z",
+    "tags": [
+      "eid",
+      "festive",
+      "rawsilk",
+      "tilla",
+      "3piece"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Embroidered Korean Raw Silk Shirt (3m)",
+      "dupatta": "Embroidered Scalloped Organza Dupatta (2.5m)",
+      "trouser": "Dyed Korean Raw Silk Trouser (2.5m)"
+    },
+    "embellishments": [
+      "Resham Threadwork",
+      "Tilla Scallops",
+      "Hand-touched Sequins"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p11",
-    slug: "kids-floral-frock",
-    name: "Kids Floral Frock",
-    category: "kids",
-    price: 4599,
-    images: [
-      img("photo-1519238263530-99bdd11df2ea"),
-      img("photo-1515488042361-ee00e0ddd4e4"),
+    "id": "kb-a01",
+    "slug": "classic-nida-open-front-abaya",
+    "name": "Sultana Classic Nida Open-Front Abaya",
+    "category": "abayas-kaftans",
+    "subCategory": "classic-abayas",
+    "price": 380,
+    "discountPrice": 320,
+    "images": [
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80"
     ],
-    sizes: ["2Y", "3Y", "4Y", "5Y", "6Y"],
-    colors: ["Pink", "Yellow", "Mint"],
-    fabric: "Cotton",
-    description:
-      "Soft cotton frock with playful florals, puff sleeves, and an easy back zip for little ones.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.8,
-    createdAt: "2026-08-10T10:00:00Z",
-    tags: ["kids", "frock", "floral"],
+    "sizes": [
+      "52",
+      "54",
+      "56",
+      "58",
+      "60"
+    ],
+    "colors": [
+      "Jet Black",
+      "Midnight Navy",
+      "Mocha"
+    ],
+    "fabric": "Premium Korean Nida",
+    "description": "A wardrobe essential for the discerning Muslim woman. Tailored from premium wrinkle-resistant Korean Nida fabric with a loose, modest silhouette. Detailed with delicate French lace along the wide kimono sleeves and front opening. Comes with a matching Sheila (Hijab) and detachable belt.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-24T10:00:00Z",
+    "tags": [
+      "abaya",
+      "modest",
+      "nida",
+      "islamic",
+      "sheila",
+      "hijab"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": "abaya-set",
+    "fabricBreakdown": {
+      "abaya": "Floor-Length Open-Front Korean Nida Abaya",
+      "dupatta": "Matching Korean Chiffon Sheila / Hijab (2m x 0.7m)"
+    },
+    "embellishments": [
+      "French Lace Trims",
+      "Hidden Snap Buttons",
+      "Fabric Belt"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p12",
-    slug: "kids-linen-shirt-set",
-    name: "Kids Linen Shirt Set",
-    category: "kids",
-    price: 5299,
-    discountPrice: 4199,
-    images: [
-      img("photo-1471286174890-9c112ffca5b4"),
-      img("photo-1503454537195-1dcabb73ffb9"),
+    "id": "kb-a02",
+    "slug": "zuleikha-embroidered-festive-kaftan",
+    "name": "Zuleikha Hand-Embroidered Festive Kaftan",
+    "category": "abayas-kaftans",
+    "subCategory": "festive-kaftans",
+    "price": 640,
+    "images": [
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80"
     ],
-    sizes: ["3Y", "4Y", "5Y", "6Y", "8Y"],
-    colors: ["Beige", "Sky"],
-    fabric: "Linen",
-    description:
-      "Two-piece linen set with a short-sleeve shirt and matching shorts for warm-weather play.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.4,
-    createdAt: "2026-06-18T10:00:00Z",
-    tags: ["kids", "linen", "set"],
+    "sizes": [
+      "One Size",
+      "S-M",
+      "L-XL"
+    ],
+    "colors": [
+      "Emerald Gold",
+      "Champagne Beige",
+      "Royal Maroon"
+    ],
+    "fabric": "Crepe Silk",
+    "description": "Designed for celebratory evenings, Eid dinners, and Ramadan gatherings. Drapes fluidly in luxurious crepe silk, enhanced with intricate Moroccan gold bullion embroidery along the V-neckline, center front slit, and cuffs. Features an interior waist cinch cord for customizable silhouette.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 5,
+    "createdAt": "2026-08-28T10:00:00Z",
+    "tags": [
+      "kaftan",
+      "ramadan",
+      "eid",
+      "moroccan",
+      "goldwork"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": "abaya-set",
+    "fabricBreakdown": {
+      "abaya": "Floor-Length Flowing Crepe Silk Kaftan with Matching Sheila"
+    },
+    "embellishments": [
+      "Gold Bullion Embroidery",
+      "Zari Tassels",
+      "Crystal Beads"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p13",
-    slug: "kids-party-lehenga",
-    name: "Kids Party Lehenga",
-    category: "kids",
-    price: 7499,
-    images: [
-      img("photo-1518831959646-742c3a14ebf7"),
-      img("photo-1522771739844-6a9f6d5f14af"),
+    "id": "kb-a03",
+    "slug": "marina-closed-modest-abaya",
+    "name": "Marina Pleated Closed-Front Modest Abaya",
+    "category": "abayas-kaftans",
+    "subCategory": "classic-abayas",
+    "price": 290,
+    "discountPrice": 245,
+    "images": [
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80"
     ],
-    sizes: ["2Y", "3Y", "4Y", "5Y"],
-    colors: ["Gold", "Red", "Teal"],
-    fabric: "Georgette",
-    description:
-      "Festive kids lehenga with soft georgette skirt and embroidered blouse for celebrations.",
-    isNew: true,
-    isOnSale: false,
-    inStock: false,
-    rating: 4.9,
-    createdAt: "2026-07-22T10:00:00Z",
-    tags: ["kids", "lehenga", "party"],
+    "sizes": [
+      "52",
+      "54",
+      "56",
+      "58",
+      "60"
+    ],
+    "colors": [
+      "Olive Green",
+      "Charcoal Grey",
+      "Desert Tan"
+    ],
+    "fabric": "Textured Linen Crepe",
+    "description": "A breathable everyday modest closed abaya with delicate knife pleats cascading down the front and back. Features discreet side pockets, elasticated wudhu-friendly cuffs, and matching breathable cotton-feel Sheila.",
+    "isNew": false,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.7,
+    "createdAt": "2026-07-10T10:00:00Z",
+    "tags": [
+      "abaya",
+      "closed",
+      "everyday",
+      "linen",
+      "wudhu-friendly"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": "abaya-set",
+    "fabricBreakdown": {
+      "abaya": "Floor-Length Closed Textured Linen Crepe Abaya",
+      "dupatta": "Breathable Premium Voile Sheila"
+    },
+    "embellishments": [
+      "Knife Pleating",
+      "Wudhu Friendly Elastic Cuffs"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p14",
-    slug: "unstitched-floral-lawn-3pc",
-    name: "Unstitched Floral Lawn 3PC",
-    category: "unstitched",
-    price: 6199,
-    images: [
-      img("photo-1558171813-4c088753af8f"),
-      img("photo-1620799140408-edc6dcb6d633"),
+    "id": "kb-a04",
+    "slug": "soraya-velvet-winter-kaftan",
+    "name": "Soraya Royal Velvet Hooded Kaftan",
+    "category": "abayas-kaftans",
+    "subCategory": "festive-kaftans",
+    "price": 780,
+    "images": [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80"
     ],
-    sizes: ["One Size"],
-    colors: ["Multi"],
-    fabric: "Lawn",
-    description:
-      "Premium unstitched lawn suite with shirt, trouser, and dupatta fabric — tailor to your fit.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-08-08T10:00:00Z",
-    tags: ["unstitched", "lawn", "3pc"],
+    "sizes": [
+      "One Size",
+      "S-M",
+      "L-XL"
+    ],
+    "colors": [
+      "Deep Plum",
+      "Midnight Navy",
+      "Black Gold"
+    ],
+    "fabric": "Silk Velvet",
+    "description": "A dramatic winter couture kaftan with a modest draped hood and antique gold tilla threadwork down the central bodice. Soft silk lining ensures ultimate comfort during cooler seasonal celebrations.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-30T10:00:00Z",
+    "tags": [
+      "velvet",
+      "hooded",
+      "kaftan",
+      "winter",
+      "royal"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 1,
+    "fabricBreakdown": {
+      "abaya": "Silk Velvet Flared Kaftan with Integrated Hood",
+      "slip": "Full Cotton Silk Inner Lining"
+    },
+    "embellishments": [
+      "Gold Tilla Embroidery",
+      "Handcrafted Braided Cord & Tassels"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p15",
-    slug: "unstitched-embroidered-karandi",
-    name: "Unstitched Embroidered Karandi",
-    category: "unstitched",
-    price: 10599,
-    discountPrice: 8399,
-    images: [
-      img("photo-1528459801416-a9e53bbf4e17"),
-      img("photo-1610030469983-98e550d6193c"),
+    "id": "kb-b01",
+    "slug": "shahi-mehfil-crimson-bridal-lehenga",
+    "name": "Shahi Mehfil Crimson Zardozi Bridal Lehenga",
+    "category": "bridal",
+    "subCategory": "lehengas",
+    "price": 4800,
+    "images": [
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
-    sizes: ["One Size"],
-    colors: ["Ivory", "Maroon"],
-    fabric: "Karandi",
-    description:
-      "Winter-weight karandi with dense embroidery panels, ready for custom stitching.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.6,
-    createdAt: "2026-02-14T10:00:00Z",
-    tags: ["unstitched", "karandi", "winter"],
+    "sizes": [
+      "Made to Measure"
+    ],
+    "colors": [
+      "Deep Crimson",
+      "Heritage Maroon",
+      "Scarlet"
+    ],
+    "fabric": "Pure Raw Silk & Net",
+    "description": "A testament to traditional bridal couture. Deep crimson pure raw silk lehenga with a majestic 4-meter ghera, completely encrusted with micro-pearls, cut-dana, marori, dabka, and real silver zari handwork. Includes an intricately worked choli and a 3-meter tissue net veil with scalloped matha patti border.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 5,
+    "createdAt": "2026-08-12T10:00:00Z",
+    "tags": [
+      "bridal",
+      "lehenga",
+      "zardozi",
+      "couture",
+      "wedding",
+      "heirloom"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Hand-worked Choli on Pure Raw Silk",
+      "dupatta": "Bridal Veil with Matha Patti Border (3m)",
+      "trouser": "16-Kali Hand-Embellished Lehenga Skirt (4m Ghera)"
+    },
+    "embellishments": [
+      "Zardozi",
+      "Dabka",
+      "Marori",
+      "Micro-pearls",
+      "Cut-dana"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p16",
-    slug: "unstitched-silk-jacquard",
-    name: "Unstitched Silk Jacquard",
-    category: "unstitched",
-    price: 14399,
-    images: [
-      img("photo-1594938298603-c8148c4dae35"),
-      img("photo-1558171813-4c088753af8f"),
+    "id": "kb-b02",
+    "slug": "dastaan-antique-gold-tissue-peshwas",
+    "name": "Dastaan Antique Gold Tissue Bridal Peshwas",
+    "category": "bridal",
+    "subCategory": "maxis",
+    "price": 4200,
+    "images": [
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
-    sizes: ["One Size"],
-    colors: ["Gold", "Emerald"],
-    fabric: "Silk Jacquard",
-    description:
-      "Luxurious silk jacquard unstitched set with woven motifs and matching borders.",
-    isNew: false,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.7,
-    createdAt: "2026-04-01T10:00:00Z",
-    tags: ["unstitched", "silk", "luxury"],
+    "sizes": [
+      "Made to Measure"
+    ],
+    "colors": [
+      "Antique Gold",
+      "Champagne Zari",
+      "Rose Gold"
+    ],
+    "fabric": "Gold Tissue & Organza",
+    "description": "Regal Nikah / Reception bridal peshwas woven in luminous metallic gold tissue. Features dense heritage kamdani, mukesh work, and floral bouquets with Swarovski crystal accents. Paired with a brocade jamawar lehenga underneath and double dupattas.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-16T10:00:00Z",
+    "tags": [
+      "bridal",
+      "peshwas",
+      "nikah",
+      "gold",
+      "mukesh"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Floor-length Tissue Gold Peshwas Gown",
+      "dupatta": "Mukesh Embellished Organza Dupatta + Head Veil",
+      "trouser": "Gold Woven Brocade Jamawar Skirt"
+    },
+    "embellishments": [
+      "Mukesh Work",
+      "Kamdani",
+      "Swarovski Crystals",
+      "Gotta Kinari"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p17",
-    slug: "ready-to-wear-pleated-skirt",
-    name: "Pleated Midi Skirt",
-    category: "ready-to-wear",
-    price: 8399,
-    images: [
-      img("photo-1583496661160-fb5886a0aaaa"),
-      img("photo-1572804013427-4d7ca7268217"),
+    "id": "kb-k01",
+    "slug": "mini-shehnai-girls-embroidered-sharara",
+    "name": "Mini Shehnai Girls Embroidered Sharara Set",
+    "category": "mommy-and-me",
+    "subCategory": "girls-festive",
+    "price": 240,
+    "discountPrice": 195,
+    "images": [
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
+      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80"
     ],
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["Black", "Camel", "Forest"],
-    fabric: "Polyester Blend",
-    description:
-      "Knife-pleated midi skirt with an elastic waist and fluid movement for day-to-night styling.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.4,
-    createdAt: "2026-08-12T10:00:00Z",
-    tags: ["skirt", "pleated", "rtw"],
+    "sizes": [
+      "3-4Y",
+      "5-6Y",
+      "7-8Y",
+      "9-10Y",
+      "11-12Y"
+    ],
+    "colors": [
+      "Blush Pink",
+      "Mint Green",
+      "Ivory Gold"
+    ],
+    "fabric": "Organza & Soft Cotton Silk",
+    "description": "A darling mini-me ensemble matching our adult Shehnai wedding collection! Features a soft organza kurta with delicate sequin floral motifs, lined with gentle breathable cotton silk, paired with a twirl-worthy flared sharara and mini net dupatta.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-19T10:00:00Z",
+    "tags": [
+      "kids",
+      "mommy-and-me",
+      "girls",
+      "sharara",
+      "eid"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Stitched Organza Kurti with Soft Cotton Lining",
+      "dupatta": "Mini Net Dupatta with Gotta Trim",
+      "trouser": "Flared Tiered Sharara"
+    },
+    "embellishments": [
+      "Soft Sequin Work",
+      "Baby Gotta",
+      "Pearl Edging"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p18",
-    slug: "ready-to-wear-cropped-jacket",
-    name: "Cropped Tailored Jacket",
-    category: "ready-to-wear",
-    price: 15799,
-    discountPrice: 12699,
-    images: [
-      img("photo-1551028719-00167b16eac5"),
-      img("photo-1591047139829-d91aecb6caea"),
+    "id": "kb-k02",
+    "slug": "mini-festive-lawn-peplum-set",
+    "name": "Mini Festive Lawn Peplum & Gharara Set",
+    "category": "mommy-and-me",
+    "subCategory": "girls-festive",
+    "price": 180,
+    "images": [
+      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80",
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80"
     ],
-    sizes: ["S", "M", "L"],
-    colors: ["Black", "Cream"],
-    fabric: "Cotton Twill",
-    description:
-      "Cropped tailored jacket with clean lines, flap pockets, and a structured shoulder.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-05-08T10:00:00Z",
-    tags: ["jacket", "tailored", "rtw"],
+    "sizes": [
+      "2-3Y",
+      "4-5Y",
+      "6-7Y",
+      "8-9Y",
+      "10-11Y"
+    ],
+    "colors": [
+      "Lilac",
+      "Peach",
+      "Aqua"
+    ],
+    "fabric": "Soft Lawn",
+    "description": "Playful and comfortable festive wear for young girls. Embroidered printed lawn peplum top with lace borders, paired with an easy-fit elasticated crushed gharara. Designed for happy celebration without scratchiness.",
+    "isNew": false,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.8,
+    "createdAt": "2026-07-22T10:00:00Z",
+    "tags": [
+      "kids",
+      "peplum",
+      "gharara",
+      "summer",
+      "lawn"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 2,
+    "fabricBreakdown": {
+      "shirt": "Stitched Lawn Peplum with Cotton Lining",
+      "trouser": "Crushed Soft Lawn Gharara"
+    },
+    "embellishments": [
+      "Cotton Laces",
+      "Tassel Tie-ups"
+    ],
+    "includesSlip": true
   },
   {
-    id: "p19",
-    slug: "ready-to-wear-wide-leg-trouser",
-    name: "Wide Leg Trouser",
-    category: "ready-to-wear",
-    price: 8799,
-    images: [
-      img("photo-1594633312681-425c7b97ccd1"),
-      img("photo-1515372039744-b8f02a3ae446"),
+    "id": "kb-u05",
+    "slug": "dilruba-chikan-embroidered-lawn",
+    "name": "Dilruba Chikan Luxury Lawn 3-Piece",
+    "category": "unstitched",
+    "subCategory": "luxury-lawn",
+    "price": 410,
+    "images": [
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80",
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80"
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Ivory", "Black", "Stone"],
-    fabric: "Crepe",
-    description:
-      "High-rise wide-leg trousers in fluid crepe with a concealed zip and pressed crease.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.6,
-    createdAt: "2026-07-30T10:00:00Z",
-    tags: ["trouser", "wide-leg", "rtw"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Butter Yellow",
+      "Powder Blue",
+      "White"
+    ],
+    "fabric": "Chikan Lawn",
+    "description": "Timeless Chikankari needlework across pure lawn fabric. Accompanied by a digital printed jacquard organza dupatta and dyed cambric trousers with organza embroidered patti.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.8,
+    "createdAt": "2026-08-27T10:00:00Z",
+    "tags": [
+      "chikan",
+      "lawn",
+      "unstitched",
+      "summer",
+      "luxury"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Chikankari Embroidered Lawn (3m)",
+      "dupatta": "Jacquard Organza Dupatta (2.5m)",
+      "trouser": "Dyed Cambric Trouser with Embroidered Motif (2.5m)"
+    },
+    "embellishments": [
+      "Chikankari",
+      "Laser Cutwork Border",
+      "Embroidered Trouser Patti"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p20",
-    slug: "sale-striped-maxi-dress",
-    name: "Striped Maxi Dress",
-    category: "women",
-    subCategory: "casual",
-    price: 10099,
-    discountPrice: 5999,
-    images: [
-      img("photo-1496747611176-843222e1e57c"),
-      img("photo-1515372039744-b8f02a3ae446"),
+    "id": "kb-u06",
+    "slug": "shabnam-jacquard-silk-suit",
+    "name": "Shabnam Metallic Jacquard Silk 3-Piece",
+    "category": "unstitched",
+    "subCategory": "mbroidered-wedding",
+    "price": 520,
+    "discountPrice": 440,
+    "images": [
+      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
-    sizes: ["S", "M", "L"],
-    colors: ["Navy Stripe", "Black Stripe"],
-    fabric: "Viscose",
-    description:
-      "Flowing striped maxi with a scooped neckline and adjustable waist ties — now on sale.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.2,
-    createdAt: "2026-01-20T10:00:00Z",
-    tags: ["sale", "maxi", "dress"],
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Gold Sand",
+      "Teal Zari",
+      "Wine"
+    ],
+    "fabric": "Woven Jacquard Silk",
+    "description": "Richly woven gold metallic threads embedded in soft silk, with an embroidered neckline patti and zari-bordered chiffon dupatta. An ideal mid-formal pick for festive dinners.",
+    "isNew": false,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.7,
+    "createdAt": "2026-07-30T10:00:00Z",
+    "tags": [
+      "jacquard",
+      "silk",
+      "unstitched",
+      "zari",
+      "wedding"
+    ],
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Woven Jacquard Silk Shirt (3m)",
+      "dupatta": "Zari Weave Chiffon Dupatta (2.5m)",
+      "trouser": "Dyed Silk Blend Trouser (2.5m)"
+    },
+    "embellishments": [
+      "Zari Weaving",
+      "Embroidered Neck Patti"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p21",
-    slug: "sale-denim-shirt-dress",
-    name: "Denim Shirt Dress",
-    category: "women",
-    subCategory: "casual",
-    price: 8599,
-    discountPrice: 5199,
-    images: [
-      img("photo-1541099649105-f69ad21f3246"),
-      img("photo-1576995853123-5a10305d93c0"),
+    "id": "kb-p04",
+    "slug": "marjaan-embroidered-pret-suit",
+    "name": "Marjaan 3-Piece Stitched Karandi Suit",
+    "category": "ready-to-wear",
+    "subCategory": "festive-pret",
+    "price": 460,
+    "images": [
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Light Wash", "Indigo"],
-    fabric: "Denim",
-    description:
-      "Classic denim shirt dress with patch pockets and a self-belt. Limited stock on sale.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.1,
-    createdAt: "2025-12-05T10:00:00Z",
-    tags: ["sale", "denim", "dress"],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "Terracotta",
+      "Forest Green",
+      "Beige"
+    ],
+    "fabric": "Soft Karandi",
+    "description": "Stitched 3-piece suit in premium soft karandi fabric. Warm, textured, and adorned with delicate Kashmiri style aari needlework on the neckline and hem. Includes an embroidered wool-blend shawl.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 4.9,
+    "createdAt": "2026-08-21T10:00:00Z",
+    "tags": [
+      "karandi",
+      "shawl",
+      "stitched",
+      "winter",
+      "pret"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "Stitched Karandi Kurta",
+      "dupatta": "Embroidered Wool-Blend Shawl",
+      "trouser": "Straight Stitched Karandi Trouser"
+    },
+    "embellishments": [
+      "Kashmiri Aari Threadwork",
+      "Shawl Scalloped Borders"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p22",
-    slug: "velvet-evening-kurta",
-    name: "Velvet Evening Kurta",
-    category: "women",
-    subCategory: "formals",
-    price: 18699,
-    images: [
-      img("photo-1566174053879-31528523f8ae"),
-      img("photo-1595777457583-95e059d581b8"),
+    "id": "kb-a05",
+    "slug": "layla-kimono-crepe-abaya",
+    "name": "Layla Embroidered Kimono Crepe Abaya",
+    "category": "abayas-kaftans",
+    "subCategory": "kimono-abayas",
+    "price": 440,
+    "discountPrice": 380,
+    "images": [
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Emerald", "Wine", "Navy"],
-    fabric: "Velvet",
-    description:
-      "Rich velvet kurta with subtle sequin accents along the neckline for evening wear.",
-    isNew: false,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.8,
-    createdAt: "2026-03-10T10:00:00Z",
-    tags: ["formal", "velvet", "evening"],
+    "sizes": [
+      "52",
+      "54",
+      "56",
+      "58",
+      "60"
+    ],
+    "colors": [
+      "Slate Blue",
+      "Onyx Black",
+      "Sand Dune"
+    ],
+    "fabric": "Textured Heavy Crepe",
+    "description": "Modest sophistication meets contemporary luxury. Wide cut kimono abaya adorned with tonal botanical thread embroidery on the wide cuffs and back shoulders. Complete with matching Sheila.",
+    "isNew": true,
+    "isOnSale": true,
+    "inStock": true,
+    "rating": 4.8,
+    "createdAt": "2026-08-29T10:00:00Z",
+    "tags": [
+      "kimono",
+      "abaya",
+      "crepe",
+      "modest",
+      "sheila"
+    ],
+    "stitchingOptions": [
+      "stitched"
+    ],
+    "pieces": "abaya-set",
+    "fabricBreakdown": {
+      "abaya": "Textured Heavy Crepe Kimono Cut Abaya",
+      "dupatta": "Matching Chiffon Sheila (2m)"
+    },
+    "embellishments": [
+      "Tonal Botanical Embroidery",
+      "Wide Dropped Sleeves"
+    ],
+    "includesSlip": false
   },
   {
-    id: "p23",
-    slug: "cotton-poplin-shirt-dress",
-    name: "Cotton Poplin Shirt Dress",
-    category: "ready-to-wear",
-    price: 9799,
-    images: [
-      img("photo-1572804013427-4d7ca7268217"),
-      img("photo-1483985988355-763728e1935b"),
+    "id": "kb-f04",
+    "slug": "ayzel-silver-organza-formal-gown",
+    "name": "Ayzel Silver Zari Organza Formal Peshwas",
+    "category": "luxury-formals",
+    "subCategory": "wedding-formals",
+    "price": 1100,
+    "images": [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
     ],
-    sizes: ["S", "M", "L"],
-    colors: ["White", "Sky", "Blush"],
-    fabric: "Cotton Poplin",
-    description:
-      "Crisp poplin shirt dress with a belted waist and button-through front — office to weekend.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-08-14T10:00:00Z",
-    tags: ["shirt-dress", "poplin", "rtw"],
-  },
-  {
-    id: "p24",
-    slug: "mens-slim-chinos",
-    name: "Slim Fit Chinos",
-    category: "men",
-    price: 7499,
-    discountPrice: 5999,
-    images: [
-      img("photo-1473966968600-fa801b869a1a"),
-      img("photo-1624378439575-d8705ad7ae80"),
+    "sizes": [
+      "Unstitched",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
     ],
-    sizes: ["30", "32", "34", "36", "38"],
-    colors: ["Khaki", "Navy", "Olive"],
-    fabric: "Cotton Twill",
-    description:
-      "Slim-fit chinos in stretch cotton twill with a clean finish and classic five-pocket layout.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.3,
-    createdAt: "2026-04-25T10:00:00Z",
-    tags: ["chinos", "casual", "pants"],
-  },
-  {
-    id: "p25",
-    slug: "knit-crewneck-sweater",
-    name: "Knit Crewneck Sweater",
-    category: "men",
-    price: 10999,
-    images: [
-      img("photo-1576566588028-4147f3842f27"),
-      img("photo-1620799140408-edc6dcb6d633"),
+    "colors": [
+      "Silver Mist",
+      "Ice Blue",
+      "Lavender"
     ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Camel", "Grey", "Black"],
-    fabric: "Merino Wool",
-    description:
-      "Fine-gauge merino crewneck with a soft hand-feel and ribbed hem and cuffs.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.7,
-    createdAt: "2026-08-02T10:00:00Z",
-    tags: ["sweater", "wool", "knit"],
-  },
-  {
-    id: "p26",
-    slug: "organza-dupatta-shawl",
-    name: "Organza Dupatta Shawl",
-    category: "women",
-    subCategory: "formals",
-    price: 5599,
-    images: [
-      img("photo-1515886657613-9f3515b0c78f"),
-      img("photo-1581044777550-4cfa60707c03"),
+    "fabric": "Glass Organza",
+    "description": "A fairytale festive gown with 14 embroidered kalis, featuring silver tilla, holographic sequins, and 3D floral appliqués. Paired with a silk crushed lehenga and an embroidered organza veil.",
+    "isNew": true,
+    "isOnSale": false,
+    "inStock": true,
+    "rating": 5,
+    "createdAt": "2026-08-31T10:00:00Z",
+    "tags": [
+      "peshwas",
+      "silver",
+      "wedding",
+      "gown",
+      "zari"
     ],
-    sizes: ["One Size"],
-    colors: ["Gold", "Silver", "Rose"],
-    fabric: "Organza",
-    description:
-      "Sheer organza dupatta with embroidered borders — layer over formals or lawn sets.",
-    isNew: false,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.4,
-    createdAt: "2026-06-11T10:00:00Z",
-    tags: ["dupatta", "organza", "accessory"],
-  },
-  {
-    id: "p27",
-    slug: "kids-cotton-tee-pack",
-    name: "Kids Soft Cotton Tee Pack",
-    category: "kids",
-    price: 3499,
-    discountPrice: 2699,
-    images: [
-      img("photo-1503454537195-1dcabb73ffb9"),
-      img("photo-1471286174890-9c112ffca5b4"),
+    "stitchingOptions": [
+      "unstitched",
+      "stitched"
     ],
-    sizes: ["2Y", "3Y", "4Y", "5Y", "6Y"],
-    colors: ["White", "Grey", "Navy"],
-    fabric: "Cotton",
-    description:
-      "Pack of three soft cotton tees with reinforced seams for everyday wear.",
-    isNew: false,
-    isOnSale: true,
-    inStock: true,
-    rating: 4.2,
-    createdAt: "2026-03-05T10:00:00Z",
-    tags: ["kids", "basics", "tee"],
-  },
-  {
-    id: "p28",
-    slug: "unstitched-digital-print-lawn",
-    name: "Digital Print Lawn Suite",
-    category: "unstitched",
-    price: 6899,
-    images: [
-      img("photo-1620799140408-edc6dcb6d633"),
-      img("photo-1558171813-4c088753af8f"),
+    "pieces": 3,
+    "fabricBreakdown": {
+      "shirt": "14-Kali Glass Organza Gown Panels with Handworked Yoke",
+      "dupatta": "Embellished Organza Veil (2.75m)",
+      "trouser": "Dyed Silk Crushed Inner Lehenga (3m)",
+      "slip": "Full Cotton Silk Inner Slip (2.5m)"
+    },
+    "embellishments": [
+      "Silver Tilla",
+      "Holographic Sequins",
+      "3D Appliqués"
     ],
-    sizes: ["One Size"],
-    colors: ["Aqua", "Coral"],
-    fabric: "Lawn",
-    description:
-      "Digitally printed lawn suite with coordinated borders and plain dyed trouser fabric.",
-    isNew: true,
-    isOnSale: false,
-    inStock: true,
-    rating: 4.5,
-    createdAt: "2026-08-16T10:00:00Z",
-    tags: ["unstitched", "digital", "lawn"],
-  },
+    "includesSlip": true
+  }
 ];

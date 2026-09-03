@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Playfair_Display, Outfit, Montserrat, Cinzel } from "next/font/google";
 import { SiteShell } from "@/components/layout/SiteShell";
 import "./globals.css";
 
@@ -9,20 +9,34 @@ const outfit = Outfit({
   display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Aurelia — Contemporary Clothing",
-    template: "%s · Aurelia",
+    default: "Kusum — The Premium Designer Wear",
+    template: "%s · Kusum",
   },
   description:
-    "Shop Aurelia for lawn, ready-to-wear, menswear, kids, and seasonal sale collections. Modern fashion with timeless ease.",
+    "Shop Kusum for luxury women's ethnic and Islamic modest wear. Explore unstitched lawn, festive pret, wedding formals, and modest abayas with UAE & worldwide delivery.",
 };
 
 export default function RootLayout({
@@ -31,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${cormorant.variable} h-full`}>
+    <html lang="en" className={`${outfit.variable} ${playfair.variable} ${montserrat.variable} ${cinzel.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
         <SiteShell>{children}</SiteShell>
       </body>

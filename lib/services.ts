@@ -120,6 +120,21 @@ export function filterProducts(
       }
     }
 
+    if (filters.stitchingType) {
+      if (
+        !product.stitchingOptions ||
+        !product.stitchingOptions.includes(filters.stitchingType)
+      ) {
+        return false;
+      }
+    }
+
+    if (filters.pieces?.length) {
+      if (!product.pieces || !filters.pieces.includes(product.pieces)) {
+        return false;
+      }
+    }
+
     if (filters.inStock === true && !product.inStock) return false;
     if (filters.inStock === false && product.inStock) return false;
 
@@ -136,6 +151,7 @@ export function filterProducts(
         product.fabric ?? "",
         ...(product.tags ?? []),
         ...product.colors,
+        ...(product.embellishments ?? []),
       ]
         .join(" ")
         .toLowerCase();
@@ -181,7 +197,31 @@ export function searchProducts(query: string, limit = 6): Product[] {
 export function getAllSizes(): string[] {
   const sizes = new Set<string>();
   products.forEach((p) => p.sizes.forEach((s) => sizes.add(s)));
-  const order = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+  const order = [
+    "Unstitched",
+    "Made to Measure",
+    "One Size",
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "52",
+    "54",
+    "56",
+    "58",
+    "60",
+    "2-3Y",
+    "3-4Y",
+    "4-5Y",
+    "5-6Y",
+    "6-7Y",
+    "7-8Y",
+    "8-9Y",
+    "9-10Y",
+    "10-11Y",
+    "11-12Y",
+  ];
   return Array.from(sizes).sort((a, b) => {
     const ai = order.indexOf(a);
     const bi = order.indexOf(b);
@@ -214,12 +254,11 @@ export function getPriceRange(): { min: number; max: number } {
   };
 }
 
+export const FREE_SHIPPING_THRESHOLD = 350;
+export const STANDARD_SHIPPING_FEE = 25;
+
 export function formatPrice(amount: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return `AED ${amount.toLocaleString("en-US")}`;
 }
 
 export function getDiscountPercent(product: Product): number | null {
@@ -230,3 +269,4 @@ export function getDiscountPercent(product: Product): number | null {
     ((product.price - product.discountPrice) / product.price) * 100,
   );
 }
+
