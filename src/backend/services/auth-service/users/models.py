@@ -183,6 +183,8 @@ class EmailJob(UUIDPrimaryKeyModel):
     )
     attempts = models.PositiveSmallIntegerField(default=0)
     celery_task_id = models.CharField(max_length=255, blank=True, default="")
+    # Signed send-time secrets (OTP / reset URL). Cleared after successful send.
+    send_payload = models.TextField(blank=True, default="")
     last_error = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

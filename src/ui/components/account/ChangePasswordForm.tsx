@@ -6,11 +6,13 @@ import { inputClassName } from "@/components/account/form-styles";
 import { FormLabel } from "@/components/account/FormLabel";
 import { ApiError } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { redirectToCustomerLogin } from "@/lib/auth-session";
 import { useCustomerAuthStore } from "@/lib/customer-auth-store";
 import { changePassword } from "@/lib/profile-api";
 
 export function ChangePasswordForm() {
   const access = useCustomerAuthStore((s) => s.access);
+  const clearSession = useCustomerAuthStore((s) => s.clearSession);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -46,10 +48,9 @@ export function ChangePasswordForm() {
     setLoading(true);
     try {
       await changePassword(access, currentPassword, newPassword);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setSuccess("Password updated.");
+      setSuccess("Password updated. Please sign in again.");
+      clearSession();
+      window.setTimeout(() => redirectToCustomerLogin("/account/password"), 800);
     } catch (err) {
       setError(
         err instanceof ApiError

@@ -1,4 +1,5 @@
 import { isSessionExpiredError, notifySessionExpired } from "@/lib/auth-session";
+import { refreshAccessToken, type AuthScope } from "@/lib/token-refresh";
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 const API_BASE_PATH = process.env.NEXT_PUBLIC_API_BASE_PATH ?? "/api";
@@ -42,13 +43,28 @@ type RequestOptions = {
   token?: string | null;
   params?: Record<string, string | number | boolean | undefined | null>;
   skipSessionExpiry?: boolean;
+  _retried?: boolean;
 };
+
+function resolveAuthScope(): AuthScope {
+  if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
+    return "staff";
+  }
+  return "customer";
+}
 
 export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, token, params, skipSessionExpiry } = options;
+  const {
+    method = "GET",
+    body,
+    token,
+    params,
+    skipSessionExpiry,
+    _retried,
+  } = options;
   const url = new URL(
     `${getApiBase()}${path.startsWith("/") ? path : `/${path}`}`,
     getRequestBaseUrl(),
@@ -101,7 +117,20 @@ export async function apiRequest<T>(
       typeof (data as { detail: unknown }).detail === "string"
         ? (data as { detail: string }).detail
         : `Request failed (${res.status})`;
-    if (token && !skipSessionExpiry && isSessionExpiredError(res.status, message)) {
+    if (
+      token &&
+      !skipSessionExpiry &&
+      !_retried &&
+      isSessionExpiredError(res.status, message)
+    ) {
+      const nextAccess = await refreshAccessToken(resolveAuthScope());
+      if (nextAccess) {
+        return apiRequest<T>(path, {
+          ...options,
+          token: nextAccess,
+          _retried: true,
+        });
+      }
       notifySessionExpired();
     }
     throw new ApiError(message, res.status, data);

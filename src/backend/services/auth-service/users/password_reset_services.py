@@ -8,10 +8,11 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils import timezone
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
+from .email_payload import dump_send_payload
 from .models import EmailJob, PasswordResetToken
 from .tasks import send_password_reset_email
+from .token_utils import blacklist_user_refresh_tokens
 
 User = get_user_model()
 
@@ -58,8 +59,9 @@ def _enqueue_password_reset_email(
         user=user,
         password_reset_token=token_obj,
         status=EmailJob.Status.PENDING,
+        send_payload=dump_send_payload({"reset_url": reset_url}),
     )
-    async_result = send_password_reset_email.delay(str(job.id), user.email, reset_url)
+    async_result = send_password_reset_email.delay(str(job.id))
     if async_result.id:
         job.celery_task_id = async_result.id
         job.save(update_fields=["celery_task_id", "updated_at"])
@@ -139,9 +141,4 @@ def confirm_password_reset(raw_token: str, new_password: str) -> None:
     token_obj.used_at = timezone.now()
     token_obj.save(update_fields=["used_at"])
 
-    _blacklist_user_refresh_tokens(user)
-
-
-def _blacklist_user_refresh_tokens(user: User) -> None:
-    for outstanding in OutstandingToken.objects.filter(user_id=user.id):
-        BlacklistedToken.objects.get_or_create(token=outstanding)
+    blacklist_user_refresh_tokens(user)

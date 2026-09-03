@@ -8,6 +8,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .email_payload import dump_send_payload
 from .models import EmailJob, EmailVerificationOTP
 from .tasks import send_email_verification_otp
 
@@ -60,8 +61,9 @@ def enqueue_email_verification_otp(user: User, otp_obj: EmailVerificationOTP, ra
         user=user,
         email_verification_otp=otp_obj,
         status=EmailJob.Status.PENDING,
+        send_payload=dump_send_payload({"otp": raw_otp}),
     )
-    async_result = send_email_verification_otp.delay(str(job.id), user.email, raw_otp)
+    async_result = send_email_verification_otp.delay(str(job.id))
     if async_result.id:
         job.celery_task_id = async_result.id
         job.save(update_fields=["celery_task_id", "updated_at"])

@@ -7,6 +7,7 @@ import {
   redirectToAdminLogin,
   registerSessionExpiredHandler,
 } from "@/lib/auth-session";
+import { registerTokenSession } from "@/lib/token-refresh";
 
 export type AuthUser = {
   id: string;
@@ -95,4 +96,11 @@ export const useAuthStore = create<AuthState>()(
 registerSessionExpiredHandler(() => {
   useAuthStore.getState().clearSession();
   redirectToAdminLogin();
+});
+
+registerTokenSession("staff", {
+  getRefresh: () => useAuthStore.getState().refresh,
+  setTokens: (access, refresh) => {
+    useAuthStore.setState({ access, refresh });
+  },
 });

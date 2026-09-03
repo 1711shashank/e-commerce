@@ -14,7 +14,13 @@ export function registerCustomerSessionExpiredHandler(fn: SessionExpiredHandler)
 
 export function isSessionExpiredError(status: number, detail: string): boolean {
   if (status !== 401 && status !== 403) return false;
-  return detail.toLowerCase().includes("token has expired");
+  const normalized = detail.toLowerCase();
+  return (
+    normalized.includes("token has expired") ||
+    normalized.includes("token is invalid or expired") ||
+    normalized.includes("not valid for any token type") ||
+    normalized.includes("token_not_valid")
+  );
 }
 
 export function notifySessionExpired(): void {

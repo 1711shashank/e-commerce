@@ -1,0 +1,5 @@
+Welcome to Aurelia.
+
+Your verification code is: {{ otp }}
+
+This code expires in {{ lifetime_minutes }} minutes. If you did not create an account, you can ignore this email.

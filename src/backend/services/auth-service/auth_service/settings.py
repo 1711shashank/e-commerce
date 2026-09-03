@@ -112,6 +112,14 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
+def _requests_per_minute(env_name: str, default: int) -> str:
+    """Env value is max requests per minute (integer). Empty falls back to default."""
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return f"{default}/minute"
+    return f"{int(raw)}/minute"
+
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -120,10 +128,20 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "password_reset_request": "5/hour",
-        "password_reset_confirm": "20/hour",
-        "email_verification_verify": "20/hour",
-        "email_verification_resend": "5/hour",
+        "login": _requests_per_minute("AUTH_LOGIN_RATE_PER_MINUTE", 10),
+        "register": _requests_per_minute("AUTH_REGISTER_RATE_PER_MINUTE", 5),
+        "password_reset_request": _requests_per_minute(
+            "PASSWORD_RESET_REQUEST_RATE_PER_MINUTE", 5
+        ),
+        "password_reset_confirm": _requests_per_minute(
+            "PASSWORD_RESET_CONFIRM_RATE_PER_MINUTE", 20
+        ),
+        "email_verification_verify": _requests_per_minute(
+            "EMAIL_VERIFICATION_VERIFY_RATE_PER_MINUTE", 20
+        ),
+        "email_verification_resend": _requests_per_minute(
+            "EMAIL_VERIFICATION_RESEND_RATE_PER_MINUTE", 5
+        ),
     },
 }
 

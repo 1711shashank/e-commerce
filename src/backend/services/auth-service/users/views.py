@@ -12,6 +12,7 @@ from .serializers import (
     RegisterSerializer,
     UserSerializer,
 )
+from .throttles import LoginThrottle, RegisterThrottle
 
 User = get_user_model()
 
@@ -20,6 +21,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [RegisterThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -37,6 +39,7 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginThrottle]
 
 
 class RefreshView(TokenRefreshView):

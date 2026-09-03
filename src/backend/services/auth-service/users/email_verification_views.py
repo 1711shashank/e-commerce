@@ -1,24 +1,16 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from .email_verification_serializers import (
     ResendVerificationOTPSerializer,
     VerifyEmailSerializer,
 )
+from .throttles import ResendVerificationOTPThrottle, VerifyEmailThrottle
 
 VERIFY_EMAIL_RESEND_MESSAGE = (
     "If that email needs verification, a new code has been sent."
 )
-
-
-class VerifyEmailThrottle(AnonRateThrottle):
-    scope = "email_verification_verify"
-
-
-class ResendVerificationOTPThrottle(AnonRateThrottle):
-    scope = "email_verification_resend"
 
 
 class VerifyEmailView(APIView):

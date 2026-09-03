@@ -1,25 +1,17 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from .password_reset_serializers import (
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
 )
+from .throttles import PasswordResetConfirmThrottle, PasswordResetRequestThrottle
 
 PASSWORD_RESET_REQUEST_MESSAGE = (
     "If an account exists with that email, a reset link has been sent."
 )
 PASSWORD_RESET_CONFIRM_MESSAGE = "Password reset successfully."
-
-
-class PasswordResetRequestThrottle(AnonRateThrottle):
-    scope = "password_reset_request"
-
-
-class PasswordResetConfirmThrottle(AnonRateThrottle):
-    scope = "password_reset_confirm"
 
 
 class PasswordResetRequestView(APIView):

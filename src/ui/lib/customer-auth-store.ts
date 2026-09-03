@@ -14,6 +14,7 @@ import {
   verifyEmailOtp,
   type VerifyEmailResponse,
 } from "@/lib/email-verification-api";
+import { registerTokenSession } from "@/lib/token-refresh";
 
 type LoginResponse = {
   access: string;
@@ -134,4 +135,11 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
 registerCustomerSessionExpiredHandler(() => {
   useCustomerAuthStore.getState().clearSession();
   redirectToCustomerLogin();
+});
+
+registerTokenSession("customer", {
+  getRefresh: () => useCustomerAuthStore.getState().refresh,
+  setTokens: (access, refresh) => {
+    useCustomerAuthStore.setState({ access, refresh });
+  },
 });

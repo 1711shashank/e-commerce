@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from .token_utils import blacklist_user_refresh_tokens
 
 User = get_user_model()
 
@@ -57,6 +60,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context["request"].user
         user.set_password(self.validated_data["new_password"])
         user.save(update_fields=["password"])
+        blacklist_user_refresh_tokens(user)
         return user
 
 
@@ -66,6 +70,20 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email", "password", "first_name", "last_name")
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        if password:
+            candidate = User(
+                email=attrs.get("email", ""),
+                first_name=attrs.get("first_name", ""),
+                last_name=attrs.get("last_name", ""),
+            )
+            try:
+                validate_password(password, candidate)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"password": list(exc.messages)}) from exc
+        return attrs
 
     def create(self, validated_data):
         from .email_verification_services import issue_and_send_verification_otp
