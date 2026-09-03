@@ -60,3 +60,11 @@ def send_password_reset_email(self, job_id: int, user_email: str, reset_url: str
         job.sent_at = timezone.now()
         job.last_error = ""
         job.save(update_fields=["status", "sent_at", "last_error", "updated_at"])
+
+    logger.info(
+        "Password reset email sent successfully via %s to %s (job_id=%s, attempt=%s)",
+        settings.EMAIL_BACKEND,
+        user_email,
+        job_id,
+        attempt,
+    )
