@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import secrets
 from datetime import timedelta
 
@@ -6,11 +7,11 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .email_payload import dump_send_payload
 from .models import EmailJob, EmailVerificationOTP
 from .tasks import send_email_verification_otp
+from .token_utils import build_tokens_for_user
 
 User = get_user_model()
 
@@ -88,25 +89,6 @@ def resend_verification_otp(email: str) -> None:
     issue_and_send_verification_otp(user)
 
 
-def _tokens_for_user(user: User) -> dict:
-    from .serializers import UserSerializer
-
-    refresh = RefreshToken.for_user(user)
-    claims = {
-        "sub": str(user.id),
-        "email": user.email,
-        "role": user.role,
-    }
-    for key, value in claims.items():
-        refresh[key] = value
-        refresh.access_token[key] = value
-    return {
-        "refresh": str(refresh),
-        "access": str(refresh.access_token),
-        "user": UserSerializer(user).data,
-    }
-
-
 @transaction.atomic
 def verify_email_otp(email: str, raw_otp: str) -> dict:
     normalized = User.objects.normalize_email(email.strip())
@@ -123,7 +105,10 @@ def verify_email_otp(email: str, raw_otp: str) -> dict:
         raise EmailVerificationError("Invalid verification code.", field="otp")
 
     if user.email_verified and user.is_active:
-        return _tokens_for_user(user)
+        raise EmailVerificationError(
+            "This verification code is invalid or has expired.",
+            field="otp",
+        )
 
     otp_obj = (
         EmailVerificationOTP.objects.select_for_update()
@@ -143,7 +128,7 @@ def verify_email_otp(email: str, raw_otp: str) -> dict:
             field="otp",
         )
 
-    if otp_obj.otp_hash != _hash_otp(otp):
+    if not hmac.compare_digest(otp_obj.otp_hash, _hash_otp(otp)):
         otp_obj.failed_attempts += 1
         otp_obj.save(update_fields=["failed_attempts"])
         raise EmailVerificationError(
@@ -161,4 +146,4 @@ def verify_email_otp(email: str, raw_otp: str) -> dict:
     user.is_active = True
     user.save(update_fields=["email_verified", "is_active"])
 
-    return _tokens_for_user(user)
+    return build_tokens_for_user(user)

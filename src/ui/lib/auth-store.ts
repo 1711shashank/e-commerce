@@ -7,7 +7,7 @@ import {
   redirectToAdminLogin,
   registerSessionExpiredHandler,
 } from "@/lib/auth-session";
-import { registerTokenSession } from "@/lib/token-refresh";
+import { registerTokenSession, refreshAccessToken } from "@/lib/token-refresh";
 
 export type AuthUser = {
   id: string;
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         const data = await apiRequest<LoginResponse>("/auth/login/", {
           method: "POST",
-          body: { email, password },
+          body: { email, password, audience: "staff" },
         });
         if (data.user.role !== "staff" && data.user.role !== "admin") {
           throw new Error("Only staff or admin accounts can use the catalog portal.");
@@ -85,7 +85,6 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "aurelia-auth",
       partialize: (state) => ({
-        access: state.access,
         refresh: state.refresh,
         user: state.user,
       }),
@@ -104,3 +103,12 @@ registerTokenSession("staff", {
     useAuthStore.setState({ access, refresh });
   },
 });
+
+if (typeof window !== "undefined") {
+  useAuthStore.persist.onFinishHydration(() => {
+    const { access, refresh } = useAuthStore.getState();
+    if (!access && refresh) {
+      void refreshAccessToken("staff");
+    }
+  });
+}

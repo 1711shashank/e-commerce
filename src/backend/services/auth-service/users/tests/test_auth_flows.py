@@ -13,6 +13,7 @@ from users.email_payload import load_send_payload
 from users.models import EmailJob, User
 from users.tasks import send_email_verification_otp, send_password_reset_email
 from users.throttles import LoginThrottle, RegisterThrottle
+from users.token_utils import apply_token_claims
 
 
 @override_settings(
@@ -39,6 +40,13 @@ class AuthFlowTests(APITestCase):
                 "first_name": "Ada",
                 "last_name": "Lovelace",
             },
+            format="json",
+        )
+
+    def _login(self, email, password, audience="customer"):
+        return self.client.post(
+            self.login_url,
+            {"email": email, "password": password, "audience": audience},
             format="json",
         )
 
@@ -96,13 +104,25 @@ class AuthFlowTests(APITestCase):
         self.assertTrue(user.is_active)
         self.assertTrue(user.email_verified)
 
-        login = self.client.post(
-            self.login_url,
-            {"email": user.email, "password": "StrongPass123!"},
-            format="json",
-        )
+        login = self._login(user.email, "StrongPass123!")
         self.assertEqual(login.status_code, status.HTTP_200_OK)
         self.assertEqual(login.data["user"]["email"], user.email)
+
+    def test_verify_email_rejects_already_verified_without_otp(self):
+        user = User.objects.create_user(
+            email="verified@example.com",
+            password="StrongPass123!",
+            role=User.Role.CUSTOMER,
+            is_active=True,
+            email_verified=True,
+        )
+        response = self.client.post(
+            self.verify_url,
+            {"email": user.email, "otp": "000000"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn("access", response.data)
 
     def test_login_blocked_for_unverified_customer(self):
         with patch(
@@ -111,17 +131,58 @@ class AuthFlowTests(APITestCase):
         ):
             self._register(email="pending@example.com")
 
-        login = self.client.post(
-            self.login_url,
-            {"email": "pending@example.com", "password": "StrongPass123!"},
-            format="json",
-        )
+        login = self._login("pending@example.com", "StrongPass123!")
         self.assertEqual(login.status_code, status.HTTP_400_BAD_REQUEST)
         payload = login.data
         if isinstance(payload.get("code"), list):
             self.assertIn("email_not_verified", payload["code"])
         else:
             self.assertEqual(payload.get("code"), "email_not_verified")
+
+    def test_login_audience_rejects_staff_on_customer_portal(self):
+        User.objects.create_user(
+            email="staff@example.com",
+            password="StrongPass123!",
+            role=User.Role.STAFF,
+            is_active=True,
+            email_verified=True,
+            is_staff=True,
+        )
+        response = self._login("staff@example.com", "StrongPass123!", audience="customer")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_requires_audience(self):
+        User.objects.create_user(
+            email="needs-audience@example.com",
+            password="StrongPass123!",
+            role=User.Role.CUSTOMER,
+            is_active=True,
+            email_verified=True,
+        )
+        response = self.client.post(
+            self.login_url,
+            {"email": "needs-audience@example.com", "password": "StrongPass123!"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_verified_email_is_noop(self):
+        User.objects.create_user(
+            email="taken@example.com",
+            password="OldPass123!",
+            role=User.Role.CUSTOMER,
+            is_active=True,
+            email_verified=True,
+        )
+        with patch(
+            "users.email_verification_services.send_email_verification_otp.delay",
+            return_value=type("R", (), {"id": None})(),
+        ) as mock_delay:
+            response = self._register(email="taken@example.com", password="NewPass123!")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mock_delay.assert_not_called()
+        user = User.objects.get(email="taken@example.com")
+        self.assertTrue(user.check_password("OldPass123!"))
 
     def test_register_rejects_weak_password(self):
         response = self._register(password="password")
@@ -155,6 +216,7 @@ class AuthFlowTests(APITestCase):
         self.assertEqual(confirm.status_code, status.HTTP_200_OK)
         user.refresh_from_db()
         self.assertTrue(user.check_password("NewPass123!"))
+        self.assertEqual(user.token_version, 1)
 
     def test_password_reset_unknown_email_is_enumeration_safe(self):
         response = self.client.post(
@@ -165,7 +227,7 @@ class AuthFlowTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_change_password_blacklists_refresh_tokens(self):
+    def test_change_password_revokes_access_and_refresh(self):
         user = User.objects.create_user(
             email="change@example.com",
             password="OldPass123!",
@@ -174,8 +236,10 @@ class AuthFlowTests(APITestCase):
             email_verified=True,
         )
         refresh = RefreshToken.for_user(user)
+        apply_token_claims(refresh, user)
         old_refresh = str(refresh)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        old_access = str(refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {old_access}")
 
         response = self.client.post(
             self.change_password_url,
@@ -199,6 +263,9 @@ class AuthFlowTests(APITestCase):
         )
         self.assertEqual(refresh_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+        me = self.client.get(reverse("auth-me"))
+        self.assertEqual(me.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_login_throttle(self):
         User.objects.create_user(
             email="throttle@example.com",
@@ -208,20 +275,12 @@ class AuthFlowTests(APITestCase):
             email_verified=True,
         )
         with patch.object(LoginThrottle, "rate", "1/minute", create=True):
-            first_login = self.client.post(
-                self.login_url,
-                {"email": "throttle@example.com", "password": "wrong"},
-                format="json",
-            )
+            first_login = self._login("throttle@example.com", "wrong")
             self.assertIn(
                 first_login.status_code,
                 (status.HTTP_401_UNAUTHORIZED, status.HTTP_400_BAD_REQUEST),
             )
-            second_login = self.client.post(
-                self.login_url,
-                {"email": "throttle@example.com", "password": "wrong"},
-                format="json",
-            )
+            second_login = self._login("throttle@example.com", "wrong")
         self.assertEqual(second_login.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
     def test_register_throttle(self):
@@ -246,3 +305,34 @@ class AuthFlowTests(APITestCase):
             self.assertEqual(len(args), 1)
             job = EmailJob.objects.get(pk=args[0])
             self.assertTrue(job.send_payload)
+
+    def test_dead_email_job_clears_send_payload(self):
+        user = User.objects.create_user(
+            email="dead-job@example.com",
+            password="StrongPass123!",
+            role=User.Role.CUSTOMER,
+            is_active=True,
+            email_verified=True,
+        )
+        job = EmailJob.objects.create(
+            email_type=EmailJob.EmailType.EMAIL_VERIFICATION,
+            recipient=user.email,
+            user=user,
+            send_payload="signed-secret",
+        )
+        from users.tasks import _mark_job_failed
+
+        _mark_job_failed(job, 3, RuntimeError("boom"))
+        job.refresh_from_db()
+        self.assertEqual(job.status, EmailJob.Status.DEAD)
+        self.assertEqual(job.send_payload, "")
+
+    def test_email_is_normalized_lowercase(self):
+        user = User.objects.create_user(
+            email="Mixed.Case@Example.COM",
+            password="StrongPass123!",
+            role=User.Role.CUSTOMER,
+            is_active=True,
+            email_verified=True,
+        )
+        self.assertEqual(user.email, "mixed.case@example.com")

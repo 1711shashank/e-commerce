@@ -1,4 +1,9 @@
-from .settings import *  # noqa: F403
+import os
+
+os.environ.setdefault("AUTH_DEBUG", "True")
+os.environ.setdefault("AUTH_SECRET_KEY", "test-auth-secret")
+
+from .settings import *  # noqa: E402, F403
 
 DATABASES = {
     "default": {
@@ -13,3 +18,15 @@ PASSWORD_HASHERS = [
 ]
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "auth-service-tests",
+    }
+}
+
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = 0

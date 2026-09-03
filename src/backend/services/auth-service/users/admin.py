@@ -143,6 +143,7 @@ class EmailJobAdmin(admin.ModelAdmin):
         "updated_at",
         "sent_at",
     )
+    exclude = ("send_payload",)
     ordering = ("-created_at",)
     date_hierarchy = "created_at"
 

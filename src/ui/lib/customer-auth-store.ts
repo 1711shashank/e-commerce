@@ -14,7 +14,7 @@ import {
   verifyEmailOtp,
   type VerifyEmailResponse,
 } from "@/lib/email-verification-api";
-import { registerTokenSession } from "@/lib/token-refresh";
+import { registerTokenSession, refreshAccessToken } from "@/lib/token-refresh";
 
 type LoginResponse = {
   access: string;
@@ -67,7 +67,7 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
       customerLogin: async (email, password) => {
         const data = await apiRequest<LoginResponse>("/auth/login/", {
           method: "POST",
-          body: { email, password },
+          body: { email, password, audience: "customer" },
         });
         applyAuthSession(set, data);
       },
@@ -124,7 +124,6 @@ export const useCustomerAuthStore = create<CustomerAuthState>()(
     {
       name: "aurelia-customer-auth",
       partialize: (state) => ({
-        access: state.access,
         refresh: state.refresh,
         user: state.user,
       }),
@@ -143,3 +142,12 @@ registerTokenSession("customer", {
     useCustomerAuthStore.setState({ access, refresh });
   },
 });
+
+if (typeof window !== "undefined") {
+  useCustomerAuthStore.persist.onFinishHydration(() => {
+    const { access, refresh } = useCustomerAuthStore.getState();
+    if (!access && refresh) {
+      void refreshAccessToken("customer");
+    }
+  });
+}

@@ -27,11 +27,19 @@ def _mark_job_failed(job: EmailJob | None, attempt: int, exc: Exception) -> None
     if not job:
         return
     job.last_error = str(exc)[:2000]
+    # Drop send secrets once the job can no longer succeed, or always clear on
+    # terminal DEAD so OTP/reset URLs do not linger in the database.
+    clear_payload = attempt >= EMAIL_MAX_RETRIES
+    if clear_payload:
+        job.send_payload = ""
     if attempt >= EMAIL_MAX_RETRIES:
         job.status = EmailJob.Status.DEAD
     else:
         job.status = EmailJob.Status.FAILED
-    job.save(update_fields=["status", "last_error", "updated_at"])
+    fields = ["status", "last_error", "updated_at"]
+    if clear_payload:
+        fields.append("send_payload")
+    job.save(update_fields=fields)
 
 
 def _mark_job_sent(job: EmailJob | None) -> None:

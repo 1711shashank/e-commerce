@@ -12,7 +12,7 @@ from django.utils import timezone
 from .email_payload import dump_send_payload
 from .models import EmailJob, PasswordResetToken
 from .tasks import send_password_reset_email
-from .token_utils import blacklist_user_refresh_tokens
+from .token_utils import bump_token_version
 
 User = get_user_model()
 
@@ -141,4 +141,4 @@ def confirm_password_reset(raw_token: str, new_password: str) -> None:
     token_obj.used_at = timezone.now()
     token_obj.save(update_fields=["used_at"])
 
-    blacklist_user_refresh_tokens(user)
+    bump_token_version(user)

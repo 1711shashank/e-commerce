@@ -2,10 +2,22 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("AUTH_SECRET_KEY", "dev-auth-secret")
-DEBUG = os.environ.get("AUTH_DEBUG", "True").lower() in ("1", "true", "yes")
+DEBUG = os.environ.get("AUTH_DEBUG", "False").lower() in ("1", "true", "yes")
+SECRET_KEY = os.environ.get("AUTH_SECRET_KEY", "").strip()
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-auth-secret"
+    else:
+        raise ImproperlyConfigured("AUTH_SECRET_KEY must be set when AUTH_DEBUG is False.")
+elif SECRET_KEY == "dev-auth-secret" and not DEBUG:
+    raise ImproperlyConfigured(
+        "AUTH_SECRET_KEY must not use the insecure development default when AUTH_DEBUG is False."
+    )
+
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get("AUTH_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
@@ -98,7 +110,7 @@ JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        minutes=int(os.environ.get("JWT_ACCESS_TOKEN_LIFETIME_MINUTES", "30"))
+        minutes=int(os.environ.get("JWT_ACCESS_TOKEN_LIFETIME_MINUTES", "15"))
     ),
     "REFRESH_TOKEN_LIFETIME": timedelta(
         days=int(os.environ.get("JWT_REFRESH_TOKEN_LIFETIME_DAYS", "7"))
@@ -120,12 +132,21 @@ def _requests_per_minute(env_name: str, default: int) -> str:
     return f"{int(raw)}/minute"
 
 
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "users.authentication.VersionedJWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ),
     "DEFAULT_THROTTLE_RATES": {
         "login": _requests_per_minute("AUTH_LOGIN_RATE_PER_MINUTE", 10),
@@ -142,10 +163,9 @@ REST_FRAMEWORK = {
         "email_verification_resend": _requests_per_minute(
             "EMAIL_VERIFICATION_RESEND_RATE_PER_MINUTE", 5
         ),
+        "token_refresh": _requests_per_minute("AUTH_TOKEN_REFRESH_RATE_PER_MINUTE", 30),
     },
 }
-
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
@@ -205,6 +225,26 @@ AUTH_EMAIL_VERIFICATION_OTP_LIFETIME_MINUTES = int(
 AUTH_EMAIL_VERIFICATION_OTP_LENGTH = int(
     os.environ.get("AUTH_EMAIL_VERIFICATION_OTP_LENGTH", "6")
 )
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # Keep False by default: gunicorn usually sees plain HTTP behind TLS-terminating nginx.
+    SECURE_SSL_REDIRECT = os.environ.get("AUTH_SECURE_SSL_REDIRECT", "False").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get("AUTH_SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    if AUTH_PASSWORD_RESET_URL.startswith("http://"):
+        raise ImproperlyConfigured(
+            "AUTH_PASSWORD_RESET_URL must use https when AUTH_DEBUG is False."
+        )
 
 # Jazzmin 3.0.1 — classic AdminLTE look (dark sidebar, white navbar)
 JAZZMIN_SETTINGS = {

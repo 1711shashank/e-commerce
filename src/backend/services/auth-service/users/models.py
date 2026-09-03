@@ -8,6 +8,10 @@ from ecommerce_shared.models import UUIDPrimaryKeyModel
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
+    def normalize_email(self, email):
+        email = super().normalize_email(email)
+        return email.strip().lower() if email else email
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email is required")
@@ -46,6 +50,7 @@ class User(AbstractUser):
     )
     mobile = models.CharField(max_length=20, blank=True, default="")
     email_verified = models.BooleanField(default=False)
+    token_version = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
 
@@ -54,6 +59,11 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = type(self).objects.normalize_email(self.email)
+        super().save(*args, **kwargs)
 
 
 class Address(UUIDPrimaryKeyModel):

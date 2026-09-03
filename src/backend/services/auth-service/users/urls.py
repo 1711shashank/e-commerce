@@ -25,9 +25,9 @@ urlpatterns = [
         name="auth-password-reset-confirm",
     ),
     path("addresses/", AddressListCreateView.as_view(), name="auth-address-list"),
-    path("addresses/<int:pk>/", AddressDetailView.as_view(), name="auth-address-detail"),
+    path("addresses/<uuid:pk>/", AddressDetailView.as_view(), name="auth-address-detail"),
     path(
-        "addresses/<int:pk>/set-default/",
+        "addresses/<uuid:pk>/set-default/",
         AddressSetDefaultView.as_view(),
         name="auth-address-set-default",
     ),

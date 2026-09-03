@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .token_utils import blacklist_user_refresh_tokens
+from .token_utils import apply_token_claims, bump_token_version
 
 User = get_user_model()
 
@@ -60,16 +60,20 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context["request"].user
         user.set_password(self.validated_data["new_password"])
         user.save(update_fields=["password"])
-        blacklist_user_refresh_tokens(user)
+        bump_token_version(user)
         return user
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
         fields = ("email", "password", "first_name", "last_name")
+
+    def validate_email(self, value):
+        return User.objects.normalize_email(value)
 
     def validate(self, attrs):
         password = attrs.get("password")
@@ -93,13 +97,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         first_name = validated_data.get("first_name", "")
         last_name = validated_data.get("last_name", "")
 
-        existing = User.objects.filter(
-            email__iexact=email,
-            role=User.Role.CUSTOMER,
-            email_verified=False,
-        ).first()
-
+        existing = User.objects.filter(email__iexact=email).first()
         if existing:
+            if existing.email_verified or existing.role != User.Role.CUSTOMER:
+                # Enumeration-safe no-op for verified / non-customer accounts.
+                return existing
+
             existing.set_password(password)
             existing.first_name = first_name
             existing.last_name = last_name
@@ -114,18 +117,18 @@ class RegisterSerializer(serializers.ModelSerializer):
                     "email_verified",
                 ]
             )
-            user = existing
-        else:
-            user = User.objects.create_user(
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                role=User.Role.CUSTOMER,
-                is_active=False,
-                email_verified=False,
-            )
+            issue_and_send_verification_otp(existing)
+            return existing
 
+        user = User.objects.create_user(
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            role=User.Role.CUSTOMER,
+            is_active=False,
+            email_verified=False,
+        )
         issue_and_send_verification_otp(user)
         return user
 
@@ -133,25 +136,25 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(TokenObtainPairSerializer):
     username_field = User.EMAIL_FIELD
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["audience"] = serializers.ChoiceField(
+            choices=("customer", "staff"),
+            write_only=True,
+        )
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        claims = {
-            "sub": str(user.id),
-            "email": user.email,
-            "role": user.role,
-        }
-        for key, value in claims.items():
-            token[key] = value
-        access = token.access_token
-        for key, value in claims.items():
-            access[key] = value
+        apply_token_claims(token, user)
         return token
 
     def validate(self, attrs):
+        audience = attrs.pop("audience", None)
         email = attrs.get(self.username_field, "")
         password = attrs.get("password", "")
         normalized = User.objects.normalize_email(str(email).strip())
+        attrs[self.username_field] = normalized
         candidate = User.objects.filter(email__iexact=normalized).first()
         if (
             candidate
@@ -167,5 +170,15 @@ class LoginSerializer(TokenObtainPairSerializer):
             )
 
         data = super().validate(attrs)
-        data["user"] = UserSerializer(self.user).data
+        user = self.user
+        if audience == "customer" and user.role != User.Role.CUSTOMER:
+            raise serializers.ValidationError(
+                {"detail": "No active account found with the given credentials."}
+            )
+        if audience == "staff" and user.role not in (User.Role.STAFF, User.Role.ADMIN):
+            raise serializers.ValidationError(
+                {"detail": "No active account found with the given credentials."}
+            )
+
+        data["user"] = UserSerializer(user).data
         return data

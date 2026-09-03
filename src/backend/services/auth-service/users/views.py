@@ -12,7 +12,8 @@ from .serializers import (
     RegisterSerializer,
     UserSerializer,
 )
-from .throttles import LoginThrottle, RegisterThrottle
+from .throttles import LoginThrottle, RegisterThrottle, TokenRefreshThrottle
+from .token_refresh import ClaimAwareTokenRefreshSerializer
 
 User = get_user_model()
 
@@ -44,6 +45,8 @@ class LoginView(TokenObtainPairView):
 
 class RefreshView(TokenRefreshView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [TokenRefreshThrottle]
+    serializer_class = ClaimAwareTokenRefreshSerializer
 
 
 class LogoutView(APIView):
@@ -58,6 +61,11 @@ class LogoutView(APIView):
             )
         try:
             token = RefreshToken(refresh)
+            if str(token.get("user_id")) != str(request.user.id):
+                return Response(
+                    {"detail": "Invalid refresh token."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             token.blacklist()
         except Exception:
             return Response(

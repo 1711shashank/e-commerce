@@ -23,3 +23,7 @@ class VerifyEmailThrottle(AnonRateThrottle):
 
 class ResendVerificationOTPThrottle(AnonRateThrottle):
     scope = "email_verification_resend"
+
+
+class TokenRefreshThrottle(AnonRateThrottle):
+    scope = "token_refresh"

@@ -78,14 +78,19 @@ export async function apiRequest<T>(
     });
   }
 
+  let authToken = token;
+  if (token === null && !_retried && !skipSessionExpiry) {
+    authToken = await refreshAccessToken(resolveAuthScope());
+  }
+
   const headers: HeadersInit = {
     Accept: "application/json",
   };
   if (body !== undefined) {
     headers["Content-Type"] = "application/json";
   }
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
   const res = await fetch(url.toString(), {
@@ -118,7 +123,7 @@ export async function apiRequest<T>(
         ? (data as { detail: string }).detail
         : `Request failed (${res.status})`;
     if (
-      token &&
+      authToken &&
       !skipSessionExpiry &&
       !_retried &&
       isSessionExpiredError(res.status, message)
