@@ -1,11 +1,13 @@
-import django.contrib.auth.models
-import django.utils.timezone
-from django.db import migrations, models
+import uuid
 
+from django.db import migrations, models
+import django.db.models.deletion
+import django.utils.timezone
 import users.models
 
 
 class Migration(migrations.Migration):
+
     initial = True
 
     dependencies = [
@@ -16,21 +18,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="User",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 (
                     "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
                 ),
                 (
                     "is_superuser",
@@ -42,15 +33,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "first_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="first name"
-                    ),
+                    models.CharField(blank=True, max_length=150, verbose_name="first name"),
                 ),
                 (
                     "last_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="last name"
-                    ),
+                    models.CharField(blank=True, max_length=150, verbose_name="last name"),
                 ),
                 (
                     "is_staff",
@@ -74,6 +61,15 @@ class Migration(migrations.Migration):
                         default=django.utils.timezone.now, verbose_name="date joined"
                     ),
                 ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("email", models.EmailField(max_length=254, unique=True)),
                 (
                     "role",
@@ -92,7 +88,7 @@ class Migration(migrations.Migration):
                     "groups",
                     models.ManyToManyField(
                         blank=True,
-                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        help_text="The groups this user belongs to. A user will get all permissions of each of their groups.",
                         related_name="user_set",
                         related_query_name="user",
                         to="auth.group",
@@ -119,5 +115,149 @@ class Migration(migrations.Migration):
             managers=[
                 ("objects", users.models.UserManager()),
             ],
+        ),
+        migrations.CreateModel(
+            name="Address",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("full_name", models.CharField(max_length=150)),
+                ("mobile", models.CharField(max_length=20)),
+                (
+                    "address_type",
+                    models.CharField(
+                        choices=[
+                            ("home", "Home"),
+                            ("office", "Office"),
+                            ("other", "Other"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("custom_label", models.CharField(blank=True, default="", max_length=50)),
+                ("address_line_1", models.CharField(max_length=255)),
+                ("address_line_2", models.CharField(blank=True, default="", max_length=255)),
+                ("city", models.CharField(max_length=100)),
+                ("state", models.CharField(max_length=100)),
+                ("postal_code", models.CharField(max_length=20)),
+                ("country", models.CharField(default="IN", max_length=2)),
+                ("is_default", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="addresses",
+                        to="users.user",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-is_default", "-updated_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="PasswordResetToken",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("token_hash", models.CharField(db_index=True, max_length=64, unique=True)),
+                ("expires_at", models.DateTimeField()),
+                ("used_at", models.DateTimeField(blank=True, null=True)),
+                ("failed_attempts", models.PositiveSmallIntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="password_reset_tokens",
+                        to="users.user",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="EmailJob",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "email_type",
+                    models.CharField(
+                        choices=[("password_reset", "Password reset")],
+                        max_length=32,
+                    ),
+                ),
+                ("recipient", models.EmailField(max_length=254)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("processing", "Processing"),
+                            ("sent", "Sent"),
+                            ("failed", "Failed"),
+                            ("dead", "Dead"),
+                        ],
+                        db_index=True,
+                        default="pending",
+                        max_length=16,
+                    ),
+                ),
+                ("attempts", models.PositiveSmallIntegerField(default=0)),
+                ("celery_task_id", models.CharField(blank=True, default="", max_length=255)),
+                ("last_error", models.TextField(blank=True, default="")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("sent_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "password_reset_token",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="email_jobs",
+                        to="users.passwordresettoken",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="email_jobs",
+                        to="users.user",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
+            },
         ),
     ]

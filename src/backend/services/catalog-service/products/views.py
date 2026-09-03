@@ -73,8 +73,11 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_object(self):
         lookup = self.kwargs.get(self.lookup_url_kwarg or self.lookup_field)
         queryset = self.filter_queryset(self.get_queryset())
-        if lookup and str(lookup).isdigit():
-            obj = get_object_or_404(queryset, pk=int(lookup))
+        if lookup:
+            try:
+                obj = get_object_or_404(queryset, pk=uuid.UUID(str(lookup)))
+            except (ValueError, TypeError):
+                obj = get_object_or_404(queryset, slug=lookup)
         else:
             obj = get_object_or_404(queryset, slug=lookup)
         self.check_object_permissions(self.request, obj)

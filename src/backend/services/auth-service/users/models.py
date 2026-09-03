@@ -1,5 +1,8 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from ecommerce_shared.models import UUIDPrimaryKeyModel
 
 
 class UserManager(BaseUserManager):
@@ -31,6 +34,7 @@ class User(AbstractUser):
         STAFF = "staff", "Staff"
         ADMIN = "admin", "Admin"
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None
     email = models.EmailField(unique=True)
     role = models.CharField(
@@ -49,7 +53,7 @@ class User(AbstractUser):
         return self.email
 
 
-class Address(models.Model):
+class Address(UUIDPrimaryKeyModel):
     class AddressType(models.TextChoices):
         HOME = "home", "Home"
         OFFICE = "office", "Office"
@@ -89,7 +93,7 @@ class Address(models.Model):
         return self.get_address_type_display()
 
 
-class PasswordResetToken(models.Model):
+class PasswordResetToken(UUIDPrimaryKeyModel):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -109,7 +113,7 @@ class PasswordResetToken(models.Model):
         return f"Reset token for {self.user.email} ({status})"
 
 
-class EmailJob(models.Model):
+class EmailJob(UUIDPrimaryKeyModel):
     class EmailType(models.TextChoices):
         PASSWORD_RESET = "password_reset", "Password reset"
 

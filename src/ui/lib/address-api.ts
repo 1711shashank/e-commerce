@@ -3,7 +3,7 @@ import { apiRequest } from "@/lib/api";
 export type AddressType = "home" | "office" | "other";
 
 export type Address = {
-  id: number;
+  id: string;
   full_name: string;
   mobile: string;
   address_type: AddressType;
@@ -51,7 +51,7 @@ export async function createAddress(
 
 export async function updateAddress(
   token: string,
-  id: number,
+  id: string,
   payload: Partial<AddressPayload>,
 ): Promise<Address> {
   return apiRequest<Address>(`/auth/addresses/${id}/`, {
@@ -61,7 +61,7 @@ export async function updateAddress(
   });
 }
 
-export async function deleteAddress(token: string, id: number): Promise<void> {
+export async function deleteAddress(token: string, id: string): Promise<void> {
   await apiRequest(`/auth/addresses/${id}/`, {
     method: "DELETE",
     token,
@@ -70,7 +70,7 @@ export async function deleteAddress(token: string, id: number): Promise<void> {
 
 export async function setDefaultAddress(
   token: string,
-  id: number,
+  id: string,
 ): Promise<Address> {
   return apiRequest<Address>(`/auth/addresses/${id}/set-default/`, {
     method: "POST",

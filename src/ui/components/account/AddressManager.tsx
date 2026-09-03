@@ -24,7 +24,7 @@ export function AddressManager() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<number | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Address | null>(null);
   const [showForm, setShowForm] = useState(false);
 

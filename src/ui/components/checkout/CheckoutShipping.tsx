@@ -52,7 +52,7 @@ export function CheckoutShipping({ value, onChange }: CheckoutShippingProps) {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [selectedId, setSelectedId] = useState<number | "manual" | null>(null);
+  const [selectedId, setSelectedId] = useState<string | "manual" | null>(null);
   const initializedFor = useRef<string | null>(null);
 
   useEffect(() => {

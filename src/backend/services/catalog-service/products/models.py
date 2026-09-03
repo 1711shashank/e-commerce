@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
+from ecommerce_shared.models import UUIDPrimaryKeyModel
 
 
-class Category(models.Model):
+class Category(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=120)
     slug = models.SlugField(unique=True)
     image = models.URLField(blank=True)
@@ -23,7 +24,7 @@ class Category(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class Product(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255)
     category = models.CharField(max_length=64)
@@ -94,7 +95,7 @@ class Product(models.Model):
         self.in_stock = any(v.stock_qty > 0 for v in variant_rows)
 
 
-class ProductColor(models.Model):
+class ProductColor(UUIDPrimaryKeyModel):
     product = models.ForeignKey(
         Product, related_name="product_colors", on_delete=models.CASCADE
     )
@@ -117,7 +118,7 @@ class ProductColor(models.Model):
         return f"{self.product_id}:{self.name}"
 
 
-class ProductSize(models.Model):
+class ProductSize(UUIDPrimaryKeyModel):
     product = models.ForeignKey(
         Product, related_name="product_sizes", on_delete=models.CASCADE
     )
@@ -137,7 +138,7 @@ class ProductSize(models.Model):
         return f"{self.product_id}:{self.label}"
 
 
-class ProductVariant(models.Model):
+class ProductVariant(UUIDPrimaryKeyModel):
     product = models.ForeignKey(
         Product, related_name="variants", on_delete=models.CASCADE
     )
@@ -164,7 +165,7 @@ class ProductVariant(models.Model):
         return self.sku
 
 
-class Banner(models.Model):
+class Banner(UUIDPrimaryKeyModel):
     TEXT_LIGHT = "light"
     TEXT_DARK = "dark"
     TEXT_COLOR_CHOICES = [

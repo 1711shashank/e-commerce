@@ -9,7 +9,7 @@ import {
 } from "@/lib/auth-session";
 
 export type AuthUser = {
-  id: number;
+  id: string;
   email: string;
   role: "customer" | "staff" | "admin";
   first_name?: string;

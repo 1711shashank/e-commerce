@@ -14,7 +14,7 @@ PASSWORD_RESET_EMAIL_RETRY_DELAY_SECONDS = 60
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=PASSWORD_RESET_EMAIL_RETRY_DELAY_SECONDS)
-def send_password_reset_email(self, job_id: int, user_email: str, reset_url: str) -> None:
+def send_password_reset_email(self, job_id: str, user_email: str, reset_url: str) -> None:
     """Send password reset link. Retries up to 3 times on transient failures."""
     job = EmailJob.objects.filter(pk=job_id).first()
     attempt = self.request.retries + 1

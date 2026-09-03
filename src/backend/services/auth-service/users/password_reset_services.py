@@ -59,7 +59,7 @@ def _enqueue_password_reset_email(
         password_reset_token=token_obj,
         status=EmailJob.Status.PENDING,
     )
-    async_result = send_password_reset_email.delay(job.id, user.email, reset_url)
+    async_result = send_password_reset_email.delay(str(job.id), user.email, reset_url)
     if async_result.id:
         job.celery_task_id = async_result.id
         job.save(update_fields=["celery_task_id", "updated_at"])
