@@ -48,11 +48,20 @@ export function ProductListing({
     ...initialFilters,
   });
   const [searchInput, setSearchInput] = useState(initialFilters.search ?? "");
+  const [prevSearchProp, setPrevSearchProp] = useState(initialFilters.search);
+  const [page, setPage] = useState(1);
+
+  // Sync search input when incoming search filter changes (React recommended render adjustment)
+  if (initialFilters.search !== prevSearchProp) {
+    setPrevSearchProp(initialFilters.search);
+    setSearchInput(initialFilters.search ?? "");
+    setPage(1);
+  }
+
   const debouncedSearch = useDebounce(searchInput, 300);
   const [sort, setSort] = useState<SortOption>("newest");
   const [view, setView] = useState<ViewMode>("grid");
   const [cardStyle, setCardStyle] = useState<CardLayoutStyle>("atelier");
-  const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const activeFilters = useMemo(

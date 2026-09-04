@@ -78,23 +78,15 @@ export function Footer() {
       <div className="border-t border-border/80 bg-surface">
         <div className="mx-auto grid max-w-[1536px] gap-10 px-4 py-12 sm:px-8 md:grid-cols-2 lg:grid-cols-5 xl:px-12 lg:py-16">
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative h-14 w-14 overflow-hidden rounded-full shrink-0 border border-border/60">
+            <Link href="/" className="flex items-center group" aria-label="Kusum - The Premium Designer Wear">
+              <div className="relative h-12 xl:h-13 w-[185px] xl:w-[210px] shrink-0">
                 <Image
-                  src="/LOGO WITH RING_page-0001.jpg"
-                  alt="Kusum Ring Logo"
+                  src="/logo-wordmark.png"
+                  alt="Kusum - The Premium Designer Wear"
                   fill
-                  sizes="56px"
-                  className="object-contain"
+                  sizes="210px"
+                  className="object-contain object-left"
                 />
-              </div>
-              <div>
-                <span className="font-display text-xl tracking-[0.22em] text-foreground font-medium block">
-                  KUSUM
-                </span>
-                <span className="font-sans text-[8px] uppercase tracking-[0.25em] text-muted block">
-                  THE PREMIUM DESIGNER WEAR
-                </span>
               </div>
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-muted">
@@ -102,7 +94,7 @@ export function Footer() {
             </p>
             <div className="mt-6 flex flex-wrap gap-2.5">
               <a
-                href="https://www.instagram.com"
+                href="https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors"
@@ -112,7 +104,7 @@ export function Footer() {
                 <span>Instagram</span>
               </a>
               <a
-                href="https://www.facebook.com"
+                href="https://www.facebook.com/share/197xSpQNnJ/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors"
@@ -122,7 +114,7 @@ export function Footer() {
                 <span>Facebook</span>
               </a>
               <a
-                href="https://www.youtube.com"
+                href="https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors"

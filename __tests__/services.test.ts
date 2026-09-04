@@ -71,6 +71,20 @@ describe("Kusum E-Commerce Services", () => {
         expect(text).toContain("lawn");
       });
     });
+
+    it("searches products by multiple tokens (e.g. 'lawn suit')", () => {
+      const results = searchProducts("lawn suit", 10);
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach((p) => {
+        const text = `${p.name} ${p.description} ${p.fabric ?? ""} ${(p.tags ?? []).join(" ")}`.toLowerCase();
+        expect(text).toContain("lawn");
+      });
+    });
+
+    it("handles hyphenated search terms like 'ready to wear'", () => {
+      const results = searchProducts("ready to wear", 10);
+      expect(results.length).toBeGreaterThan(0);
+    });
   });
 
   describe("Sorting", () => {

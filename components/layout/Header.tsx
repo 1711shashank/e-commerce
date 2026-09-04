@@ -88,120 +88,222 @@ export function Header({ categories }: { categories: Category[] }) {
     <header className="sticky top-0 z-40 bg-surface shadow-xs">
       {/* Tier 1: Top Utility & Announcement Bar */}
       <div className="border-b border-white/10 bg-[#141414] text-white">
-        <div className="mx-auto flex min-h-10 max-w-[1536px] items-center justify-between gap-4 px-4 sm:px-8 xl:px-12 py-2 sm:py-0">
-          {/* Social Icons & Names */}
-          <div className="flex items-center gap-3 sm:gap-4.5 font-[family-name:var(--font-brand)] text-xs font-bold uppercase tracking-[0.14em] shrink-0">
-            <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
-              aria-label="Follow Kusum on Instagram"
-            >
-              <InstagramIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" />
-              <span>Instagram</span>
-            </a>
-            <span className="text-white/25 hidden sm:inline">·</span>
-            <a
-              href="https://www.facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
-              aria-label="Follow Kusum on Facebook"
-            >
-              <FacebookIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" />
-              <span>Facebook</span>
-            </a>
-            <span className="text-white/25 hidden sm:inline">·</span>
-            <a
-              href="https://www.youtube.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
-              aria-label="Subscribe to Kusum on YouTube"
-            >
-              <YoutubeIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5 transition-transform group-hover:scale-110" />
-              <span>YouTube</span>
-            </a>
+        <div className="mx-auto flex h-9 sm:h-9 max-w-[1536px] items-center justify-between px-3 sm:px-8 xl:px-12">
+          {/* Mobile Tier 1: Prominent Social Media Icons (Left) + Delivery & Currency (Right) */}
+          <div className="flex lg:hidden w-full items-center justify-between font-[family-name:var(--font-brand)] text-[10px] sm:text-xs">
+            {/* Left: Large Prominent Social Icons (Without text labels, clear & touch-friendly) */}
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+              <a
+                href="https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-7 w-7 items-center justify-center text-white/90 hover:text-[#e00075] active:scale-90 transition-all"
+                aria-label="Follow Kusum on Instagram"
+              >
+                <InstagramIcon className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.facebook.com/share/197xSpQNnJ/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-7 w-7 items-center justify-center text-white/90 hover:text-[#e00075] active:scale-90 transition-all"
+                aria-label="Follow Kusum on Facebook"
+              >
+                <FacebookIcon className="h-5 w-5" />
+              </a>
+              <a
+                href="https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-7 w-7 items-center justify-center text-white/90 hover:text-[#e00075] active:scale-90 transition-all"
+                aria-label="Subscribe to Kusum on YouTube"
+              >
+                <YoutubeIcon className="h-5 w-5" />
+              </a>
+            </div>
+
+            {/* Right: UAE Delivery & Currency Indicator */}
+            <div className="flex items-center gap-1.5 min-w-0 pl-2 text-white/95 font-medium tracking-[0.05em]">
+              <span className="text-[#e00075] font-bold shrink-0">✦</span>
+              <span className="truncate hidden sm:inline">Complimentary UAE Delivery &gt; AED 350</span>
+              <span className="truncate sm:hidden text-[10px]">Free UAE Delivery &gt; 350</span>
+              <span className="text-white/30 shrink-0">·</span>
+              <span className="font-bold text-white shrink-0 text-[10.5px]">🇦🇪 AED</span>
+            </div>
           </div>
 
-          {/* Central Promotion */}
-          <p className="hidden text-xs tracking-[0.08em] text-white/95 lg:block font-medium">
-            Complimentary UAE Delivery on orders over AED 350 · Worldwide Express Delivery
-          </p>
+          {/* Desktop Tier 1: Socials (Left), Center Banner, Utilities (Right) */}
+          <div className="hidden lg:flex w-full items-center justify-between gap-4">
+            {/* Social Icons & Names */}
+            <div className="flex items-center gap-3 sm:gap-4 font-[family-name:var(--font-brand)] text-xs font-bold uppercase tracking-[0.14em] shrink-0">
+              <a
+                href="https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
+                aria-label="Follow Kusum on Instagram"
+              >
+                <InstagramIcon className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
+                <span>Instagram</span>
+              </a>
+              <span className="text-white/25">·</span>
+              <a
+                href="https://www.facebook.com/share/197xSpQNnJ/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
+                aria-label="Follow Kusum on Facebook"
+              >
+                <FacebookIcon className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
+                <span>Facebook</span>
+              </a>
+              <span className="text-white/25">·</span>
+              <a
+                href="https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-1.5 text-white/85 transition-colors hover:text-[#e00075]"
+                aria-label="Subscribe to Kusum on YouTube"
+              >
+                <YoutubeIcon className="h-4.5 w-4.5 transition-transform group-hover:scale-110" />
+                <span>YouTube</span>
+              </a>
+            </div>
 
-          {/* Right Utilities (Track Order, Size Guide, Currency) */}
-          <div className="flex items-center gap-3.5 sm:gap-4.5 font-[family-name:var(--font-brand)] text-xs font-bold uppercase tracking-[0.14em] text-white/85 shrink-0">
-            <Link
-              href="/track-order"
-              className="transition-colors hover:text-[#e00075]"
-            >
-              Track Order
-            </Link>
-            <span className="text-white/25">·</span>
-            <Link
-              href="/size-guide"
-              className="transition-colors hover:text-[#e00075]"
-            >
-              Size Guide
-            </Link>
-            <span className="hidden text-white/25 sm:inline">·</span>
-            <span className="hidden font-black text-white sm:inline tracking-wider">
-              🇦🇪 AED
-            </span>
+            {/* Central Promotion */}
+            <p className="text-xs tracking-[0.08em] text-white/95 font-medium">
+              Complimentary UAE Delivery on orders over AED 350 · Worldwide Express Delivery
+            </p>
+
+            {/* Right Utilities (Track Order, Size Guide, Currency) */}
+            <div className="flex items-center gap-3 sm:gap-4 font-[family-name:var(--font-brand)] text-xs font-bold uppercase tracking-[0.14em] text-white/85 shrink-0">
+              <Link
+                href="/track-order"
+                className="transition-colors hover:text-[#e00075]"
+              >
+                Track Order
+              </Link>
+              <span className="text-white/25">·</span>
+              <Link
+                href="/size-guide"
+                className="transition-colors hover:text-[#e00075]"
+              >
+                Size Guide
+              </Link>
+              <span className="text-white/25">·</span>
+              <span className="font-black text-white tracking-wider">
+                🇦🇪 AED
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Single Main Header Bar: Logo (Left) + Center Glass Nav / Sliding Search in SAME space + Actions (Right) */}
+      {/* Tier 2: Main Header Bar */}
       <div className="border-b border-border/80 bg-surface/95 backdrop-blur-md">
-        <div className="mx-auto flex h-20 sm:h-24 max-w-[1536px] items-center justify-between gap-4 px-4 sm:px-8 xl:px-12">
-          {/* LEFT: Mobile Menu Trigger + Brand Ring Logo + Hard Geometric Font */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-            <button
-              type="button"
-              onClick={openMobileNav}
-              className="flex h-11 w-11 items-center justify-center lg:hidden text-foreground hover:text-[#e00075] transition-colors"
-              aria-label="Open menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
+        <div className="mx-auto flex h-16 sm:h-18 lg:h-19 xl:h-20 max-w-[1536px] items-center justify-between gap-2 sm:gap-4 px-3 sm:px-8 xl:px-12">
+          
+          {/* ========================================================= */}
+          {/* MOBILE HEADER LAYOUT (< lg): Symmetrical 3-Section Layout */}
+          {/* ========================================================= */}
+          <div className="flex lg:hidden w-full items-center justify-between">
+            {/* Left: Hamburger Menu + Search */}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={openMobileNav}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-black/5 hover:text-[#e00075] transition-colors"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="h-5.5 w-5.5" />
+              </button>
+              <button
+                type="button"
+                onClick={openSearch}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-black/5 hover:text-[#e00075] transition-colors"
+                aria-label="Search collection"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+            </div>
 
-            {/* Official Brand Identity (Left-aligned) */}
+            {/* Center: Official Brand Wordmark Logo (Pixel-perfect on 360px Galaxy S8+ to 4K) */}
             <Link
               href="/"
-              className="flex items-center gap-3.5 sm:gap-4 group py-1 shrink-0"
+              className="flex items-center justify-center group py-1 outline-none select-none min-w-0"
               aria-label="Kusum - The Premium Designer Wear"
             >
-              {/* Circular Ring Logo Asset */}
-              <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 transition-transform duration-300 group-hover:scale-105">
+              <div className="relative h-8.5 sm:h-9.5 w-[125px] sm:w-[145px] shrink-0 transition-transform duration-200 group-hover:scale-105">
                 <Image
-                  src="/LOGO WITH RING_page-0001.jpg"
-                  alt="Kusum Ring Logo"
+                  src="/logo-wordmark.png"
+                  alt="Kusum - The Premium Designer Wear"
                   fill
                   priority
-                  sizes="(max-width: 640px) 56px, 64px"
-                  className="object-contain rounded-full shadow-xs"
+                  sizes="(max-width: 640px) 130px, 150px"
+                  className="object-contain"
                 />
               </div>
+            </Link>
 
-              {/* Hard Geometric Brand Wordmark in Magenta Pink (Centered on top of Tagline, perfect alignment) */}
-              <div className="flex flex-col items-center justify-center text-center select-none">
-                <span className="font-[family-name:var(--font-brand)] font-black text-2xl sm:text-3xl lg:text-[32px] tracking-[0.16em] text-[#e00075] leading-none transition-transform duration-200">
-                  KUSUM
-                </span>
-                <span className="font-[family-name:var(--font-heading)] text-[8px] sm:text-[9px] uppercase tracking-[0.24em] text-[#222222] font-semibold mt-1.5 whitespace-nowrap leading-none">
-                  THE PREMIUM DESIGNER WEAR
-                </span>
+            {/* Right: Wishlist + Cart */}
+            <div className="flex items-center gap-1 shrink-0">
+              <Link
+                href="/wishlist"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5 text-foreground hover:text-[#e00075] transition-colors"
+                aria-label={`Wishlist, ${wishes} items`}
+              >
+                <Heart className="h-5 w-5" />
+                {wishes > 0 && (
+                  <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
+                    {wishes}
+                  </span>
+                )}
+              </Link>
+
+              <button
+                type="button"
+                onClick={openCart}
+                className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5 text-foreground hover:text-[#e00075] transition-colors"
+                aria-label={`Cart, ${bags} items`}
+              >
+                <ShoppingBag className="h-5 w-5" />
+                {bags > 0 && (
+                  <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
+                    {bags}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* ========================================================= */}
+          {/* DESKTOP HEADER LAYOUT (>= lg): Symmetrical Luxury Flanks  */}
+          {/* ========================================================= */}
+          {/* LEFT FLANK: Brand Identity (Balanced Symmetrical Width) */}
+          <div className="hidden lg:flex items-center shrink-0 w-[240px] 2xl:w-[270px] justify-start">
+            <Link
+              href="/"
+              className="flex items-center group py-1 shrink-0 outline-none select-none"
+              aria-label="Kusum - The Premium Designer Wear"
+            >
+              <div className="relative h-11.5 xl:h-12.5 2xl:h-13 w-[170px] xl:w-[190px] 2xl:w-[205px] shrink-0 transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src="/logo-wordmark.png"
+                  alt="Kusum - The Premium Designer Wear"
+                  fill
+                  priority
+                  sizes="(max-width: 1280px) 175px, 205px"
+                  className="object-contain object-left"
+                />
               </div>
             </Link>
           </div>
 
-          {/* MIDDLE: Glass Capsule Navigation OR Sliding Search in the EXACT SAME PLACE with safe margins */}
-          <div className="hidden lg:flex flex-1 items-center justify-center mx-4 xl:mx-8 px-2 min-w-0">
+          {/* MIDDLE: Symmetrical Glass Capsule Navigation OR Sliding Search - EXACT DEAD CENTER */}
+          <div className="hidden lg:flex flex-1 items-center justify-center min-w-0 px-2">
             {isInlineSearchOpen ? (
               /* Sliding Search Input in the SAME middle space */
-              <div className="flex w-full max-w-2xl items-center gap-3 px-3 py-1 animate-fade-in">
+              <div className="flex w-full max-w-xl items-center gap-3 px-3 py-1 animate-fade-in">
                 <Search className="h-4 w-4 text-[#e00075] shrink-0" />
                 <input
                   autoFocus
@@ -213,20 +315,20 @@ export function Header({ categories }: { categories: Category[] }) {
                       setIsInlineSearchOpen(false);
                     }
                     if (e.key === "Enter" && searchQuery.trim()) {
-                      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
                     }
                   }}
                   placeholder="Search luxury lawn, abayas, bridal, festive formals…"
-                  className="w-full h-11 px-5 rounded-full border border-border/90 bg-[#faf8f5] text-xs text-foreground placeholder:text-muted focus:outline-none focus:border-[#e00075] focus:bg-white focus:ring-2 focus:ring-[#e00075]/20 transition-all shadow-xs"
+                  className="w-full h-10.5 px-4 rounded-full border border-border/90 bg-[#faf8f5] text-xs text-foreground placeholder:text-muted focus:outline-none focus:border-[#e00075] focus:bg-white focus:ring-2 focus:ring-[#e00075]/20 transition-all shadow-xs"
                 />
                 <button
                   type="button"
                   onClick={() => {
                     if (searchQuery.trim()) {
-                      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
                     }
                   }}
-                  className="h-10 px-5 rounded-full bg-[#e00075] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#c20065] transition-colors shrink-0 shadow-xs"
+                  className="h-9.5 px-4 rounded-full bg-[#e00075] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#c20065] transition-colors shrink-0 shadow-xs"
                 >
                   Search
                 </button>
@@ -236,7 +338,7 @@ export function Header({ categories }: { categories: Category[] }) {
                     setIsInlineSearchOpen(false);
                     setSearchQuery("");
                   }}
-                  className="h-10 w-10 flex items-center justify-center rounded-full hover:bg-black/5 text-muted hover:text-foreground shrink-0 text-sm font-bold transition-colors"
+                  className="h-9.5 w-9.5 flex items-center justify-center rounded-full hover:bg-black/5 text-muted hover:text-foreground shrink-0 text-sm font-bold transition-colors"
                   aria-label="Close search"
                   title="Close search (Esc)"
                 >
@@ -244,9 +346,9 @@ export function Header({ categories }: { categories: Category[] }) {
                 </button>
               </div>
             ) : (
-              /* Glossy Translucent Glass Capsule Buttons with Left/Right Glass Border & Padding */
-              <nav aria-label="Main">
-                <ul className="flex items-center justify-center gap-2 xl:gap-2.5">
+              /* Glossy Translucent Glass Capsule Buttons - Symmetrically Aligned */
+              <nav aria-label="Main" className="max-w-full">
+                <ul className="flex items-center justify-center gap-1 xl:gap-1.5 2xl:gap-2">
                   {navItems.map((item) => {
                     const parent = categories.find((c) => c.slug === item.slug);
                     const subs = parent
@@ -256,16 +358,16 @@ export function Header({ categories }: { categories: Category[] }) {
                     return (
                       <li
                         key={item.label}
-                        className="relative"
+                        className="relative shrink-0"
                         onMouseEnter={() => setHovered(item.label)}
                         onMouseLeave={() => setHovered(null)}
                       >
                         <Link
                           href={item.href}
                           className={cn(
-                            "flex h-10 xl:h-10.5 items-center px-4 xl:px-5 rounded-full text-[11px] xl:text-[12px] font-bold uppercase tracking-[0.12em] whitespace-nowrap transition-all duration-300",
-                            "bg-white/50 backdrop-blur-md border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.9)]",
-                            "hover:bg-white hover:text-[#e00075] hover:border-[#e00075]/35 hover:shadow-[0_4px_16px_rgba(224,0,117,0.12),inset_0_1px_2px_rgba(255,255,255,1)] hover:scale-102",
+                            "flex h-9 xl:h-9.5 2xl:h-10 items-center px-2.5 xl:px-3.5 2xl:px-4.5 rounded-full text-[10px] xl:text-[11px] 2xl:text-[11.5px] font-bold uppercase tracking-[0.08em] xl:tracking-[0.11em] whitespace-nowrap transition-colors duration-200 outline-none focus:outline-none",
+                            "bg-white/55 backdrop-blur-md border border-white/85 shadow-[0_2px_8px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.9)]",
+                            "hover:bg-white hover:text-[#e00075] hover:border-[#e00075]/35 hover:shadow-[0_2px_12px_rgba(224,0,117,0.12)]",
                             isSale ? "text-[#e00075] font-black" : "text-[#1c1c1c]",
                           )}
                         >
@@ -287,8 +389,8 @@ export function Header({ categories }: { categories: Category[] }) {
                               ))}
                               <li className="pt-2 border-t border-border mt-2">
                                 <Link
-                                  href={item.href}
-                                  className="block min-h-9 px-3 py-1.5 text-xs uppercase tracking-wider font-bold text-[#e00075] hover:underline whitespace-nowrap"
+                                    href={item.href}
+                                    className="block min-h-9 px-3 py-1.5 text-xs uppercase tracking-wider font-bold text-[#e00075] hover:underline whitespace-nowrap"
                                 >
                                   Explore All {item.label} →
                                 </Link>
@@ -304,20 +406,14 @@ export function Header({ categories }: { categories: Category[] }) {
             )}
           </div>
 
-          {/* RIGHT: Actions (Search Trigger + Wishlist + Cart) */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* RIGHT FLANK: Actions (Search Trigger + Wishlist + Cart) (Balanced Symmetrical Width) */}
+          <div className="hidden lg:flex items-center gap-2.5 shrink-0 w-[240px] 2xl:w-[270px] justify-end relative z-20">
             {/* Search Trigger Button */}
             <button
               type="button"
-              onClick={() => {
-                if (window.innerWidth < 1024) {
-                  openSearch();
-                } else {
-                  setIsInlineSearchOpen((prev) => !prev);
-                }
-              }}
+              onClick={() => setIsInlineSearchOpen((prev) => !prev)}
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full transition-all",
+                "flex h-10 w-10 sm:h-10.5 sm:w-10.5 items-center justify-center rounded-full transition-all outline-none focus:outline-none",
                 isInlineSearchOpen
                   ? "bg-[#e00075] text-white shadow-xs"
                   : "hover:bg-black/5 text-foreground hover:text-[#e00075]",
@@ -331,12 +427,12 @@ export function Header({ categories }: { categories: Category[] }) {
             {/* Wishlist */}
             <Link
               href="/wishlist"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full hover:bg-black/5 hover:text-[#e00075] transition-all"
+              className="relative flex h-10 w-10 sm:h-10.5 sm:w-10.5 items-center justify-center rounded-full hover:bg-black/5 hover:text-[#e00075] transition-all outline-none"
               aria-label={`Wishlist, ${wishes} items`}
             >
               <Heart className="h-5 w-5" />
               {wishes > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
                   {wishes}
                 </span>
               )}
@@ -346,21 +442,20 @@ export function Header({ categories }: { categories: Category[] }) {
             <button
               type="button"
               onClick={openCart}
-              className="relative flex h-11 w-11 items-center justify-center rounded-full hover:bg-black/5 hover:text-[#e00075] transition-all"
+              className="relative flex h-10 w-10 sm:h-10.5 sm:w-10.5 items-center justify-center rounded-full hover:bg-black/5 hover:text-[#e00075] transition-all outline-none"
               aria-label={`Cart, ${bags} items`}
             >
               <ShoppingBag className="h-5 w-5" />
               {bags > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e00075] px-1 text-[10px] font-bold text-white shadow-xs">
                   {bags}
                 </span>
               )}
             </button>
           </div>
+
         </div>
       </div>
     </header>
   );
 }
-
-

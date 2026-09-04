@@ -27,7 +27,7 @@ export function InfiniteMarquee() {
             {/* Embedded Official Ring Logo */}
             <div className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full overflow-hidden shrink-0 border border-white/30 shadow-xs mx-4 bg-white">
               <Image
-                src="/LOGO WITH RING_page-0001.jpg"
+                src="/logo-ring.png"
                 alt="Kusum"
                 fill
                 sizes="36px"

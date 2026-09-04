@@ -143,8 +143,26 @@ export function filterProducts(
 
     if (filters.search?.trim()) {
       const q = filters.search.trim().toLowerCase();
-      const haystack = [
+      const searchTerms = q.split(/\s+/).filter(Boolean);
+
+      const fabricParts = product.fabricBreakdown
+        ? Object.values(product.fabricBreakdown).join(" ")
+        : "";
+
+      const pieceKeywords =
+        product.pieces === 3 || product.pieces === 2
+          ? `${product.pieces} piece ${product.pieces}-piece suit set ensemble dress`
+          : product.pieces === "abaya-set"
+            ? "abaya set dress kaftan modest"
+            : "";
+
+      const stitchingKeywords = product.stitchingOptions
+        ? product.stitchingOptions.join(" ")
+        : "";
+
+      const searchableFields = [
         product.name,
+        product.slug.replace(/-/g, " "),
         product.description,
         product.category,
         product.subCategory ?? "",
@@ -152,10 +170,24 @@ export function filterProducts(
         ...(product.tags ?? []),
         ...product.colors,
         ...(product.embellishments ?? []),
+        fabricParts,
+        pieceKeywords,
+        stitchingKeywords,
       ]
         .join(" ")
         .toLowerCase();
-      if (!haystack.includes(q)) return false;
+
+      const normalizedHaystack = searchableFields.replace(/-/g, " ");
+
+      const allTermsMatch = searchTerms.every((term) => {
+        const cleanTerm = term.replace(/-/g, " ");
+        return (
+          searchableFields.includes(term) ||
+          normalizedHaystack.includes(cleanTerm)
+        );
+      });
+
+      if (!allTermsMatch) return false;
     }
 
     return true;
@@ -191,7 +223,33 @@ export function sortProducts(
 
 export function searchProducts(query: string, limit = 6): Product[] {
   if (!query.trim()) return [];
-  return filterProducts({ search: query }).slice(0, limit);
+  const q = query.trim().toLowerCase();
+  const searchTerms = q.split(/\s+/).filter(Boolean);
+  const matches = filterProducts({ search: query });
+
+  return matches
+    .sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+
+      const aExact = aName === q;
+      const bExact = bName === q;
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+
+      const aStarts = aName.startsWith(q);
+      const bStarts = bName.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      const aNameHasAll = searchTerms.every((t) => aName.includes(t));
+      const bNameHasAll = searchTerms.every((t) => bName.includes(t));
+      if (aNameHasAll && !bNameHasAll) return -1;
+      if (!aNameHasAll && bNameHasAll) return 1;
+
+      return 0;
+    })
+    .slice(0, limit);
 }
 
 export function getAllSizes(): string[] {
@@ -269,4 +327,11 @@ export function getDiscountPercent(product: Product): number | null {
     ((product.price - product.discountPrice) / product.price) * 100,
   );
 }
+
+export const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr",
+  facebook: "https://www.facebook.com/share/197xSpQNnJ/",
+  youtube: "https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd",
+};
+
 

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronDown, Search, Sparkles, MessageCircle, Truck, Ruler, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { Drawer } from "@/components/ui/Drawer";
 import { useStore } from "@/lib/store";
 import type { Category } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -32,24 +34,27 @@ function YoutubeIcon({ className }: { className?: string }) {
   );
 }
 
-const utilityLinks = [
-  { href: "/track-order", label: "Track Your Order" },
-  { href: "/size-guide", label: "Custom Stitching & Size Guide" },
-  { href: "/bridal", label: "Bridal Couture Consultation" },
-  { href: "/shipping", label: "Shipping & Customs" },
-  { href: "/about", label: "About Kusum" },
-  { href: "/contact", label: "Contact Us" },
-];
-
 export function MobileNav({
   categories,
 }: {
   categories: Category[];
 }) {
+  const router = useRouter();
   const { isMobileNavOpen, closeMobileNav } = useStore();
   const [openId, setOpenId] = useState<string | null>(null);
+  const [drawerSearch, setDrawerSearch] = useState("");
 
   const parents = categories.filter((c) => !c.parentId);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = drawerSearch.trim();
+    if (clean) {
+      closeMobileNav();
+      setDrawerSearch("");
+      router.push(`/products?search=${encodeURIComponent(clean)}`);
+    }
+  };
 
   return (
     <Drawer
@@ -58,63 +63,135 @@ export function MobileNav({
       title="Menu"
       side="left"
     >
-      <div className="px-5 py-4 border-b border-border/80 flex items-center gap-3 bg-surface">
-        <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border border-border/60 shadow-xs">
-          <Image
-            src="/LOGO WITH RING_page-0001.jpg"
-            alt="Kusum Logo"
-            fill
-            sizes="48px"
-            className="object-contain"
-          />
-        </div>
-        <div>
-          <span className="font-display text-lg tracking-[0.22em] text-foreground font-medium block">
-            KUSUM
-          </span>
-          <span className="text-[7.5px] uppercase tracking-[0.26em] text-[#e00075] font-semibold block">
-            THE PREMIUM DESIGNER WEAR
-          </span>
-        </div>
+      {/* Brand Identity Header in Drawer */}
+      <div className="px-5 py-4 border-b border-border/80 flex items-center justify-between bg-surface">
+        <Link
+          href="/"
+          onClick={closeMobileNav}
+          className="flex items-center group"
+          aria-label="Kusum - The Premium Designer Wear"
+        >
+          <div className="relative h-9 sm:h-10 w-[145px] sm:w-[160px] shrink-0">
+            <Image
+              src="/logo-wordmark.png"
+              alt="Kusum - The Premium Designer Wear"
+              fill
+              sizes="160px"
+              className="object-contain object-left"
+            />
+          </div>
+        </Link>
+        <span className="text-[10px] font-bold text-muted bg-[#faf8f5] px-2 py-1 rounded-md border border-border">
+          🇦🇪 AED
+        </span>
       </div>
 
-      <nav className="px-3 py-4">
-        <ul>
+      {/* In-Drawer Fast Search Bar */}
+      <div className="px-4 pt-3.5 pb-2 border-b border-border/60 bg-[#faf8f5]/50">
+        <form onSubmit={handleSearchSubmit} className="relative">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#e00075]" />
+          <input
+            type="search"
+            value={drawerSearch}
+            onChange={(e) => setDrawerSearch(e.target.value)}
+            placeholder="Search lawn, abayas, bridal formals…"
+            className="h-10 w-full rounded-full border border-border bg-white pl-10 pr-9 text-xs text-foreground placeholder:text-muted focus:border-[#e00075] focus:outline-none focus:ring-2 focus:ring-[#e00075]/20 shadow-2xs"
+            aria-label="Search within navigation"
+          />
+          {drawerSearch ? (
+            <button
+              type="button"
+              onClick={() => setDrawerSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground text-xs"
+            >
+              ✕
+            </button>
+          ) : null}
+        </form>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="px-3 py-3">
+        {/* Quick Highlights Tabs */}
+        <div className="grid grid-cols-2 gap-2 mb-3 pb-3 border-b border-border/70">
+          <Link
+            href="/products?new=1"
+            onClick={closeMobileNav}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface py-2 px-2 text-[11px] font-bold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors shadow-2xs"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-[#e00075]" />
+            <span>New Drops</span>
+          </Link>
+          <Link
+            href="/collections/sale"
+            onClick={closeMobileNav}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-[#e00075]/30 bg-[#fdf0f6] py-2 px-2 text-[11px] font-black uppercase tracking-wider text-[#e00075] hover:bg-[#e00075] hover:text-white transition-all shadow-2xs"
+          >
+            <span>Sale Offers ✦</span>
+          </Link>
+        </div>
+
+        {/* Primary Categories List */}
+        <ul className="space-y-0.5">
           {parents.map((cat) => {
             const subs = categories.filter((c) => c.parentId === cat.id);
             const isOpen = openId === cat.id;
+            const isSale = cat.slug === "sale";
+            const isBridal = cat.slug === "bridal";
+            const targetHref = isBridal ? "/bridal" : `/collections/${cat.slug}`;
+
             return (
-              <li key={cat.id} className="border-b border-border">
+              <li key={cat.id} className="border-b border-border/50 last:border-b-0">
                 <div className="flex items-center justify-between">
                   <Link
-                    href={`/collections/${cat.slug}`}
+                    href={targetHref}
                     onClick={closeMobileNav}
-                    className="flex min-h-12 flex-1 items-center px-3 text-xs uppercase tracking-[0.14em] font-medium"
+                    className={cn(
+                      "flex min-h-12 flex-1 items-center px-3 text-xs uppercase tracking-[0.14em] font-bold transition-colors",
+                      isSale
+                        ? "text-[#e00075]"
+                        : "text-foreground hover:text-[#e00075]",
+                    )}
                   >
-                    {cat.name}
+                    <span>{cat.name}</span>
+                    {isSale && (
+                      <span className="ml-2 rounded-full bg-[#e00075] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                        HOT
+                      </span>
+                    )}
+                    {isBridal && (
+                      <span className="ml-2 rounded-full bg-[#141414] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                        ATELIER
+                      </span>
+                    )}
                   </Link>
+
                   {subs.length > 0 && (
                     <button
                       type="button"
-                      className="flex h-12 w-12 items-center justify-center text-muted"
+                      className="flex h-12 w-12 items-center justify-center text-muted hover:text-foreground"
                       onClick={() => setOpenId(isOpen ? null : cat.id)}
                       aria-expanded={isOpen}
                       aria-label={`Toggle ${cat.name} subcategories`}
                     >
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        className={cn(
+                          "h-4 w-4 transition-transform duration-200",
+                          isOpen && "rotate-180 text-[#e00075]",
+                        )}
                       />
                     </button>
                   )}
                 </div>
+
                 {isOpen && subs.length > 0 && (
-                  <ul className="bg-surface pb-3 pl-2">
+                  <ul className="bg-[#faf8f5]/80 py-2 pl-3 rounded-lg mb-2">
                     {subs.map((sub) => (
                       <li key={sub.id}>
                         <Link
                           href={`/collections/${cat.slug}?sub=${sub.slug}`}
                           onClick={closeMobileNav}
-                          className="flex min-h-10 items-center px-5 text-xs text-muted hover:text-foreground"
+                          className="flex min-h-9 items-center px-4 text-xs text-muted hover:text-[#e00075] transition-colors"
                         >
                           {sub.name}
                         </Link>
@@ -122,9 +199,9 @@ export function MobileNav({
                     ))}
                     <li>
                       <Link
-                        href={`/collections/${cat.slug}`}
+                        href={targetHref}
                         onClick={closeMobileNav}
-                        className="flex min-h-10 items-center px-5 text-xs font-medium text-accent underline-offset-4 hover:underline"
+                        className="flex min-h-9 items-center px-4 text-xs font-bold text-[#e00075] hover:underline"
                       >
                         All {cat.name} →
                       </Link>
@@ -136,57 +213,120 @@ export function MobileNav({
           })}
         </ul>
 
+        {/* WhatsApp Bespoke Concierge Banner */}
+        <div className="mt-5 p-3 rounded-xl border border-emerald-200 bg-emerald-50/50">
+          <a
+            href="https://wa.me/971500000000?text=Hello%20Kusum%20Bespoke%20Stylist,%20I%20would%20like%20to%20inquire%20about%20your%20luxury%20couture"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={closeMobileNav}
+            className="flex items-center justify-between text-xs font-bold text-emerald-900"
+          >
+            <div className="flex items-center gap-2.5">
+              <MessageCircle className="h-4.5 w-4.5 text-emerald-600" />
+              <span>WhatsApp Bespoke Stylist</span>
+            </div>
+            <ArrowRight className="h-4 w-4 text-emerald-600" />
+          </a>
+        </div>
+
         {/* Quick Utility Links */}
-        <div className="mt-8 border-t border-border pt-4">
-          <p className="px-3 text-[10px] uppercase tracking-[0.2em] text-muted mb-2">
-            Customer Care & Services
+        <div className="mt-6 border-t border-border pt-4">
+          <p className="px-3 text-[10px] uppercase tracking-[0.2em] text-muted font-bold mb-2">
+            Client Services
           </p>
           <ul className="space-y-1">
-            {utilityLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={closeMobileNav}
-                  className="flex min-h-10 items-center px-3 text-xs text-muted hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            <li>
+              <Link
+                href="/track-order"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center gap-2.5 px-3 text-xs font-medium text-muted hover:text-foreground transition-colors"
+              >
+                <Truck className="h-4 w-4 text-[#e00075]" />
+                <span>Track Your Order</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/size-guide"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center gap-2.5 px-3 text-xs font-medium text-muted hover:text-foreground transition-colors"
+              >
+                <Ruler className="h-4 w-4 text-[#e00075]" />
+                <span>Custom Stitching & Size Guide</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/bridal"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center gap-2.5 px-3 text-xs font-medium text-muted hover:text-foreground transition-colors"
+              >
+                <Sparkles className="h-4 w-4 text-[#e00075]" />
+                <span>Bridal Couture Consultation</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/shipping"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center px-3 text-xs text-muted hover:text-foreground transition-colors"
+              >
+                Shipping & Customs Info
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/about"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center px-3 text-xs text-muted hover:text-foreground transition-colors"
+              >
+                About Kusum
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                onClick={closeMobileNav}
+                className="flex min-h-10 items-center px-3 text-xs text-muted hover:text-foreground transition-colors"
+              >
+                Contact Us
+              </Link>
+            </li>
           </ul>
         </div>
 
         {/* Social Media Section in Drawer */}
-        <div className="mt-8 border-t border-border pt-5 pb-6 px-3">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted mb-3">
+        <div className="mt-6 border-t border-border pt-4 pb-6 px-3">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted font-bold mb-3">
             Connect With Us
           </p>
           <div className="flex flex-col gap-2">
             <a
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-border bg-surface text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors shadow-2xs"
             >
-              <InstagramIcon className="h-5 w-5 text-[#e00075]" />
+              <InstagramIcon className="h-4.5 w-4.5 text-[#e00075]" />
               <span>Instagram</span>
             </a>
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/share/197xSpQNnJ/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-border bg-surface text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors shadow-2xs"
             >
-              <FacebookIcon className="h-5 w-5 text-[#e00075]" />
+              <FacebookIcon className="h-4.5 w-4.5 text-[#e00075]" />
               <span>Facebook</span>
             </a>
             <a
-              href="https://www.youtube.com"
+              href="https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-border bg-surface text-xs font-semibold uppercase tracking-wider text-foreground hover:border-[#e00075] hover:text-[#e00075] transition-colors shadow-2xs"
             >
-              <YoutubeIcon className="h-5 w-5 text-[#e00075]" />
+              <YoutubeIcon className="h-4.5 w-4.5 text-[#e00075]" />
               <span>YouTube</span>
             </a>
           </div>
@@ -195,4 +335,3 @@ export function MobileNav({
     </Drawer>
   );
 }
-
