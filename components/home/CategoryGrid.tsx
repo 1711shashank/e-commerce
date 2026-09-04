@@ -1,11 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Category } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+const categoryBadges: Record<string, string> = {
+  unstitched: "✦ Flagship Lawn",
+  "ready-to-wear": "✦ Daily & Festive Pret",
+  "luxury-formals": "✦ Shehnai Wedding",
+  "abayas-kaftans": "✦ Modest Silk Edit",
+  bridal: "✦ Royal Atelier",
+  "mommy-and-me": "✦ Junior Festive",
+  sale: "✦ Special Offers",
+};
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {
   return (
     <section className="mx-auto max-w-[1536px] px-4 py-10 sm:px-8 lg:py-14 xl:px-12">
-      <div className="mb-8 flex flex-col gap-2 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-6 flex flex-col gap-2 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#e00075]" />
@@ -25,58 +36,82 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-        {categories.map((category, i) => (
-          <Link
-            key={category.id}
-            href={`/collections/${category.slug}`}
-            className="group relative aspect-[2/3] overflow-hidden bg-[#161616] rounded-xl animate-fade-up shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-black/10"
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            {/* Smooth Zoom Image */}
-            <Image
-              src={category.image}
-              alt={category.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
-            />
+      <div className="grid grid-cols-2 gap-3.5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+        {categories.map((category, i) => {
+          // On mobile (< sm), the first flagship category (Unstitched) spans 2 columns
+          // creating a stunning hero banner followed by 3 perfectly balanced pairs (eliminates the awkward 7th lone card)
+          const isHero = i === 0;
+          const badge = categoryBadges[category.slug] ?? "✦ Kusum Couture";
 
-            {/* Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-            <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-[#e00075]/40 transition-colors duration-300" />
-
-            {/* Floating Top Tag */}
-            <div className="absolute top-3 left-3">
-              <span className="inline-block px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] font-bold text-white/95 bg-black/50 backdrop-blur-md border border-white/20">
-                Kusum Couture
-              </span>
-            </div>
-
-            {/* Content & Hover Slide-Up CTA */}
-            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 flex flex-col justify-end">
-              <h3 className="font-display text-2xl text-white sm:text-3xl font-bold tracking-normal drop-shadow-sm group-hover:text-[#ffd6eb] transition-colors">
-                {category.name}
-              </h3>
-
-              {category.description && (
-                <p className="mt-1.5 line-clamp-1 text-xs sm:text-sm text-white/85 font-normal">
-                  {category.description}
-                </p>
+          return (
+            <Link
+              key={category.id}
+              href={`/collections/${category.slug}`}
+              className={cn(
+                "group relative overflow-hidden bg-[#161616] rounded-xl animate-fade-up shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-black/10",
+                isHero
+                  ? "col-span-2 aspect-[16/10] sm:col-span-1 sm:aspect-[2/3]"
+                  : "aspect-[2/3]",
               )}
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              {/* Smooth Zoom Image */}
+              <Image
+                src={category.image}
+                alt={category.name}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+              />
 
-              {/* Animated Slide-Up Button */}
-              <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-3 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                <span className="text-xs uppercase tracking-[0.2em] font-bold text-[#ffd6eb]">
-                  Explore Line
-                </span>
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e00075] text-white text-xs font-bold shadow-xs">
-                  →
+              {/* Gradient Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/95" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-[#e00075]/40 transition-colors duration-300" />
+
+              {/* Floating Top Tag */}
+              <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3">
+                <span className="inline-block px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8.5px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.2em] font-bold text-white/95 bg-black/60 backdrop-blur-md border border-white/20 rounded-xs">
+                  {badge}
                 </span>
               </div>
-            </div>
-          </Link>
-        ))}
+
+              {/* Content & Touch-Accessible Action Prompt */}
+              <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-5 flex flex-col justify-end">
+                <h3
+                  className={cn(
+                    "font-display text-white font-bold drop-shadow-sm group-hover:text-[#ffd6eb] transition-colors leading-tight",
+                    isHero
+                      ? "text-2xl sm:text-3xl"
+                      : "text-base sm:text-2xl lg:text-3xl",
+                  )}
+                >
+                  {category.name}
+                </h3>
+
+                {category.description && (
+                  <p
+                    className={cn(
+                      "mt-1 text-white/85 font-normal leading-relaxed line-clamp-1",
+                      isHero
+                        ? "text-xs sm:text-sm"
+                        : "text-[11px] sm:text-xs hidden xs:block",
+                    )}
+                  >
+                    {category.description}
+                  </p>
+                )}
+
+                {/* Explore Action Prompt (Visible on touch, animated on desktop) */}
+                <div className="mt-2.5 sm:mt-3 flex items-center justify-between border-t border-white/20 pt-2 sm:pt-3 text-[10px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.2em] font-bold text-[#ffd6eb]">
+                  <span>Explore Line</span>
+                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#e00075] text-white text-[11px] sm:text-xs font-bold shadow-xs transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
