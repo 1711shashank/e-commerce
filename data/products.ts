@@ -3,8 +3,16 @@ import type { Product } from "@/lib/types";
 export const products: Product[] = [
   {
     "id": "kb-u01",
-    "slug": "chintz-rose-luxury-lawn",
-    "name": "Chintz Rose Luxury Lawn 3-Piece",
+    "slug": "royal-farshi-zardozi-bridal-lehenga",
+    "name": "Royal Farshi Zardozi Bridal Lehenga",
+    "category": "bridal",
+    "subCategory": "wedding-formals",
+    "price": 1450,
+    "discountPrice": 1250,
+    "images": [
+      "/kusum-bridal-purple.jpg",
+      "/kusum-bridal-maroon.jpg"
+    ],
     "category": "unstitched",
     "subCategory": "luxury-lawn",
     "price": 380,
@@ -60,15 +68,23 @@ export const products: Product[] = [
   },
   {
     "id": "kb-u02",
-    "slug": "zaffran-embroidered-chiffon",
-    "name": "Zaffran Embroidered Chiffon 3-Piece",
+    "slug": "areej-velvet-embroidered-festive-suit",
+    "name": "Areej Velvet Embroidered Festive Suit",
+    "category": "unstitched",
+    "subCategory": "mbroidered-wedding",
+    "price": 890,
+    "discountPrice": 750,
+    "images": [
+      "/kusum-velvet-areej.jpg",
+      "/kusum-ivory-peshwas.jpg"
+    ],
     "category": "unstitched",
     "subCategory": "embroidered-chiffon",
     "price": 680,
     "discountPrice": 590,
     "images": [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
+      "/kusum-ivory-peshwas.jpg?w=800&q=80"
     ],
     "sizes": [
       "Unstitched",
@@ -118,13 +134,21 @@ export const products: Product[] = [
   },
   {
     "id": "kb-u03",
-    "slug": "mbroidered-velvet-festive",
-    "name": "Mbroidered Royal Velvet 3-Piece",
+    "slug": "shahi-nizami-khada-dupatta-ensemble",
+    "name": "Shahi Nizami Khada Dupatta Ensemble",
+    "category": "bridal",
+    "subCategory": "wedding-formals",
+    "price": 1850,
+    "discountPrice": 1590,
+    "images": [
+      "/kusum-bridal-maroon.jpg",
+      "/kusum-silver-shehnai.jpg"
+    ],
     "category": "unstitched",
     "subCategory": "mbroidered-wedding",
     "price": 890,
     "images": [
-      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
+      "/kusum-bridal-purple.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
     "sizes": [
@@ -180,8 +204,8 @@ export const products: Product[] = [
     "subCategory": "luxury-lawn",
     "price": 260,
     "images": [
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80",
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80"
+      "/kusum-festive-rust.jpg?w=800&q=80",
+      "/kusum-festive-black.jpg?w=800&q=80"
     ],
     "sizes": [
       "Unstitched",
@@ -286,8 +310,8 @@ export const products: Product[] = [
     "subCategory": "festive-pret",
     "price": 540,
     "images": [
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
+      "/kusum-festive-black.jpg?w=800&q=80",
+      "/kusum-festive-rust.jpg?w=800&q=80"
     ],
     "sizes": [
       "XS",
@@ -341,8 +365,8 @@ export const products: Product[] = [
     "price": 210,
     "discountPrice": 175,
     "images": [
-      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80",
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
+      "/kusum-silver-shehnai.jpg?w=800&q=80",
+      "/kusum-festive-rust.jpg?w=800&q=80"
     ],
     "sizes": [
       "XS",
@@ -392,7 +416,7 @@ export const products: Product[] = [
     "price": 1250,
     "discountPrice": 1090,
     "images": [
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
+      "/kusum-ivory-peshwas.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
     "sizes": [
@@ -450,7 +474,7 @@ export const products: Product[] = [
     "price": 980,
     "images": [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
+      "/kusum-ivory-peshwas.jpg?w=800&q=80"
     ],
     "sizes": [
       "Unstitched",
@@ -564,7 +588,7 @@ export const products: Product[] = [
     "discountPrice": 320,
     "images": [
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80"
+      "/kusum-bridal-maroon.jpg?w=800&q=80"
     ],
     "sizes": [
       "52",
@@ -616,7 +640,7 @@ export const products: Product[] = [
     "subCategory": "festive-kaftans",
     "price": 640,
     "images": [
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "/kusum-bridal-maroon.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80"
     ],
     "sizes": [
@@ -666,7 +690,7 @@ export const products: Product[] = [
     "price": 290,
     "discountPrice": 245,
     "images": [
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80"
     ],
     "sizes": [
@@ -718,7 +742,7 @@ export const products: Product[] = [
     "price": 780,
     "images": [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80"
+      "/kusum-bridal-purple.jpg?w=800&q=80"
     ],
     "sizes": [
       "One Size",
@@ -766,7 +790,7 @@ export const products: Product[] = [
     "subCategory": "lehengas",
     "price": 4800,
     "images": [
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "/kusum-bridal-maroon.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
     "sizes": [
@@ -818,7 +842,7 @@ export const products: Product[] = [
     "subCategory": "maxis",
     "price": 4200,
     "images": [
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
+      "/kusum-ivory-peshwas.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
     "sizes": [
@@ -869,8 +893,8 @@ export const products: Product[] = [
     "price": 240,
     "discountPrice": 195,
     "images": [
-      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
-      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80"
+      "/kusum-bridal-purple.jpg?w=800&q=80",
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80"
     ],
     "sizes": [
       "3-4Y",
@@ -922,8 +946,8 @@ export const products: Product[] = [
     "subCategory": "girls-festive",
     "price": 180,
     "images": [
-      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80",
-      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80"
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80",
+      "/kusum-bridal-purple.jpg?w=800&q=80"
     ],
     "sizes": [
       "2-3Y",
@@ -1029,7 +1053,7 @@ export const products: Product[] = [
     "price": 520,
     "discountPrice": 440,
     "images": [
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
+      "/kusum-festive-black.jpg?w=800&q=80",
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
     ],
     "sizes": [
@@ -1084,7 +1108,7 @@ export const products: Product[] = [
     "price": 460,
     "images": [
       "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80",
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
+      "/kusum-festive-rust.jpg?w=800&q=80"
     ],
     "sizes": [
       "XS",
@@ -1137,7 +1161,7 @@ export const products: Product[] = [
     "discountPrice": 380,
     "images": [
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80"
+      "/kusum-bridal-maroon.jpg?w=800&q=80"
     ],
     "sizes": [
       "52",
@@ -1188,7 +1212,7 @@ export const products: Product[] = [
     "price": 1100,
     "images": [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80"
+      "/kusum-ivory-peshwas.jpg?w=800&q=80"
     ],
     "sizes": [
       "Unstitched",

@@ -107,7 +107,7 @@ describe("Kusum E-Commerce Services", () => {
     it("retrieves valid category by slug", () => {
       const cat = getCategoryBySlug("luxury-formals");
       expect(cat).toBeDefined();
-      expect(cat?.name).toBe("Luxury Formals");
+      expect(cat?.name).toBe("Farshi Shararas & Ghararas");
     });
   });
 });

@@ -4,9 +4,9 @@ import { products } from "@/data/products";
 
 export function LayoutComparisonSection() {
   // Select 3 signature products to showcase each layout option
-  const p1 = products[0]; // Chintz Rose Luxury Lawn
-  const p2 = products[1]; // Zaffran Embroidered Chiffon
-  const p3 = products[2]; // Mbroidered Velvet Festive
+  const p1 = products[0]; // Royal Farshi Zardozi Bridal Lehenga
+  const p2 = products[1]; // Areej Velvet Embroidered Festive Suit
+  const p3 = products[2]; // Shahi Nizami Khada Dupatta Ensemble
 
   return (
     <section className="border-t border-border/80 bg-gradient-to-b from-[#faf8f5] via-white to-[#faf8f5] py-14 lg:py-20">

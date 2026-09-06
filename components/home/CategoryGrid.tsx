@@ -4,13 +4,13 @@ import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const categoryBadges: Record<string, string> = {
-  unstitched: "✦ Flagship Lawn",
-  "ready-to-wear": "✦ Daily & Festive Pret",
-  "luxury-formals": "✦ Shehnai Wedding",
-  "abayas-kaftans": "✦ Modest Silk Edit",
-  bridal: "✦ Royal Atelier",
-  "mommy-and-me": "✦ Junior Festive",
-  sale: "✦ Special Offers",
+  unstitched: "✦ Pakistani Designer Lawn",
+  "ready-to-wear": "✦ Festive Pret & Anarkalis",
+  "luxury-formals": "✦ Farshi Sharara & Gharara",
+  "abayas-kaftans": "✦ Modest Dubai Abaya",
+  bridal: "✦ Khada Dupatta & Bridal",
+  "mommy-and-me": "✦ Junior Festive Sharara",
+  sale: "✦ Dhamaka Sale Flat 60%",
 };
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {
@@ -21,7 +21,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#e00075]" />
             <p className="text-xs uppercase tracking-[0.25em] text-[#e00075] font-bold">
-              Signature Ensembles · Festive & Pret
+              Bridal Lehengas · Khada Dupatta · Pakistani Suits
             </p>
           </div>
           <h2 className="mt-1.5 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#141414]">
