@@ -36,26 +36,17 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
             <div key={banner.id} className="relative min-w-0 flex-[0_0_100%]">
               <Link
                 href={banner.ctaHref}
-                className="group relative block w-full aspect-[16/9] sm:aspect-auto sm:h-[50vh] lg:h-[calc(100vh-130px)] lg:max-h-[560px] xl:max-h-[620px] min-h-[220px] sm:min-h-[380px] overflow-hidden cursor-pointer select-none bg-[#0d0d0d]"
+                className="group relative block w-full aspect-[16/9] sm:aspect-auto sm:h-[52vh] lg:h-[calc(100vh-125px)] lg:max-h-[560px] xl:max-h-[600px] min-h-[220px] sm:min-h-[380px] overflow-hidden cursor-pointer select-none bg-[#121212]"
                 aria-label={`${banner.title} — ${banner.ctaLabel}`}
               >
-                {/* Ambient Blurred Backdrop (Fills ultra-wide margins with slide's natural luxury tone) */}
-                <Image
-                  src={banner.image}
-                  alt=""
-                  fill
-                  aria-hidden="true"
-                  className="hidden sm:block object-cover blur-2xl scale-110 opacity-30 pointer-events-none"
-                />
-
-                {/* 100% Full-Fidelity Uncropped Banner (Sharp, centered, zero text or model cropped) */}
+                {/* 100% Full Cover Cinematic Banner (Edge-to-edge full bleed) */}
                 <Image
                   src={banner.image}
                   alt={banner.title}
                   fill
                   priority={index === 0}
                   sizes="100vw"
-                  className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.01]"
+                  className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                 />
 
                 {/* Subtle Luxury Vignette on Desktop Bottom for CTA Contrast */}

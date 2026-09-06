@@ -1,6 +1,6 @@
 # KUSUM — THE PREMIUM DESIGNER WEAR
 
-A high-end luxury e-commerce platform for women's couture ethnic wear, royal Pakistani lawn, bridal lehengas, festive formals, abayas, and kaftans.
+A high-end luxury e-commerce platform for women's couture ethnic wear, royal luxury lawn, bridal lehengas, festive formals, abayas, and kaftans.
 
 > **Design System & Architecture**: For the full architectural specifications, UX decisions, brand guidelines, and verification rules, refer to [PROJECT_BLUEPRINT.md](./PROJECT_BLUEPRINT.md).
 

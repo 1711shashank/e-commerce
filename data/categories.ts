@@ -3,7 +3,7 @@ import type { Category } from "@/lib/types";
 export const categories: Category[] = [
   {
     id: "cat-unstitched",
-    name: "Pakistani Designer Lawn",
+    name: "Luxury Designer Lawn",
     slug: "unstitched",
     image: "/kusum-velvet-areej.jpg",
     description: "Original 3-piece embroidered lawn, pure silk dupattas & Areej International luxury suits",
@@ -14,7 +14,7 @@ export const categories: Category[] = [
     name: "Festive Pret & Anarkalis",
     slug: "ready-to-wear",
     image: "/kusum-ivory-peshwas.jpg",
-    description: "Tailored festive kurtas, readymade Pakistani suits & celebratory anarkalis",
+    description: "Tailored festive kurtas, readymade luxury suits & celebratory anarkalis",
     parentId: null,
   },
   {
@@ -31,7 +31,7 @@ export const categories: Category[] = [
     slug: "abayas-kaftans",
     image:
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
-    description: "Flowing Dubai crepe abayas, kimono cuts and festive kaftans with matching sheilas",
+    description: "Flowing royal crepe abayas, kimono cuts and festive kaftans with matching sheilas",
     parentId: null,
   },
   {
