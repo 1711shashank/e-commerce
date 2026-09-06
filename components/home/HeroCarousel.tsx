@@ -36,17 +36,26 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
             <div key={banner.id} className="relative min-w-0 flex-[0_0_100%]">
               <Link
                 href={banner.ctaHref}
-                className="group relative block w-full aspect-[16/9] overflow-hidden cursor-pointer select-none"
+                className="group relative block w-full aspect-[16/9] sm:aspect-auto sm:h-[50vh] lg:h-[calc(100vh-130px)] lg:max-h-[560px] xl:max-h-[620px] min-h-[220px] sm:min-h-[380px] overflow-hidden cursor-pointer select-none bg-[#0d0d0d]"
                 aria-label={`${banner.title} — ${banner.ctaLabel}`}
               >
-                {/* 100% Full-Fidelity 16:9 Image (Pixel-perfect on mobile & desktop, zero cropping) */}
+                {/* Ambient Blurred Backdrop (Fills ultra-wide margins with slide's natural luxury tone) */}
+                <Image
+                  src={banner.image}
+                  alt=""
+                  fill
+                  aria-hidden="true"
+                  className="hidden sm:block object-cover blur-2xl scale-110 opacity-30 pointer-events-none"
+                />
+
+                {/* 100% Full-Fidelity Uncropped Banner (Sharp, centered, zero text or model cropped) */}
                 <Image
                   src={banner.image}
                   alt={banner.title}
                   fill
                   priority={index === 0}
                   sizes="100vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.015]"
+                  className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.01]"
                 />
 
                 {/* Subtle Luxury Vignette on Desktop Bottom for CTA Contrast */}
@@ -59,7 +68,7 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
                 </div>
 
                 {/* Desktop Floating Pill Action: Subtle, High-End & Unobtrusive */}
-                <div className="absolute bottom-5 right-5 lg:bottom-8 lg:right-10 z-10 hidden sm:flex items-center gap-2 rounded-full bg-[#141414]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-xl backdrop-blur-md border border-white/20 transition-all duration-300 group-hover:bg-[#e00075] group-hover:border-[#e00075] group-hover:scale-105">
+                <div className="absolute bottom-4 right-4 lg:bottom-6 lg:right-8 z-10 hidden sm:flex items-center gap-2 rounded-full bg-[#141414]/90 px-4.5 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-xl backdrop-blur-md border border-white/20 transition-all duration-300 group-hover:bg-[#e00075] group-hover:border-[#e00075] group-hover:scale-105">
                   <span>{banner.ctaLabel}</span>
                   <span className="text-[#ffd6eb] transition-transform duration-300 group-hover:translate-x-1">
                     →
