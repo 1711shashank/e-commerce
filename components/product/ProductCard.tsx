@@ -146,17 +146,17 @@ export function ProductCard({
           </button>
 
           {/* Maria.B Slide-Up Glass Quick-Add Bar */}
-          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-white/95 backdrop-blur-md p-3 border-t border-black/10 flex flex-col gap-2 z-20 shadow-lg">
-            <div className="flex items-center justify-center gap-2 text-[9.5px] uppercase tracking-wider font-semibold text-muted">
-              <span className="px-2 py-0.5 rounded bg-black/5">Unstitched</span>
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 max-sm:translate-y-0 transition-transform duration-300 ease-out bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border-t border-black/10 flex flex-col gap-1.5 sm:gap-2 z-20 shadow-lg">
+            <div className="flex items-center justify-center gap-2 text-[9px] sm:text-[9.5px] uppercase tracking-wider font-semibold text-muted">
+              <span className="px-1.5 py-0.5 rounded bg-black/5">Unstitched</span>
               <span>·</span>
-              <span className="px-2 py-0.5 rounded bg-black/5">Stitched</span>
+              <span className="px-1.5 py-0.5 rounded bg-black/5">Stitched</span>
             </div>
             <button
               type="button"
               onClick={handleQuickAdd}
               disabled={!product.inStock}
-              className="w-full h-9 rounded-md bg-[#141414] text-white text-[10.5px] uppercase tracking-[0.16em] font-bold hover:bg-[#e00075] transition-colors flex items-center justify-center gap-2 disabled:opacity-40"
+              className="w-full h-8 sm:h-9 rounded-md bg-[#141414] text-white text-[10px] sm:text-[10.5px] uppercase tracking-[0.14em] sm:tracking-[0.16em] font-bold hover:bg-[#e00075] transition-colors flex items-center justify-center gap-1.5 sm:gap-2 disabled:opacity-40"
             >
               <ShoppingBag className="h-3.5 w-3.5" />
               <span>{product.inStock ? `+ Quick Add · ${formatPrice(price)}` : "Sold Out"}</span>
@@ -225,13 +225,13 @@ export function ProductCard({
             <Heart className={cn("h-3.5 w-3.5", wished && "fill-[#e00075] text-[#e00075]")} />
           </button>
 
-          {/* Dual Action Buttons on Hover */}
-          <div className="absolute inset-x-2.5 bottom-2.5 z-20 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          {/* Dual Action Buttons on Hover & Always Visible on Mobile Touch */}
+          <div className="absolute inset-x-2 bottom-2 sm:inset-x-2.5 sm:bottom-2.5 z-20 flex gap-1.5 sm:gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100 transition-all duration-300">
             <button
               type="button"
               onClick={handleQuickAdd}
               disabled={!product.inStock}
-              className="flex-1 h-9 rounded-lg bg-[#141414]/95 text-white text-[10px] uppercase tracking-wider font-bold hover:bg-[#e00075] transition-colors flex items-center justify-center gap-1.5 shadow-md"
+              className="flex-1 h-8 sm:h-9 rounded-lg bg-[#141414]/95 text-white text-[9.5px] sm:text-[10px] uppercase tracking-wider font-bold hover:bg-[#e00075] transition-colors flex items-center justify-center gap-1 sm:gap-1.5 shadow-md"
             >
               <ShoppingBag className="h-3.5 w-3.5" />
               Bag
@@ -241,7 +241,7 @@ export function ProductCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex-1 h-9 rounded-lg bg-[#25D366] text-white text-[10px] uppercase tracking-wider font-bold hover:bg-[#20b858] transition-colors flex items-center justify-center gap-1 shadow-md"
+              className="flex-1 h-8 sm:h-9 rounded-lg bg-[#25D366] text-white text-[9.5px] sm:text-[10px] uppercase tracking-wider font-bold hover:bg-[#20b858] transition-colors flex items-center justify-center gap-1 shadow-md"
             >
               <span>WhatsApp 💬</span>
             </a>

@@ -3,30 +3,35 @@ import type { Banner } from "@/lib/types";
 export const banners: Banner[] = [
   {
     id: "banner-1",
-    title: "Luxury Lawn Collection '26",
-    subtitle: "Exquisite hand-embroidery, pure silk dupattas & breezy unstitched 3-piece sets",
-    ctaLabel: "Shop Unstitched Lawn",
-    ctaHref: "/collections/unstitched",
-    image:
-      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1600&q=80",
+    title: "Biggest Bridal Festive Season Sale",
+    subtitle: "Flat 60% Off — Fashionable, Affordable, Unforgettable",
+    ctaLabel: "Shop Bridal Sale",
+    ctaHref: "/collections/sale",
+    image: "/slider-1.jpg",
   },
   {
     id: "banner-2",
-    title: "The Modest Abaya & Kaftan Edit",
-    subtitle: "Graceful cuts, rich crepe textures & embroidered kaftans complete with matching Sheila",
-    ctaLabel: "Explore Modest Wear",
-    ctaHref: "/collections/abayas-kaftans",
-    image:
-      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=1600&q=80",
+    title: "Original Areej International Collection",
+    subtitle: "Exclusive Haute Couture Designer Edit — Coming Soon",
+    ctaLabel: "Discover Collection",
+    ctaHref: "/collections/unstitched",
+    image: "/slider-2.jpg",
   },
   {
     id: "banner-3",
-    title: "Shehnai Festive & Wedding Formals",
-    subtitle: "Opulent zari, sequins & gotta craftsmanship designed for celebratory moments",
-    ctaLabel: "Discover Formals",
+    title: "Grand Festive Clearance",
+    subtitle: "Flat 60% Off on Signature Luxury Festive Ensembles",
+    ctaLabel: "Shop Flat 60% Off",
+    ctaHref: "/collections/sale",
+    image: "/slider-3.jpg",
+  },
+  {
+    id: "banner-4",
+    title: "The Festive Silver Formal Edit",
+    subtitle: "Heirloom Silver Embroidery & Zari Craftsmanship — Special Offers",
+    ctaLabel: "Explore Festive Formals",
     ctaHref: "/collections/luxury-formals",
-    image:
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1600&q=80",
+    image: "/slider-4.jpg",
   },
 ];
 

@@ -94,7 +94,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
                       "mt-1 text-white/85 font-normal leading-relaxed line-clamp-1",
                       isHero
                         ? "text-xs sm:text-sm"
-                        : "text-[11px] sm:text-xs hidden xs:block",
+                        : "text-[11px] sm:text-xs hidden sm:block",
                     )}
                   >
                     {category.description}

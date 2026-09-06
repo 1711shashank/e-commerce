@@ -29,83 +29,78 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
   }, [emblaApi]);
 
   return (
-    <section className="relative overflow-hidden bg-foreground">
+    <section className="relative overflow-hidden bg-[#121212]">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <div key={banner.id} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="relative h-[540px] sm:h-[660px] lg:h-[780px] xl:h-[840px]">
+              <Link
+                href={banner.ctaHref}
+                className="group relative block w-full aspect-[16/9] overflow-hidden cursor-pointer select-none"
+                aria-label={`${banner.title} — ${banner.ctaLabel}`}
+              >
+                {/* 100% Full-Fidelity 16:9 Image (Pixel-perfect on mobile & desktop, zero cropping) */}
                 <Image
                   src={banner.image}
-                  alt=""
+                  alt={banner.title}
                   fill
-                  priority
+                  priority={index === 0}
                   sizes="100vw"
-                  className="object-cover opacity-80"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.015]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
-                <div className="absolute inset-0 flex items-end sm:items-center">
-                  <div className="mx-auto w-full max-w-[1536px] px-5 pb-16 pt-16 sm:px-8 sm:pb-0 sm:pt-20 xl:px-12">
-                    <p className="mb-3 sm:mb-4 text-[11px] sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.35em] text-[#fdf0f6] font-semibold animate-fade-up">
-                      Kusum Designer Wear · The Haute Couture Edit
-                    </p>
-                    <h1 className="max-w-2xl font-[family-name:var(--font-heading)] text-3xl leading-[1.1] text-white sm:text-6xl lg:text-7xl xl:text-8xl animate-fade-up [animation-delay:80ms] drop-shadow-md">
-                      {banner.title}
-                    </h1>
-                    <p className="mt-3 sm:mt-5 max-w-lg text-xs sm:text-lg text-white/90 animate-fade-up [animation-delay:140ms] font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
-                      {banner.subtitle}
-                    </p>
-                    {/* Aligned CTA Action Buttons: Symmetrically stacked on mobile, row on tablet/desktop */}
-                    <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-4 w-full sm:w-auto max-w-xs sm:max-w-none animate-fade-up [animation-delay:200ms]">
-                      <Link
-                        href={banner.ctaHref}
-                        className="flex h-11.5 sm:h-12 w-full sm:w-auto items-center justify-center rounded-full bg-[#e00075] px-6 sm:px-8 text-xs font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-white shadow-xl transition-all duration-300 hover:bg-[#c20065] hover:scale-105 active:scale-95 text-center"
-                      >
-                        {banner.ctaLabel}
-                      </Link>
-                      <Link
-                        href="/bridal"
-                        className="flex h-11.5 sm:h-12 w-full sm:w-auto items-center justify-center rounded-full border border-white/40 bg-white/10 px-6 sm:px-8 text-xs font-semibold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:bg-white/25 hover:scale-105 active:scale-95 text-center"
-                      >
-                        Bridal Bespoke
-                      </Link>
-                    </div>
-                  </div>
+
+                {/* Subtle Luxury Vignette on Desktop Bottom for CTA Contrast */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 sm:opacity-40" />
+
+                {/* Hidden Semantic Info for SEO and Screen Readers */}
+                <div className="sr-only">
+                  <h2>{banner.title}</h2>
+                  <p>{banner.subtitle}</p>
                 </div>
-              </div>
+
+                {/* Desktop Floating Pill Action: Subtle, High-End & Unobtrusive */}
+                <div className="absolute bottom-5 right-5 lg:bottom-8 lg:right-10 z-10 hidden sm:flex items-center gap-2 rounded-full bg-[#141414]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-xl backdrop-blur-md border border-white/20 transition-all duration-300 group-hover:bg-[#e00075] group-hover:border-[#e00075] group-hover:scale-105">
+                  <span>{banner.ctaLabel}</span>
+                  <span className="text-[#ffd6eb] transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </Link>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Prev/Next Navigation Controls: Circular Frosted Luxury Badges */}
+      {/* Prev/Next Navigation Controls: Circular Frosted Glass */}
       <button
         type="button"
         onClick={scrollPrev}
-        className="absolute left-2.5 sm:left-6 top-1/2 z-10 flex h-9 w-9 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 sm:bg-white/15 text-white backdrop-blur-md border border-white/20 hover:bg-white/30 transition-all active:scale-90 shadow-md"
+        className="absolute left-2 sm:left-6 top-1/2 z-20 flex h-8 w-8 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 sm:bg-black/35 text-white backdrop-blur-md border border-white/20 hover:bg-[#e00075] hover:border-[#e00075] transition-all active:scale-90 shadow-md"
         aria-label="Previous slide"
       >
-        <ChevronLeft className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
       </button>
       <button
         type="button"
         onClick={scrollNext}
-        className="absolute right-2.5 sm:right-6 top-1/2 z-10 flex h-9 w-9 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 sm:bg-white/15 text-white backdrop-blur-md border border-white/20 hover:bg-white/30 transition-all active:scale-90 shadow-md"
+        className="absolute right-2 sm:right-6 top-1/2 z-20 flex h-8 w-8 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 sm:bg-black/35 text-white backdrop-blur-md border border-white/20 hover:bg-[#e00075] hover:border-[#e00075] transition-all active:scale-90 shadow-md"
         aria-label="Next slide"
       >
-        <ChevronRight className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
       </button>
 
       {/* Slide Position Indicator Dots */}
-      <div className="absolute bottom-4 sm:bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-2 sm:bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-1.5 sm:gap-2">
         {banners.map((banner, i) => (
           <button
             key={banner.id}
             type="button"
             onClick={() => emblaApi?.scrollTo(i)}
             className={cn(
-              "h-1.5 sm:h-2 rounded-full transition-all",
-              selected === i ? "w-7 sm:w-8 bg-white" : "w-2 bg-white/50",
+              "h-1.5 sm:h-2 rounded-full transition-all shadow-[0_1px_3px_rgba(0,0,0,0.8)]",
+              selected === i
+                ? "w-6 sm:w-8 bg-[#e00075]"
+                : "w-2 sm:w-2.5 bg-white/70 hover:bg-white",
             )}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={selected === i}

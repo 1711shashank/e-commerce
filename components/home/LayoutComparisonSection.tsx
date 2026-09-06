@@ -82,7 +82,7 @@ export function LayoutComparisonSection() {
           </p>
           <Link
             href="/collections/ready-to-wear"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#141414] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#e00075] transition-colors shadow-sm"
+            className="inline-flex items-center justify-center text-center max-w-full gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#141414] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest hover:bg-[#e00075] transition-colors shadow-sm"
           >
             <span>Open Interactive Collection Grid Switcher →</span>
           </Link>
