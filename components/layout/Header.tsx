@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
-import { useSyncExternalStore, useState } from "react";
+import { useSyncExternalStore, useState, useRef, useEffect } from "react";
 import { useStore } from "@/lib/store";
 import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -73,6 +73,32 @@ export function Header({ categories }: { categories: Category[] }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [isInlineSearchOpen, setIsInlineSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = (label: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setHovered(label);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setHovered(null);
+    }, 180);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Safe client-only mounting using useSyncExternalStore (prevents cascading render lint error)
   const mounted = useSyncExternalStore(
@@ -359,8 +385,8 @@ export function Header({ categories }: { categories: Category[] }) {
                       <li
                         key={item.label}
                         className="relative shrink-0"
-                        onMouseEnter={() => setHovered(item.label)}
-                        onMouseLeave={() => setHovered(null)}
+                        onMouseEnter={() => handleMouseEnter(item.label)}
+                        onMouseLeave={handleMouseLeave}
                       >
                         <Link
                           href={item.href}
@@ -375,27 +401,37 @@ export function Header({ categories }: { categories: Category[] }) {
                         </Link>
 
                         {subs.length > 0 && hovered === item.label && (
-                          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 min-w-[260px] rounded-xl border border-border bg-surface p-4 shadow-xl animate-fade-in z-50">
-                            <ul className="space-y-1">
-                              {subs.map((sub) => (
-                                <li key={sub.id}>
+                          <div
+                            className="absolute left-1/2 -translate-x-1/2 top-full pt-2.5 z-50 before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
+                            onMouseEnter={() => handleMouseEnter(item.label)}
+                            onMouseLeave={handleMouseLeave}
+                          >
+                            <div className="min-w-[260px] rounded-xl border border-border bg-surface p-3 sm:p-3.5 shadow-2xl animate-fade-in">
+                              <ul className="space-y-1">
+                                {subs.map((sub) => (
+                                  <li key={sub.id}>
+                                    <Link
+                                      href={`/collections/${parent!.slug}?sub=${sub.slug}`}
+                                      onClick={() => setHovered(null)}
+                                      className="flex items-center justify-between min-h-9 px-3 py-2 rounded-lg text-xs font-medium text-foreground/85 hover:bg-[#fdf2f7] hover:text-[#e00075] transition-all group whitespace-nowrap"
+                                    >
+                                      <span>{sub.name}</span>
+                                      <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity text-[#e00075]">→</span>
+                                    </Link>
+                                  </li>
+                                ))}
+                                <li className="pt-2 border-t border-border mt-2">
                                   <Link
-                                    href={`/collections/${parent!.slug}?sub=${sub.slug}`}
-                                    className="block min-h-9 px-3 py-2 rounded-lg text-xs font-medium text-[#555555] hover:bg-[#faf8f5] hover:text-[#e00075] transition-colors whitespace-nowrap"
+                                    href={item.href}
+                                    onClick={() => setHovered(null)}
+                                    className="flex items-center justify-between min-h-9 px-3 py-2 text-xs uppercase tracking-wider font-bold text-[#e00075] hover:bg-[#fdf2f7] rounded-lg transition-all whitespace-nowrap"
                                   >
-                                    {sub.name}
+                                    <span>Explore All {item.label}</span>
+                                    <span>→</span>
                                   </Link>
                                 </li>
-                              ))}
-                              <li className="pt-2 border-t border-border mt-2">
-                                <Link
-                                    href={item.href}
-                                    className="block min-h-9 px-3 py-1.5 text-xs uppercase tracking-wider font-bold text-[#e00075] hover:underline whitespace-nowrap"
-                                >
-                                  Explore All {item.label} →
-                                </Link>
-                              </li>
-                            </ul>
+                              </ul>
+                            </div>
                           </div>
                         )}
                       </li>
