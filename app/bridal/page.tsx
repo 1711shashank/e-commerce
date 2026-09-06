@@ -10,21 +10,21 @@ import { Button } from "@/components/ui/Button";
 const couturePieces = [
   {
     title: "Shahi Mehfil Crimson Zardozi Lehenga",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1000&q=80",
+    image: "/kusum-bridal-maroon.jpg",
     work: "Pure Zardozi, Marori, Dabka & Real Silver Zari",
     silhouette: "16-Kali Kalidar Lehenga with 4-Meter Ghera",
   },
   {
     title: "Dastaan Antique Gold Tissue Bridal Peshwas",
-    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=1000&q=80",
+    image: "/kusum-ivory-peshwas.jpg",
     work: "Handcrafted Mukesh, Kamdani & Swarovski Crystal Sprays",
     silhouette: "Royal Nikah Floor-Length Peshwas with Brocade Skirt",
   },
   {
-    title: "Gulmohar Rose Gold Scalloped Bridal Gown",
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1000&q=80",
+    title: "Gulmohar Royal Purple Scalloped Bridal Farshi Sharara",
+    image: "/kusum-bridal-purple.jpg",
     work: "Panni Work, Cut-Dana & Pearl Embellished Net Veil",
-    silhouette: "Contemporary Flared Bridal Gown with Matha Patti Veil",
+    silhouette: "Traditional Farshi Sharara with Hand-Embroidered Matha Patti Veil",
   },
 ];
 
@@ -50,7 +50,7 @@ export default function BridalPage() {
       {/* Hero Banner */}
       <div className="relative h-[65vh] min-h-[460px] w-full bg-[#0a0a0a] flex items-center justify-center text-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1600&q=80"
+          src="/slider-1.jpg"
           alt="Kusum Bridal Couture"
           fill
           priority

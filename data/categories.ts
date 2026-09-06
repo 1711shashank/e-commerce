@@ -71,8 +71,7 @@ export const categories: Category[] = [
     id: "sub-chiffon",
     name: "Embroidered Chiffon",
     slug: "embroidered-chiffon",
-    image:
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+    image: "/kusum-ivory-peshwas.jpg",
     parentId: "cat-unstitched",
   },
   {

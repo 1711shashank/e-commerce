@@ -394,7 +394,7 @@ export const products: Product[] = [
     "discountPrice": 1090,
     "images": [
       "/kusum-ivory-peshwas.jpg",
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
+      "/kusum-silver-shehnai.jpg"
     ],
     "sizes": [
       "Unstitched",
@@ -450,7 +450,7 @@ export const products: Product[] = [
     "subCategory": "wedding-formals",
     "price": 980,
     "images": [
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "/kusum-festive-black.jpg",
       "/kusum-ivory-peshwas.jpg"
     ],
     "sizes": [
@@ -718,7 +718,7 @@ export const products: Product[] = [
     "subCategory": "festive-kaftans",
     "price": 780,
     "images": [
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "/kusum-velvet-areej.jpg",
       "/kusum-bridal-purple.jpg"
     ],
     "sizes": [
@@ -768,7 +768,7 @@ export const products: Product[] = [
     "price": 4800,
     "images": [
       "/kusum-bridal-maroon.jpg",
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
+      "/kusum-bridal-purple.jpg"
     ],
     "sizes": [
       "Made to Measure"
@@ -820,7 +820,7 @@ export const products: Product[] = [
     "price": 4200,
     "images": [
       "/kusum-ivory-peshwas.jpg",
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
+      "/kusum-silver-shehnai.jpg"
     ],
     "sizes": [
       "Made to Measure"
@@ -1031,7 +1031,7 @@ export const products: Product[] = [
     "discountPrice": 440,
     "images": [
       "/kusum-festive-black.jpg",
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80"
+      "/kusum-festive-rust.jpg"
     ],
     "sizes": [
       "Unstitched",
@@ -1188,7 +1188,7 @@ export const products: Product[] = [
     "subCategory": "wedding-formals",
     "price": 1100,
     "images": [
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+      "/kusum-silver-shehnai.jpg",
       "/kusum-ivory-peshwas.jpg"
     ],
     "sizes": [
