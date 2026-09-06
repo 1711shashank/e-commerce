@@ -39,7 +39,7 @@ export const categories: Category[] = [
     name: "Bridal Lehengas & Khada Dupatta",
     slug: "bridal",
     image: "/kusum-bridal-maroon.jpg",
-    description: "Heirloom Hyderabadi khada dupattas, zardozi bridal lehengas & bespoke wedding couture",
+    description: "Heirloom royal khada dupattas, zardozi bridal lehengas & bespoke wedding couture",
     parentId: null,
   },
   {
