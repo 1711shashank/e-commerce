@@ -77,16 +77,51 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "ap-south-1")
+AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN", "").strip()
+AWS_S3_FILE_OVERWRITE = True
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+AWS_S3_ADDRESSING_STYLE = "virtual"
+
+AWS_S3_ACCESS_KEY_ID = os.environ.get(
+    "AWS_S3_ACCESS_KEY_ID", os.environ.get("AWS_ACCESS_KEY_ID", "")
+).strip()
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get(
+    "AWS_S3_SECRET_ACCESS_KEY", os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+).strip()
+
+s3_options = {
+    "bucket_name": AWS_STORAGE_BUCKET_NAME,
+    "region_name": AWS_S3_REGION_NAME,
+    "file_overwrite": True,
+    "default_acl": None,
+    "querystring_auth": False,
+    "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+    "addressing_style": "virtual",
+    "access_key": AWS_S3_ACCESS_KEY_ID,
+    "secret_key": AWS_S3_SECRET_ACCESS_KEY,
+}
+if AWS_S3_CUSTOM_DOMAIN:
+    s3_options["custom_domain"] = AWS_S3_CUSTOM_DOMAIN
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": s3_options,
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = (
+    f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    if AWS_S3_CUSTOM_DOMAIN
+    else f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "change-me-to-a-long-random-secret")

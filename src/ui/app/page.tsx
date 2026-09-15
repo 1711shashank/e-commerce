@@ -5,6 +5,7 @@ import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { LayoutComparisonSection } from "@/components/home/LayoutComparisonSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { PromoStrip } from "@/components/home/PromoStrip";
+import { fetchPublicBanners } from "@/lib/banner-api";
 import {
   getBestSellers,
   getFeaturedProducts,
@@ -19,16 +20,22 @@ export const metadata: Metadata = {
     "Discover luxury women's ethnic and Islamic modest wear by Kusum. Shop 3-piece unstitched lawn, festive pret, wedding formals, and modest abayas with express delivery across UAE and worldwide.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const categories = getParentCategories();
   const featured = getFeaturedProducts(8);
   const bestsellers = getBestSellers(8);
   const sale = getSaleProducts(8);
   const promos = getPromoStrips();
+  let banners = [] as Awaited<ReturnType<typeof fetchPublicBanners>>;
+  try {
+    banners = await fetchPublicBanners();
+  } catch {
+    banners = [];
+  }
 
   return (
     <>
-      <HomeHeroCarousel />
+      <HomeHeroCarousel initialBanners={banners} />
       <InfiniteMarquee />
       <CategoryGrid categories={categories} />
       <LayoutComparisonSection />

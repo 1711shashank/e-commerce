@@ -5,9 +5,12 @@ import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { fetchPublicBanners } from "@/lib/banner-api";
 import type { Banner } from "@/lib/types";
 
-export function HomeHeroCarousel() {
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [loading, setLoading] = useState(true);
+export function HomeHeroCarousel({
+  initialBanners = [],
+}: {
+  initialBanners?: Banner[];
+}) {
+  const [banners, setBanners] = useState<Banner[]>(initialBanners);
 
   useEffect(() => {
     let cancelled = false;
@@ -16,25 +19,13 @@ export function HomeHeroCarousel() {
         const data = await fetchPublicBanners();
         if (!cancelled) setBanners(data);
       } catch {
-        if (!cancelled) setBanners([]);
-      } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setBanners(initialBanners);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, []);
-
-  if (loading) {
-    return (
-      <section
-        className="relative h-[360px] bg-foreground sm:h-[440px] lg:h-[560px]"
-        aria-label="Loading carousel"
-        aria-busy="true"
-      />
-    );
-  }
 
   if (!banners.length) return null;
 

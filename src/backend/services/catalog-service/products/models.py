@@ -178,7 +178,7 @@ class Banner(UUIDPrimaryKeyModel):
     subtitle = models.CharField(max_length=160)
     cta_label = models.CharField(max_length=40)
     cta_href = models.CharField(max_length=500)
-    image = models.URLField()
+    image = models.CharField(max_length=2048)
     image_alt = models.CharField(max_length=200, blank=True)
     sort_order = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)

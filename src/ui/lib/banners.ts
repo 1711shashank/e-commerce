@@ -60,6 +60,16 @@ export function formValuesToBannerPreview(
   };
 }
 
+export function isAllowedImageUrl(value: string): boolean {
+  if (value.startsWith("/media/")) return true;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 export function validateCtaHref(href: string): string | null {
   const value = href.trim();
   if (!value) return "Redirect URL is required.";
@@ -99,12 +109,8 @@ export function validateBannerForm(
   const hrefErr = validateCtaHref(values.ctaHref);
   if (hrefErr) errs.ctaHref = hrefErr;
   if (!values.image.trim()) errs.image = "Background image is required.";
-  else {
-    try {
-      new URL(values.image);
-    } catch {
-      errs.image = "Enter a valid image URL.";
-    }
+  else if (!isAllowedImageUrl(values.image.trim())) {
+    errs.image = "Upload an image from the admin panel (S3 or /media URL).";
   }
   if (values.imageAlt.length > 200) errs.imageAlt = "Max 200 characters.";
   return errs;

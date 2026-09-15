@@ -1,6 +1,5 @@
 import uuid
 
-from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -21,6 +20,44 @@ ALLOWED_IMAGE_TYPES = {
     "image/webp": ".webp",
     "image/gif": ".gif",
 }
+FILENAME_IMAGE_TYPES = {
+    ".jpg": ".jpg",
+    ".jpeg": ".jpg",
+    ".png": ".png",
+    ".webp": ".webp",
+    ".gif": ".gif",
+}
+
+
+def save_uploaded_image(uploaded, folder: str):
+    content_type = (uploaded.content_type or "").split(";")[0].strip().lower()
+    ext = ALLOWED_IMAGE_TYPES.get(content_type)
+    if not ext:
+        name = (getattr(uploaded, "name", "") or "").lower()
+        for suffix, mapped in FILENAME_IMAGE_TYPES.items():
+            if name.endswith(suffix):
+                ext = mapped
+                break
+    if not ext:
+        return None, Response(
+            {"detail": "Unsupported image type. Use JPEG, PNG, WebP, or GIF."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if uploaded.size > MAX_UPLOAD_BYTES:
+        return None, Response(
+            {"detail": "Image must be 8 MB or smaller."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    filename = f"{folder}/{uuid.uuid4().hex}{ext}"
+    try:
+        saved_path = default_storage.save(filename, uploaded)
+        url = default_storage.url(saved_path)
+    except Exception as exc:
+        return None, Response(
+            {"detail": f"Could not upload image to S3: {exc}"},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+    return {"url": url}, None
 
 
 class ProductFilter(filters.FilterSet):
@@ -105,25 +142,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        content_type = uploaded.content_type or ""
-        ext = ALLOWED_IMAGE_TYPES.get(content_type)
-        if not ext:
-            return Response(
-                {"detail": "Unsupported image type. Use JPEG, PNG, WebP, or GIF."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if uploaded.size > MAX_UPLOAD_BYTES:
-            return Response(
-                {"detail": "Image must be 8 MB or smaller."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        filename = f"products/{uuid.uuid4().hex}{ext}"
-        saved_path = default_storage.save(filename, uploaded)
-        media_url = settings.MEDIA_URL.rstrip("/")
-        url = f"{media_url}/{saved_path}"
-        return Response({"url": url})
+        payload, error = save_uploaded_image(uploaded, "products")
+        if error:
+            return error
+        return Response(payload)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -222,22 +244,7 @@ class BannerViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        content_type = uploaded.content_type or ""
-        ext = ALLOWED_IMAGE_TYPES.get(content_type)
-        if not ext:
-            return Response(
-                {"detail": "Unsupported image type. Use JPEG, PNG, WebP, or GIF."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if uploaded.size > MAX_UPLOAD_BYTES:
-            return Response(
-                {"detail": "Image must be 8 MB or smaller."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        filename = f"banners/{uuid.uuid4().hex}{ext}"
-        saved_path = default_storage.save(filename, uploaded)
-        media_url = settings.MEDIA_URL.rstrip("/")
-        url = f"{media_url}/{saved_path}"
-        return Response({"url": url})
+        payload, error = save_uploaded_image(uploaded, "banners")
+        if error:
+            return error
+        return Response(payload)

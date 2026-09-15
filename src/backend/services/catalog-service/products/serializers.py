@@ -354,6 +354,7 @@ def _validate_cta_href(value: str) -> str:
 class BannerSerializer(serializers.ModelSerializer):
     ctaLabel = serializers.CharField(source="cta_label")
     ctaHref = serializers.CharField(source="cta_href")
+    image = serializers.CharField(max_length=2048)
     imageAlt = serializers.CharField(
         source="image_alt", required=False, allow_blank=True
     )

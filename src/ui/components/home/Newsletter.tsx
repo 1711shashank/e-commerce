@@ -16,14 +16,7 @@ export function Newsletter() {
 
   return (
     <section className="relative overflow-hidden bg-[#141414] text-white">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-15"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 20%, #e00075 1.5px, transparent 1.5px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      <div className="newsletter-dots pointer-events-none absolute inset-0 opacity-15" />
       <div className="relative mx-auto flex max-w-[1536px] flex-col items-start gap-6 px-4 py-12 sm:px-8 lg:flex-row lg:items-center lg:justify-between xl:px-12 lg:py-16">
         <div className="max-w-xl">
           <div className="flex items-center gap-2">

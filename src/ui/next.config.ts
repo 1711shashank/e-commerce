@@ -5,9 +5,13 @@ const AUTH_PROXY =
 const CATALOG_PROXY =
   process.env.CATALOG_SERVICE_URL || "http://127.0.0.1:8002";
 
+const extraMediaHosts = (process.env.NEXT_PUBLIC_MEDIA_HOSTS ?? "")
+  .split(",")
+  .map((host) => host.trim().replace(/^https?:\/\//, ""))
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Django APIs require trailing slashes; without this, POST /api/auth/login/ → 308 → 500
   skipTrailingSlashRedirect: true,
   images: {
     remotePatterns: [
@@ -23,6 +27,18 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.cloudfront.net",
+      },
+      ...extraMediaHosts.map((hostname) => ({
+        protocol: "https" as const,
+        hostname,
+      })),
     ],
   },
   async rewrites() {
@@ -30,6 +46,14 @@ const nextConfig: NextConfig = {
       {
         source: "/api/auth/:path*",
         destination: `${AUTH_PROXY}/api/auth/:path*/`,
+      },
+      {
+        source: "/api/products/upload-image/",
+        destination: `${CATALOG_PROXY}/api/products/upload-image/`,
+      },
+      {
+        source: "/api/products/upload-image",
+        destination: `${CATALOG_PROXY}/api/products/upload-image/`,
       },
       {
         source: "/api/products/:path*",
@@ -46,6 +70,14 @@ const nextConfig: NextConfig = {
       {
         source: "/api/categories",
         destination: `${CATALOG_PROXY}/api/categories/`,
+      },
+      {
+        source: "/api/banners/upload-image/",
+        destination: `${CATALOG_PROXY}/api/banners/upload-image/`,
+      },
+      {
+        source: "/api/banners/upload-image",
+        destination: `${CATALOG_PROXY}/api/banners/upload-image/`,
       },
       {
         source: "/api/banners/:path*",

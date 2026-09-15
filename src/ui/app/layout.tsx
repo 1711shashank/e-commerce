@@ -45,8 +45,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable} ${montserrat.variable} ${cinzel.variable} h-full`}>
-      <body className="flex min-h-full flex-col antialiased">
+    <html
+      lang="en"
+      className={`${outfit.variable} ${playfair.variable} ${montserrat.variable} ${cinzel.variable} h-full`}
+      suppressHydrationWarning
+    >
+      <body className="flex min-h-full flex-col antialiased" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>
     </html>

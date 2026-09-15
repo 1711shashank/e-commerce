@@ -21,6 +21,7 @@ import {
 } from "@/lib/banner-api";
 import { useAuthStore } from "@/lib/auth-store";
 import { ApiError } from "@/lib/api";
+import { getApiErrorMessage, getFieldError } from "@/lib/api-errors";
 import { revalidateStorefrontHome } from "@/lib/revalidate-storefront";
 import type { Banner } from "@/lib/types";
 
@@ -84,7 +85,14 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   };
 
   const onUploadFiles = async (files: FileList | null) => {
-    if (!files?.length || !access) return;
+    if (!files?.length) return;
+    if (!access) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        image: "You must be logged in to upload images.",
+      }));
+      return;
+    }
     setUploading(true);
     setError(null);
     try {
@@ -95,8 +103,8 @@ export function CarouselForm({ banner }: CarouselFormProps) {
         ...prev,
         image:
           err instanceof ApiError
-            ? err.message
-            : "Could not upload image. Is the catalog service running?",
+            ? getApiErrorMessage(err)
+            : "Could not upload image to S3. Is the catalog service running?",
       }));
     } finally {
       setUploading(false);
@@ -143,11 +151,15 @@ export function CarouselForm({ banner }: CarouselFormProps) {
       router.push("/admin/carousel");
       router.refresh();
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : "Could not save slide. Try again.",
-      );
+      if (err instanceof ApiError) {
+        const imageError = getFieldError(err, "image");
+        if (imageError) {
+          setFieldErrors((prev) => ({ ...prev, image: imageError }));
+        }
+        setError(getApiErrorMessage(err, "image"));
+      } else {
+        setError("Could not save slide. Try again.");
+      }
     } finally {
       setSaving(false);
     }
