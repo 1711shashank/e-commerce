@@ -15,31 +15,38 @@ export function Newsletter() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-accent text-white">
+    <section className="relative overflow-hidden bg-[#141414] text-white">
       <div
-        className="pointer-events-none absolute inset-0 opacity-20"
+        className="pointer-events-none absolute inset-0 opacity-15"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+            "radial-gradient(circle at 20% 20%, #e00075 1.5px, transparent 1.5px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
         }}
       />
-      <div className="relative mx-auto flex max-w-7xl flex-col items-start gap-6 px-5 py-16 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-20">
-        <div className="max-w-lg">
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl">
-            Stay in the loop
+      <div className="relative mx-auto flex max-w-[1536px] flex-col items-start gap-6 px-4 py-12 sm:px-8 lg:flex-row lg:items-center lg:justify-between xl:px-12 lg:py-16">
+        <div className="max-w-xl">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#e00075]" />
+            <span className="text-xs uppercase tracking-[0.25em] text-[#e00075] font-bold">
+              The Kusum Atelier Circle
+            </span>
+          </div>
+          <h2 className="mt-1.5 font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">
+            Subscribe for Private Previews
           </h2>
-          <p className="mt-3 text-sm text-white/80 sm:text-base">
-            New drops, early sale access, and styling notes — straight to your
-            inbox.
+          <p className="mt-2.5 text-sm sm:text-base text-white/80 font-normal leading-relaxed">
+            Be the first to receive unstitched seasonal lawn catalog drops, festive bridal trunk shows, and private VIP previews directly to your inbox.
           </p>
         </div>
         {done ? (
-          <p className="text-sm tracking-wide">Thanks for subscribing.</p>
+          <p className="text-base font-semibold tracking-wide text-[#ffd6eb]">
+            ✦ Thank you for joining the Kusum Circle.
+          </p>
         ) : (
           <form
             onSubmit={onSubmit}
-            className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
+            className="flex w-full max-w-md flex-col gap-2.5 sm:flex-row"
           >
             <label className="sr-only" htmlFor="newsletter-email">
               Email address
@@ -50,13 +57,12 @@ export function Newsletter() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email"
-              className="min-h-12 flex-1 border border-white/30 bg-transparent px-4 text-sm text-white placeholder:text-white/60 focus:outline-none focus:ring-1 focus:ring-white"
+              placeholder="Enter your email address…"
+              className="min-h-12 flex-1 border border-white/20 bg-white/5 px-4 text-sm tracking-wide text-white placeholder:text-white/60 focus:border-[#e00075] focus:outline-none"
             />
             <Button
               type="submit"
-              variant="secondary"
-              className="bg-white text-accent hover:bg-white/90"
+              className="min-h-12 bg-[#e00075] text-white hover:bg-[#c20065] text-xs uppercase tracking-[0.18em] font-bold border-0 px-7 shrink-0 shadow-sm"
             >
               Subscribe
             </Button>

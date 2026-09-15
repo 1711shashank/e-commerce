@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { HomeHeroCarousel } from "@/components/home/HomeHeroCarousel";
+import { InfiniteMarquee } from "@/components/home/InfiniteMarquee";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
+import { LayoutComparisonSection } from "@/components/home/LayoutComparisonSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { PromoStrip } from "@/components/home/PromoStrip";
 import {
@@ -12,9 +14,9 @@ import {
 } from "@/lib/services";
 
 export const metadata: Metadata = {
-  title: "Aurelia — Contemporary Clothing",
+  title: "Kusum — The Premium Designer Wear | Luxury Ethnic & Modest Fashion",
   description:
-    "Discover new arrivals, lawn collections, ready-to-wear, and seasonal sale pieces at Aurelia.",
+    "Discover luxury women's ethnic and Islamic modest wear by Kusum. Shop 3-piece unstitched lawn, festive pret, wedding formals, and modest abayas with express delivery across UAE and worldwide.",
 };
 
 export default function HomePage() {
@@ -27,26 +29,28 @@ export default function HomePage() {
   return (
     <>
       <HomeHeroCarousel />
+      <InfiniteMarquee />
       <CategoryGrid categories={categories} />
+      <LayoutComparisonSection />
       <PromoStrip items={promos} />
       <FeaturedProducts
-        title="New Arrivals"
-        subtitle="Just landed"
+        title="New Drops"
+        subtitle="Fresh from the atelier"
         products={featured}
         href="/products?new=1"
       />
       <div className="border-t border-border">
         <FeaturedProducts
-          title="Best Sellers"
-          subtitle="Most loved"
+          title="Most Coveted"
+          subtitle="Customer favourites"
           products={bestsellers}
-          href="/collections"
+          href="/collections/unstitched"
         />
       </div>
       <div className="bg-surface">
         <FeaturedProducts
-          title="On Sale"
-          subtitle="Limited time"
+          title="Seasonal Offers"
+          subtitle="Limited-time reductions"
           products={sale}
           href="/collections/sale"
         />

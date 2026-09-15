@@ -51,9 +51,10 @@ export default function ContactPage() {
       )}
 
       <div className="mt-14 space-y-2 text-sm text-muted">
-        <p>hello@aurelia.example</p>
-        <p>+1 (555) 010-2040</p>
-        <p>Mon–Fri, 9am–6pm</p>
+        <p className="font-medium text-foreground">concierge@kusum.ae</p>
+        <p>WhatsApp & Tel: +971 4 800 KUSUM (+971 4 800 58786)</p>
+        <p>Sunday – Friday: 10:00 AM – 8:00 PM (Gulf Standard Time)</p>
+        <p className="text-xs text-muted/80">Kusum Flagship Atelier · Dubai Design District (d3), UAE</p>
       </div>
     </div>
   );

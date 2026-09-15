@@ -22,7 +22,7 @@ export async function generateMetadata({
   if (!cat) return { title: "Collection" };
   return {
     title: cat.name,
-    description: cat.description ?? `Shop ${cat.name} at Aurelia.`,
+    description: cat.description ?? `Shop ${cat.name} at Kusum — The Premium Designer Wear.`,
   };
 }
 
@@ -41,13 +41,12 @@ export default async function CategoryPage({
   const cat = getCategoryBySlug(category);
   if (!cat || cat.parentId) notFound();
 
-  const allCategories = getCategories();
   const subs = getSubCategories(cat.id);
   const products = getProducts();
 
   return (
     <div>
-      <div className="mx-auto max-w-7xl px-5 pt-8 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1536px] px-4 pt-8 sm:px-8 xl:px-12">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },

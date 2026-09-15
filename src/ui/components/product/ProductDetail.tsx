@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, Sparkles } from "lucide-react";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfoTabs } from "@/components/product/ProductInfoTabs";
 import { VariantSelector } from "@/components/product/VariantSelector";
@@ -56,6 +56,10 @@ export function ProductDetail({
   );
   const initialSize = stockedSizes[0] ?? product.sizes[0] ?? "";
   const [size, setSize] = useState(initialSize);
+  const defaultStitching = product.stitchingOptions?.[0] ?? "stitched";
+  const [stitching, setStitching] = useState<"unstitched" | "stitched">(
+    defaultStitching,
+  );
   const [qty, setQty] = useState(1);
   const [cartError, setCartError] = useState<string | null>(null);
 
@@ -93,9 +97,27 @@ export function ProductDetail({
     });
   }, [maxAddQty, color, size]);
 
+  const handleStitchingChange = (type: "unstitched" | "stitched") => {
+    setStitching(type);
+    if (type === "unstitched") {
+      setSize("Unstitched");
+    } else {
+      const standardSize =
+        sizesWithStockForColor(product, color).find((s) => s !== "Unstitched") ??
+        product.sizes.find((s) => s !== "Unstitched") ??
+        "";
+      setSize(standardSize);
+    }
+    setQty(1);
+    setCartError(null);
+  };
+
   const handleAddToCart = (openCart = true): boolean => {
     setCartError(null);
-    const ok = addToCart(product, size, color, qty, { openCart });
+    const ok = addToCart(product, size, color, qty, {
+      openCart,
+      stitchingType: stitching,
+    });
     if (!ok) {
       setCartError("Not enough stock for this color and size.");
       return false;
@@ -158,9 +180,13 @@ export function ProductDetail({
             </p>
 
             {product.fabric && (
-              <p className="text-xs uppercase tracking-[0.15em] text-muted">
-                Fabric — {product.fabric}
-              </p>
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-muted border-t border-b border-border py-2.5">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <span>
+                  Fabric Composition:{" "}
+                  <strong className="text-foreground">{product.fabric}</strong>
+                </span>
+              </div>
             )}
 
             <VariantSelector
@@ -180,6 +206,9 @@ export function ProductDetail({
                 setCartError(null);
               }}
               onQuantityChange={setQty}
+              stitchingOptions={product.stitchingOptions}
+              selectedStitching={stitching}
+              onStitchingChange={handleStitchingChange}
               maxQuantity={maxAddQty}
               disabledColors={disabledColors}
               disabledSizes={disabledSizes}

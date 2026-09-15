@@ -1,16 +1,18 @@
 import { ProductCard } from "@/components/product/ProductCard";
-import type { Product, ViewMode } from "@/lib/types";
+import type { Product, ViewMode, CardLayoutStyle } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface ProductGridProps {
   products: Product[];
   view?: ViewMode;
+  layoutStyle?: CardLayoutStyle;
   emptyMessage?: string;
 }
 
 export function ProductGrid({
   products,
   view = "grid",
+  layoutStyle = "atelier",
   emptyMessage = "No products found. Try adjusting your filters.",
 }: ProductGridProps) {
   if (products.length === 0) {
@@ -26,7 +28,7 @@ export function ProductGrid({
     return (
       <div className="divide-y divide-border">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} view="list" />
+          <ProductCard key={product.id} product={product} view="list" layoutStyle={layoutStyle} />
         ))}
       </div>
     );
@@ -35,12 +37,11 @@ export function ProductGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10",
-        "md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5",
+        "grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8 xl:gap-y-12",
       )}
     >
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} layoutStyle={layoutStyle} />
       ))}
     </div>
   );

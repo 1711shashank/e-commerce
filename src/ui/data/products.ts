@@ -333,6 +333,8 @@ export const products: Product[] = [
     rating: 4.5,
     createdAt: "2026-08-08T10:00:00Z",
     tags: ["unstitched", "lawn", "3pc"],
+    stitchingOptions: ["unstitched", "stitched"],
+    pieces: 3,
   },
   {
     id: "p15",

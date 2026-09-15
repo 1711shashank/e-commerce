@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getAllColors, getAllFabrics, getAllSizes } from "@/lib/services";
 import type { Category, ProductFilters } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -38,17 +38,18 @@ export function FilterSidebar({
   const fabrics = getAllFabrics();
   const subs = categories.filter((c) => c.parentId);
 
-  const [minInput, setMinInput] = useState(
-    String(filters.minPrice ?? priceRange.min),
-  );
-  const [maxInput, setMaxInput] = useState(
-    String(filters.maxPrice ?? priceRange.max),
-  );
+  const targetMin = String(filters.minPrice ?? priceRange.min);
+  const targetMax = String(filters.maxPrice ?? priceRange.max);
 
-  useEffect(() => {
-    setMinInput(String(filters.minPrice ?? priceRange.min));
-    setMaxInput(String(filters.maxPrice ?? priceRange.max));
-  }, [filters.minPrice, filters.maxPrice, priceRange.min, priceRange.max]);
+  const [prevBounds, setPrevBounds] = useState({ min: targetMin, max: targetMax });
+  const [minInput, setMinInput] = useState(targetMin);
+  const [maxInput, setMaxInput] = useState(targetMax);
+
+  if (prevBounds.min !== targetMin || prevBounds.max !== targetMax) {
+    setPrevBounds({ min: targetMin, max: targetMax });
+    setMinInput(targetMin);
+    setMaxInput(targetMax);
+  }
 
   const minEmpty = minInput.trim() === "";
   const maxEmpty = maxInput.trim() === "";

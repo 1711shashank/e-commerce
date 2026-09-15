@@ -1,7 +1,8 @@
-import { promoStrips } from "@/data/banners";
+import { banners, promoStrips } from "@/data/banners";
 import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import type {
+  Banner,
   Category,
   Product,
   ProductFilters,
@@ -35,6 +36,10 @@ export function getCategoryBySlug(slug: string): Category | undefined {
 
 export function getSubCategories(parentId: string): Category[] {
   return categories.filter((c) => c.parentId === parentId);
+}
+
+export function getBanners(): Banner[] {
+  return banners;
 }
 
 export function getPromoStrips() {
@@ -117,6 +122,21 @@ export function filterProducts(
       }
     }
 
+    if (filters.stitchingType) {
+      if (
+        !product.stitchingOptions ||
+        !product.stitchingOptions.includes(filters.stitchingType)
+      ) {
+        return false;
+      }
+    }
+
+    if (filters.pieces?.length) {
+      if (!product.pieces || !filters.pieces.includes(product.pieces)) {
+        return false;
+      }
+    }
+
     if (filters.inStock === true && !productHasStock(product)) return false;
     if (filters.inStock === false && productHasStock(product)) return false;
 
@@ -125,18 +145,51 @@ export function filterProducts(
 
     if (filters.search?.trim()) {
       const q = filters.search.trim().toLowerCase();
-      const haystack = [
+      const searchTerms = q.split(/\s+/).filter(Boolean);
+
+      const fabricParts = product.fabricBreakdown
+        ? Object.values(product.fabricBreakdown).join(" ")
+        : "";
+
+      const pieceKeywords =
+        product.pieces === 3 || product.pieces === 2
+          ? `${product.pieces} piece ${product.pieces}-piece suit set ensemble dress`
+          : product.pieces === "abaya-set"
+            ? "abaya set dress kaftan modest"
+            : "";
+
+      const stitchingKeywords = product.stitchingOptions
+        ? product.stitchingOptions.join(" ")
+        : "";
+
+      const searchableFields = [
         product.name,
+        product.slug.replace(/-/g, " "),
         product.description,
         product.category,
         product.subCategory ?? "",
         product.fabric ?? "",
         ...(product.tags ?? []),
         ...product.colors,
+        ...(product.embellishments ?? []),
+        fabricParts,
+        pieceKeywords,
+        stitchingKeywords,
       ]
         .join(" ")
         .toLowerCase();
-      if (!haystack.includes(q)) return false;
+
+      const normalizedHaystack = searchableFields.replace(/-/g, " ");
+
+      const allTermsMatch = searchTerms.every((term) => {
+        const cleanTerm = term.replace(/-/g, " ");
+        return (
+          searchableFields.includes(term) ||
+          normalizedHaystack.includes(cleanTerm)
+        );
+      });
+
+      if (!allTermsMatch) return false;
     }
 
     return true;
@@ -176,13 +229,63 @@ export function searchProducts(
   list: Product[] = products,
 ): Product[] {
   if (!query.trim()) return [];
-  return filterProducts({ search: query }, list).slice(0, limit);
+  const q = query.trim().toLowerCase();
+  const searchTerms = q.split(/\s+/).filter(Boolean);
+  const matches = filterProducts({ search: query }, list);
+
+  return matches
+    .sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+
+      const aExact = aName === q;
+      const bExact = bName === q;
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+
+      const aStarts = aName.startsWith(q);
+      const bStarts = bName.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      const aNameHasAll = searchTerms.every((t) => aName.includes(t));
+      const bNameHasAll = searchTerms.every((t) => bName.includes(t));
+      if (aNameHasAll && !bNameHasAll) return -1;
+      if (!aNameHasAll && bNameHasAll) return 1;
+
+      return 0;
+    })
+    .slice(0, limit);
 }
 
 export function getAllSizes(): string[] {
   const sizes = new Set<string>();
   products.forEach((p) => p.sizes.forEach((s) => sizes.add(s)));
-  const order = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  const order = [
+    "Unstitched",
+    "Made to Measure",
+    "One Size",
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "52",
+    "54",
+    "56",
+    "58",
+    "60",
+    "2-3Y",
+    "3-4Y",
+    "4-5Y",
+    "5-6Y",
+    "6-7Y",
+    "7-8Y",
+    "8-9Y",
+    "9-10Y",
+    "10-11Y",
+    "11-12Y",
+  ];
   return Array.from(sizes).sort((a, b) => {
     const ai = order.indexOf(a);
     const bi = order.indexOf(b);
@@ -219,12 +322,11 @@ export function getPriceRange(list: Product[] = products): {
   };
 }
 
+export const FREE_SHIPPING_THRESHOLD = 350;
+export const STANDARD_SHIPPING_FEE = 25;
+
 export function formatPrice(amount: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return `AED ${amount.toLocaleString("en-US")}`;
 }
 
 export function getDiscountPercent(product: Product): number | null {
@@ -235,3 +337,11 @@ export function getDiscountPercent(product: Product): number | null {
     ((product.price - product.discountPrice) / product.price) * 100,
   );
 }
+
+export const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/kusumdesignerwear?igsi=MWExdXUwM2E5dWswaQ%3D%3D&utm_source=qr",
+  facebook: "https://www.facebook.com/share/197xSpQNnJ/",
+  youtube: "https://youtube.com/@kusumthepremiumdesignerwea-v5v?si=Hv1jcbiTJPztlOZd",
+};
+
+

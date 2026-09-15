@@ -2,97 +2,136 @@ import type { Category } from "@/lib/types";
 
 export const categories: Category[] = [
   {
-    id: "cat-women",
-    name: "Women",
-    slug: "women",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
-    description: "Contemporary silhouettes for every occasion",
-    parentId: null,
-  },
-  {
-    id: "cat-men",
-    name: "Men",
-    slug: "men",
-    image:
-      "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=800&q=80",
-    description: "Refined essentials and seasonal menswear",
-    parentId: null,
-  },
-  {
-    id: "cat-kids",
-    name: "Kids",
-    slug: "kids",
-    image:
-      "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80",
-    description: "Soft, playful pieces for little ones",
-    parentId: null,
-  },
-  {
     id: "cat-unstitched",
-    name: "Unstitched",
+    name: "Luxury Designer Lawn",
     slug: "unstitched",
-    image:
-      "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80",
-    description: "Premium fabrics ready for your tailor",
+    image: "/kusum-velvet-areej.jpg",
+    description: "Original 3-piece embroidered lawn, pure silk dupattas & Areej International luxury suits",
     parentId: null,
   },
   {
     id: "cat-ready-to-wear",
-    name: "Ready to Wear",
+    name: "Festive Pret & Anarkalis",
     slug: "ready-to-wear",
+    image: "/kusum-ivory-peshwas.jpg",
+    description: "Tailored festive kurtas, readymade luxury suits & celebratory anarkalis",
+    parentId: null,
+  },
+  {
+    id: "cat-luxury-formals",
+    name: "Farshi Shararas & Ghararas",
+    slug: "luxury-formals",
+    image: "/kusum-bridal-purple.jpg",
+    description: "Royal Nizami ghararas, heavy zardozi peplum shararas and celebratory wedding wear",
+    parentId: null,
+  },
+  {
+    id: "cat-abayas",
+    name: "Modest Abayas & Kaftans",
+    slug: "abayas-kaftans",
     image:
-      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80",
-    description: "Finished looks, ready to wear now",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
+    description: "Flowing royal crepe abayas, kimono cuts and festive kaftans with matching sheilas",
+    parentId: null,
+  },
+  {
+    id: "cat-bridal",
+    name: "Bridal Lehengas & Khada Dupatta",
+    slug: "bridal",
+    image: "/kusum-bridal-maroon.jpg",
+    description: "Heirloom royal khada dupattas, zardozi bridal lehengas & bespoke wedding couture",
+    parentId: null,
+  },
+  {
+    id: "cat-mommy-and-me",
+    name: "Junior Festive & Shararas",
+    slug: "mommy-and-me",
+    image:
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80",
+    description: "Festive girls lehengas, frocks and shararas for weddings, festive Eid & family celebrations",
     parentId: null,
   },
   {
     id: "cat-sale",
-    name: "Sale",
+    name: "Festive Sale (Flat 60% Off)",
     slug: "sale",
-    image:
-      "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&q=80",
-    description: "Limited-time offers on seasonal favourites",
+    image: "/kusum-festive-rust.jpg",
+    description: "Limited-time offers on designer bridal, festive pret & clearance suits",
     parentId: null,
   },
+  // Subcategories
   {
     id: "sub-lawn",
-    name: "Lawn",
-    slug: "lawn",
-    image:
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
-    parentId: "cat-women",
+    name: "Luxury Lawn",
+    slug: "luxury-lawn",
+    image: "/kusum-festive-rust.jpg",
+    parentId: "cat-unstitched",
   },
   {
-    id: "sub-formals",
-    name: "Formals",
-    slug: "formals",
-    image:
-      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-    parentId: "cat-women",
+    id: "sub-chiffon",
+    name: "Embroidered Chiffon",
+    slug: "embroidered-chiffon",
+    image: "/kusum-ivory-peshwas.jpg",
+    parentId: "cat-unstitched",
   },
   {
-    id: "sub-casual",
-    name: "Casual",
-    slug: "casual",
-    image:
-      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80",
-    parentId: "cat-women",
+    id: "sub-mbroidered",
+    name: "Mbroidered Wedding",
+    slug: "mbroidered-wedding",
+    image: "/kusum-velvet-areej.jpg",
+    parentId: "cat-unstitched",
   },
   {
-    id: "sub-shirts",
-    name: "Shirts",
-    slug: "shirts",
-    image:
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80",
-    parentId: "cat-men",
+    id: "sub-casual-pret",
+    name: "Casual Pret",
+    slug: "casual-pret",
+    image: "/kusum-silver-shehnai.jpg",
+    parentId: "cat-ready-to-wear",
   },
   {
-    id: "sub-kurtas",
-    name: "Kurtas",
-    slug: "kurtas",
+    id: "sub-festive-pret",
+    name: "Festive Pret",
+    slug: "festive-pret",
+    image: "/kusum-festive-black.jpg",
+    parentId: "cat-ready-to-wear",
+  },
+  {
+    id: "sub-wedding-formals",
+    name: "Shehnai Wedding Formals",
+    slug: "wedding-formals",
+    image: "/kusum-bridal-purple.jpg",
+    parentId: "cat-luxury-formals",
+  },
+  {
+    id: "sub-eid-collection",
+    name: "Festive Eid Drops",
+    slug: "eid-drops",
+    image: "/kusum-bridal-maroon.jpg",
+    parentId: "cat-luxury-formals",
+  },
+  {
+    id: "sub-classic-abayas",
+    name: "Classic Modest Abayas",
+    slug: "classic-abayas",
     image:
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80",
-    parentId: "cat-men",
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
+    parentId: "cat-abayas",
+  },
+  {
+    id: "sub-kaftans",
+    name: "Festive Kaftans",
+    slug: "festive-kaftans",
+    image:
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&q=80",
+    parentId: "cat-abayas",
+  },
+  {
+    id: "sub-girls-festive",
+    name: "Girls Festive Wear",
+    slug: "girls-festive",
+    image:
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80",
+    parentId: "cat-mommy-and-me",
   },
 ];
+

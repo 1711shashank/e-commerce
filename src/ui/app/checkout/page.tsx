@@ -12,7 +12,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { validateCartAgainstCatalog } from "@/lib/cart-stock";
 import { useCustomerAuthStore } from "@/lib/customer-auth-store";
-import { formatPrice } from "@/lib/services";
+import { formatPrice, FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_FEE } from "@/lib/services";
 import { useStore } from "@/lib/store";
 import { useProductCatalog } from "@/lib/use-product-catalog";
 
@@ -32,7 +32,10 @@ function CheckoutContent() {
     postalCode: "",
   });
   const subtotal = cartSubtotal();
-  const shippingCost = subtotal >= 7199 || subtotal === 0 ? 0 : 799;
+  const shippingCost =
+    subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0
+      ? 0
+      : STANDARD_SHIPPING_FEE;
   const total = subtotal + shippingCost;
 
   useEffect(() => {

@@ -2,26 +2,34 @@ import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "FAQs",
-  description: "Frequently asked questions about shopping at Aurelia.",
+  title: "FAQs · Kusum Designer Wear",
+  description: "Frequently asked questions about shopping at Kusum — The Premium Designer Wear.",
 };
 
 const faqs = [
   {
-    q: "How do I choose the right size?",
-    a: "Each product lists available sizes. When between sizes, we recommend sizing up for a relaxed fit. Unstitched pieces include fabric lengths for your tailor.",
+    q: "What is the difference between Unstitched and Stitched?",
+    a: "Unstitched includes 3-piece raw designer fabric (shirt, dupatta, trouser, and embroidered necklines/borders) ready for your local tailor. Stitched items are tailored in-house by Kusum master tailors with complete modest lining according to our size chart.",
   },
   {
-    q: "Do you ship internationally?",
-    a: "This demo storefront focuses on the shopping experience. International shipping can be enabled when a real fulfillment backend is connected.",
+    q: "How long does custom stitching take?",
+    a: "Stitched orders require 10–14 business days for precision cutting, embroidery placement, and lining attachment before dispatch via express courier.",
   },
   {
-    q: "How does the wishlist work?",
-    a: "Saved items are stored in your browser via localStorage so they persist between visits on the same device.",
+    q: "Do you offer free delivery in the UAE?",
+    a: "Yes! All UAE orders exceeding AED 350 qualify for complimentary delivery. For orders below AED 350, standard shipping is AED 25.",
   },
   {
-    q: "Is checkout real?",
-    a: "No — checkout is a static UI for this phase. No payments are processed.",
+    q: "How can I track my order status?",
+    a: "You can track your package and stitching progress anytime on our Track Order page (/track-order) using your order number and email or phone number.",
+  },
+  {
+    q: "How do I choose the correct abaya length?",
+    a: "Abayas are sized by length from shoulder to floor (sizes 52 through 60). Please visit our comprehensive Size Guide (/size-guide) to match your height.",
+  },
+  {
+    q: "Do your abayas come with matching head scarves (Sheilas)?",
+    a: "Yes, all Kusum abayas and festive kaftans include a coordinated matching Sheila (Hijab) crafted from soft breathable chiffon or voile.",
   },
 ];
 

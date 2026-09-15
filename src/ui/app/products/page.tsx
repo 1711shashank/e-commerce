@@ -8,7 +8,7 @@ import {
 
 export const metadata: Metadata = {
   title: "All Products",
-  description: "Browse all Aurelia products with search and filters.",
+  description: "Browse all Kusum designer wear products with search and filters.",
 };
 
 interface PageProps {
@@ -22,7 +22,7 @@ export default async function AllProductsPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <div className="mx-auto max-w-7xl px-5 pt-8 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1536px] px-4 pt-8 sm:px-8 xl:px-12">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
