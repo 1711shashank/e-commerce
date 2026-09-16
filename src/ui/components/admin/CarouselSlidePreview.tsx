@@ -15,7 +15,7 @@ export function CarouselSlidePreview({ banner }: { banner: Banner }) {
 
     const update = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight * 0.7;
+      const h = Math.min(560, Math.max(380, window.innerHeight - 130));
       setLive({ w, h });
       const pw = paneEl.clientWidth;
       setScale(pw > 0 && w > 0 ? pw / w : 0);
@@ -37,7 +37,7 @@ export function CarouselSlidePreview({ banner }: { banner: Banner }) {
     >
       {scale > 0 ? (
         <div
-          className="relative overflow-hidden bg-foreground"
+          className="relative overflow-hidden bg-[#121212]"
           style={{ width: "100%", height: live.h * scale }}
         >
           <div

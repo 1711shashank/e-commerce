@@ -7,6 +7,7 @@ import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { PromoStrip } from "@/components/home/PromoStrip";
 import { fetchPublicBanners } from "@/lib/banner-api";
 import {
+  getBanners,
   getBestSellers,
   getFeaturedProducts,
   getParentCategories,
@@ -31,6 +32,9 @@ export default async function HomePage() {
     banners = await fetchPublicBanners();
   } catch {
     banners = [];
+  }
+  if (!banners.length) {
+    banners = getBanners();
   }
 
   return (

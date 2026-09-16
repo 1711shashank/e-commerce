@@ -17,15 +17,15 @@ export function HomeHeroCarousel({
     (async () => {
       try {
         const data = await fetchPublicBanners();
-        if (!cancelled) setBanners(data);
+        if (!cancelled && data.length > 0) setBanners(data);
       } catch {
-        if (!cancelled) setBanners(initialBanners);
+        if (!cancelled && initialBanners.length > 0) setBanners(initialBanners);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialBanners]);
 
   if (!banners.length) return null;
 

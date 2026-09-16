@@ -52,6 +52,9 @@ export interface Banner {
   id: string;
   ctaHref: string;
   image: string;
+  title?: string;
+  subtitle?: string;
+  ctaLabel?: string;
   sortOrder?: number;
   createdAt?: string;
   updatedAt?: string;
