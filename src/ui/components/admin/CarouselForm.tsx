@@ -25,6 +25,14 @@ import { getApiErrorMessage, getFieldError } from "@/lib/api-errors";
 import { revalidateStorefrontHome } from "@/lib/revalidate-storefront";
 import type { Banner } from "@/lib/types";
 
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
 interface CarouselFormProps {
   banner?: Banner;
 }
@@ -33,6 +41,7 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   const router = useRouter();
   const access = useAuthStore((s) => s.access);
   const fileRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
 
   const [values, setValues] = useState<BannerFormValues>(() =>
     banner ? bannerToFormValues(banner) : emptyBannerForm(),
@@ -40,6 +49,7 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   const [initial] = useState(() =>
     banner ? bannerToFormValues(banner) : emptyBannerForm(),
   );
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -47,8 +57,10 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   const [ctaOpen, setCtaOpen] = useState(false);
 
   const dirty = useMemo(
-    () => JSON.stringify(values) !== JSON.stringify(initial),
-    [values, initial],
+    () =>
+      pendingImageFile !== null ||
+      JSON.stringify(values) !== JSON.stringify(initial),
+    [values, initial, pendingImageFile],
   );
 
   const preview = useMemo(
@@ -66,6 +78,15 @@ export function CarouselForm({ banner }: CarouselFormProps) {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [dirty]);
 
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
+
   const setField = <K extends keyof BannerFormValues>(
     key: K,
     value: BannerFormValues[K],
@@ -79,37 +100,45 @@ export function CarouselForm({ banner }: CarouselFormProps) {
     });
   };
 
+  const revokePendingObjectUrl = () => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+  };
+
   const onCancel = () => {
     if (dirty && !window.confirm("Discard unsaved changes?")) return;
     router.push("/admin/carousel");
   };
 
-  const onUploadFiles = async (files: FileList | null) => {
+  const onSelectFiles = (files: FileList | null) => {
     if (!files?.length) return;
-    if (!access) {
+    const file = files[0];
+
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
       setFieldErrors((prev) => ({
         ...prev,
-        image: "You must be logged in to upload images.",
+        image: "Unsupported image type. Use JPEG, PNG, WebP, or GIF.",
       }));
+      if (fileRef.current) fileRef.current.value = "";
       return;
     }
-    setUploading(true);
-    setError(null);
-    try {
-      const url = await uploadBannerImage(files[0], access);
-      setField("image", url);
-    } catch (err) {
+    if (file.size > MAX_IMAGE_BYTES) {
       setFieldErrors((prev) => ({
         ...prev,
-        image:
-          err instanceof ApiError
-            ? getApiErrorMessage(err)
-            : "Could not upload image to S3. Is the catalog service running?",
+        image: "Image must be 8 MB or smaller.",
       }));
-    } finally {
-      setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
+      return;
     }
+
+    revokePendingObjectUrl();
+    const objectUrl = URL.createObjectURL(file);
+    objectUrlRef.current = objectUrl;
+    setPendingImageFile(file);
+    setField("image", objectUrl);
+    if (fileRef.current) fileRef.current.value = "";
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -129,19 +158,39 @@ export function CarouselForm({ banner }: CarouselFormProps) {
     setSaving(true);
     setError(null);
 
-    const payload = {
-      eyebrow: values.eyebrow.trim(),
-      title: values.title.trim(),
-      subtitle: values.subtitle.trim(),
-      ctaLabel: values.ctaLabel.trim(),
-      ctaHref: values.ctaHref.trim(),
-      image: values.image.trim(),
-      imageAlt: values.imageAlt.trim(),
-      textColor: values.textColor,
-      isActive: values.isActive,
-    };
-
     try {
+      let imageUrl = values.image.trim();
+      if (pendingImageFile) {
+        setUploading(true);
+        try {
+          imageUrl = await uploadBannerImage(pendingImageFile, access);
+        } catch (err) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            image:
+              err instanceof ApiError
+                ? getApiErrorMessage(err)
+                : "Could not upload image to S3. Is the catalog service running?",
+          }));
+          setError("Fix the highlighted fields.");
+          return;
+        } finally {
+          setUploading(false);
+        }
+      }
+
+      const payload = {
+        eyebrow: values.eyebrow.trim(),
+        title: values.title.trim(),
+        subtitle: values.subtitle.trim(),
+        ctaLabel: values.ctaLabel.trim(),
+        ctaHref: values.ctaHref.trim(),
+        image: imageUrl,
+        imageAlt: values.imageAlt.trim(),
+        textColor: values.textColor,
+        isActive: values.isActive,
+      };
+
       if (banner) {
         await updateBanner(banner.id, payload, access);
       } else {
@@ -162,8 +211,11 @@ export function CarouselForm({ banner }: CarouselFormProps) {
       }
     } finally {
       setSaving(false);
+      setUploading(false);
     }
   };
+
+  const busy = saving || uploading;
 
   return (
     <form onSubmit={onSubmit}>
@@ -188,11 +240,17 @@ export function CarouselForm({ banner }: CarouselFormProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="button" variant="ghost" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving || uploading}>
-            {saving ? "Saving…" : banner ? "Save changes" : "Create slide"}
+          <Button type="submit" disabled={busy}>
+            {uploading
+              ? "Uploading…"
+              : saving
+                ? "Saving…"
+                : banner
+                  ? "Save changes"
+                  : "Create slide"}
           </Button>
         </div>
       </div>
@@ -207,11 +265,11 @@ export function CarouselForm({ banner }: CarouselFormProps) {
         <Button
           type="button"
           variant="outline"
-          disabled={uploading}
+          disabled={busy}
           onClick={() => fileRef.current?.click()}
         >
           <Upload className="h-4 w-4" />
-          {uploading ? "Uploading…" : values.image ? "Upload new image" : "Upload image"}
+          {values.image ? "Change image" : "Choose image"}
         </Button>
         {fieldErrors.image && (
           <span className="text-sm text-sale">{fieldErrors.image}</span>
@@ -238,7 +296,7 @@ export function CarouselForm({ banner }: CarouselFormProps) {
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
-        onChange={(e) => void onUploadFiles(e.target.files)}
+        onChange={(e) => onSelectFiles(e.target.files)}
       />
 
       <CarouselCtaPopover

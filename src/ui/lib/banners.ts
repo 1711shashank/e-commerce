@@ -62,6 +62,7 @@ export function formValuesToBannerPreview(
 
 export function isAllowedImageUrl(value: string): boolean {
   if (value.startsWith("/media/")) return true;
+  if (value.startsWith("blob:")) return true;
   try {
     const parsed = new URL(value);
     return parsed.protocol === "https:" || parsed.protocol === "http:";
