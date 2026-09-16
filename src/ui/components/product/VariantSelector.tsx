@@ -20,6 +20,7 @@ interface VariantSelectorProps {
   disabledColors?: string[];
   disabledSizes?: string[];
   sizeStock?: Record<string, number>;
+}
 
 export function VariantSelector({
   sizes,

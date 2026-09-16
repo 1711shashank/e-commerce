@@ -30,26 +30,43 @@ function CarouselContent() {
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
     if (!access) return;
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await listAllBanners(access);
+        if (cancelled) return;
+        setBanners(
+          [...list].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+        );
+        setError(null);
+      } catch {
+        if (cancelled) return;
+        setError("Could not load carousel slides.");
+        setBanners([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [access]);
+
+  const reload = useCallback(async () => {
+    if (!access) return;
     try {
       const list = await listAllBanners(access);
       setBanners(
         [...list].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
       );
+      setError(null);
     } catch {
       setError("Could not load carousel slides.");
       setBanners([]);
-    } finally {
-      setLoading(false);
     }
   }, [access]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   const persistOrder = async (next: Banner[]) => {
     if (!access) return;
@@ -62,7 +79,7 @@ function CarouselContent() {
       await revalidateStorefrontHome();
     } catch {
       setError("Could not save slide order.");
-      void load();
+      void reload();
     }
   };
 
@@ -112,8 +129,8 @@ function CarouselContent() {
     <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 lg:py-12">
       <h1 className="font-display text-4xl sm:text-5xl">Homepage carousel</h1>
       <p className="mt-3 max-w-2xl text-sm text-muted sm:text-base">
-        Manage hero slides on the storefront. Edit inline on a live preview —
-        image, text, and button link.
+        Manage hero slides on the storefront. Add or edit a slide to preview it
+        as shoppers will see it.
       </p>
 
       {error && (
@@ -128,8 +145,8 @@ function CarouselContent() {
         <div className="mt-12 border border-dashed border-border bg-surface px-6 py-14 text-center">
           <p className="font-display text-2xl">No slides yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-            Add your first hero slide. The editor looks like the live homepage
-            banner.
+            Add your first hero slide. The editor shows a live homepage preview
+            beside the form.
           </p>
           <Link
             href="/admin/carousel/new"
@@ -195,18 +212,7 @@ function CarouselContent() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{banner.title}</p>
-                  <p className="truncate text-sm text-muted">{banner.subtitle}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <span>{banner.ctaLabel}</span>
-                    <span aria-hidden>·</span>
-                    <span className="truncate">{banner.ctaHref}</span>
-                    {!banner.isActive && (
-                      <span className="border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-                        Inactive
-                      </span>
-                    )}
-                  </div>
+                  <p className="truncate text-sm">{banner.ctaHref}</p>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">

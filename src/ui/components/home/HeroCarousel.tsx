@@ -10,29 +10,22 @@ import { HeroSlide } from "@/components/home/HeroSlide";
 
 type HeroCarouselProps = {
   banners: Banner[];
-  mode?: "live" | "edit";
   selectedIndex?: number;
   onSelectSlide?: (index: number) => void;
-  fieldErrors?: Record<string, string>;
-  onFieldChange?: (field: keyof Banner, value: string) => void;
-  onCtaClick?: () => void;
+  preview?: boolean;
 };
 
 export function HeroCarousel({
   banners,
-  mode = "live",
   selectedIndex = 0,
   onSelectSlide,
-  fieldErrors,
-  onFieldChange,
-  onCtaClick,
+  preview = false,
 }: HeroCarouselProps) {
-  const isEdit = mode === "edit";
-  const showControls = banners.length > 1;
+  const showControls = !preview && banners.length > 1;
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: showControls, startIndex: selectedIndex },
-    isEdit ? [] : [Autoplay({ delay: 5000, stopOnInteraction: false })],
+    { loop: showControls, startIndex: selectedIndex, watchDrag: !preview },
+    preview ? [] : [Autoplay({ delay: 5000, stopOnInteraction: false })],
   );
   const [selected, setSelected] = useState(selectedIndex);
 
@@ -54,27 +47,20 @@ export function HeroCarousel({
   }, [emblaApi, onSelectSlide]);
 
   useEffect(() => {
-    if (!emblaApi || isEdit) return;
+    if (!emblaApi) return;
     emblaApi.scrollTo(selectedIndex, true);
-  }, [emblaApi, selectedIndex, isEdit]);
+  }, [emblaApi, selectedIndex]);
 
   if (!banners.length) {
     return null;
   }
 
   return (
-    <section className="relative overflow-hidden bg-foreground">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
+    <section className="relative h-[70dvh] max-h-[70dvh] overflow-hidden bg-foreground">
+      <div className="h-full overflow-hidden" ref={emblaRef}>
+        <div className="flex h-full">
           {banners.map((banner) => (
-            <HeroSlide
-              key={banner.id}
-              banner={banner}
-              mode={mode}
-              fieldErrors={fieldErrors}
-              onFieldChange={onFieldChange}
-              onCtaClick={onCtaClick}
-            />
+            <HeroSlide key={banner.id} banner={banner} preview={preview} />
           ))}
         </div>
       </div>

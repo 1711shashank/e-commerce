@@ -166,25 +166,9 @@ class ProductVariant(UUIDPrimaryKeyModel):
 
 
 class Banner(UUIDPrimaryKeyModel):
-    TEXT_LIGHT = "light"
-    TEXT_DARK = "dark"
-    TEXT_COLOR_CHOICES = [
-        (TEXT_LIGHT, "Light"),
-        (TEXT_DARK, "Dark"),
-    ]
-
-    eyebrow = models.CharField(max_length=60, blank=True)
-    title = models.CharField(max_length=80)
-    subtitle = models.CharField(max_length=160)
-    cta_label = models.CharField(max_length=40)
     cta_href = models.CharField(max_length=500)
     image = models.CharField(max_length=2048)
-    image_alt = models.CharField(max_length=200, blank=True)
     sort_order = models.PositiveSmallIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    text_color = models.CharField(
-        max_length=8, choices=TEXT_COLOR_CHOICES, default=TEXT_LIGHT
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -192,4 +176,4 @@ class Banner(UUIDPrimaryKeyModel):
         ordering = ["sort_order", "id"]
 
     def __str__(self) -> str:
-        return self.title
+        return self.cta_href or str(self.id)

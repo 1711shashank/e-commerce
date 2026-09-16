@@ -164,15 +164,7 @@ class BannerViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        qs = Banner.objects.all()
-        is_staff = getattr(self.request.user, "is_staff_user", False)
-        if self.action == "list":
-            show_all = self.request.query_params.get("all") == "true"
-            if not is_staff or not show_all:
-                qs = qs.filter(is_active=True)
-        elif self.action == "retrieve" and not is_staff:
-            qs = qs.filter(is_active=True)
-        return qs
+        return Banner.objects.all()
 
     def create(self, request, *args, **kwargs):
         if Banner.objects.count() >= MAX_BANNERS:

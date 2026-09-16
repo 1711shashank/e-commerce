@@ -33,7 +33,9 @@ function EditBody({ id }: { id: string }) {
   }, [access, id]);
 
   if (loading) {
-    return <p className="text-sm text-muted">Loading slide…</p>;
+    return (
+      <p className="px-5 py-8 text-sm text-muted sm:px-8">Loading slide…</p>
+    );
   }
   if (missing || !banner) notFound();
 
@@ -49,7 +51,7 @@ export default function EditCarouselClient({
 
   return (
     <RequireAuth>
-      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <EditBody id={id} />
       </div>
     </RequireAuth>

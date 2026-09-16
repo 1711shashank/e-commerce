@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const nav = [
   { href: "/admin", label: "Products", exact: true },
   { href: "/admin/products/new", label: "Add product" },
-  { href: "/admin/carousel", label: "Carousel", exact: true },
+  { href: "/admin/carousel", label: "Carousel" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -19,13 +19,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const access = useAuthStore((s) => s.access);
   const logout = useAuthStore((s) => s.logout);
   const isLogin = pathname.startsWith("/admin/login");
+  const isCarouselEditor =
+    pathname === "/admin/carousel/new" ||
+    /^\/admin\/carousel\/[^/]+\/edit$/.test(pathname);
   const staff =
     hydrated &&
     !!access &&
     (user?.role === "staff" || user?.role === "admin");
 
   return (
-    <div className="flex min-h-full flex-col bg-[color-mix(in_srgb,var(--background)_92%,var(--accent)_8%)]">
+    <div
+      className={cn(
+        "flex flex-col bg-[color-mix(in_srgb,var(--background)_92%,var(--accent)_8%)]",
+        isCarouselEditor ? "h-dvh overflow-hidden" : "min-h-full",
+      )}
+    >
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
           <div className="flex min-w-0 items-center gap-6">
@@ -92,10 +100,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </header>
-      <main className="flex-1">{children}</main>
-      <footer className="border-t border-border bg-surface/80 py-4 text-center text-xs text-muted">
-        Internal catalog tools · login required · not part of the public store
-      </footer>
+      <main
+        className={cn(
+          "flex-1",
+          isCarouselEditor && "flex min-h-0 min-w-0 flex-col overflow-hidden",
+        )}
+      >
+        {children}
+      </main>
+      {!isCarouselEditor && (
+        <footer className="border-t border-border bg-surface/80 py-4 text-center text-xs text-muted">
+          Internal catalog tools · login required · not part of the public store
+        </footer>
+      )}
     </div>
   );
 }

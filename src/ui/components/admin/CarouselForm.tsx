@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Upload } from "lucide-react";
-import { HeroCarousel } from "@/components/home/HeroCarousel";
-import { CarouselCtaPopover } from "@/components/admin/CarouselCtaPopover";
+import { ArrowLeft, ExternalLink, Upload } from "lucide-react";
+import { CarouselSlidePreview } from "@/components/admin/CarouselSlidePreview";
 import { Button } from "@/components/ui/Button";
 import {
   bannerToFormValues,
   emptyBannerForm,
   formValuesToBannerPreview,
   validateBannerForm,
+  validateCtaHref,
   type BannerFormValues,
 } from "@/lib/banners";
 import {
@@ -24,6 +25,7 @@ import { ApiError } from "@/lib/api";
 import { getApiErrorMessage, getFieldError } from "@/lib/api-errors";
 import { revalidateStorefrontHome } from "@/lib/revalidate-storefront";
 import type { Banner } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
@@ -32,6 +34,10 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/gif",
 ]);
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const fieldHint = "mt-1 text-xs text-sale";
+const inputClass =
+  "mt-1.5 min-h-11 w-full border border-border bg-background px-3 text-sm outline-none focus:border-accent";
+const labelClass = "block text-xs uppercase tracking-[0.14em] text-muted";
 
 interface CarouselFormProps {
   banner?: Banner;
@@ -54,7 +60,7 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [ctaOpen, setCtaOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const dirty = useMemo(
     () =>
@@ -107,9 +113,13 @@ export function CarouselForm({ banner }: CarouselFormProps) {
     }
   };
 
+  const goBack = () => {
+    router.push("/admin/carousel");
+  };
+
   const onCancel = () => {
     if (dirty && !window.confirm("Discard unsaved changes?")) return;
-    router.push("/admin/carousel");
+    goBack();
   };
 
   const onSelectFiles = (files: FileList | null) => {
@@ -180,15 +190,8 @@ export function CarouselForm({ banner }: CarouselFormProps) {
       }
 
       const payload = {
-        eyebrow: values.eyebrow.trim(),
-        title: values.title.trim(),
-        subtitle: values.subtitle.trim(),
-        ctaLabel: values.ctaLabel.trim(),
         ctaHref: values.ctaHref.trim(),
         image: imageUrl,
-        imageAlt: values.imageAlt.trim(),
-        textColor: values.textColor,
-        isActive: values.isActive,
       };
 
       if (banner) {
@@ -216,20 +219,28 @@ export function CarouselForm({ banner }: CarouselFormProps) {
   };
 
   const busy = saving || uploading;
+  const hrefError = validateCtaHref(values.ctaHref);
+  const canTest = !hrefError && values.ctaHref.trim().length > 0;
+
+  const onTestLink = () => {
+    const href = values.ctaHref.trim();
+    if (validateCtaHref(href)) return;
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
 
   return (
-    <form onSubmit={onSubmit}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-5 py-3 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex min-h-11 items-center gap-2 text-sm text-muted hover:text-foreground"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center text-muted hover:text-foreground"
+            aria-label="Back to carousel"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
           </button>
-          <div>
+          <div className="min-w-0">
             <h1 className="font-display text-2xl sm:text-3xl">
               {banner ? "Edit slide" : "New slide"}
             </h1>
@@ -238,78 +249,142 @@ export function CarouselForm({ banner }: CarouselFormProps) {
             )}
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={busy}>
-            {uploading
-              ? "Uploading…"
-              : saving
-                ? "Saving…"
-                : banner
-                  ? "Save changes"
-                  : "Create slide"}
-          </Button>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+        <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+          <CarouselSlidePreview banner={preview} />
         </div>
-      </div>
 
-      {error && (
-        <p className="mb-4 border border-sale/30 bg-sale/5 px-4 py-3 text-sm text-sale">
-          {error}
-        </p>
-      )}
-
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          disabled={busy}
-          onClick={() => fileRef.current?.click()}
+        <form
+          onSubmit={onSubmit}
+          className="flex h-full w-[min(28rem,40%)] shrink-0 flex-col overflow-hidden border-l border-border bg-surface"
         >
-          <Upload className="h-4 w-4" />
-          {values.image ? "Change image" : "Choose image"}
-        </Button>
-        {fieldErrors.image && (
-          <span className="text-sm text-sale">{fieldErrors.image}</span>
-        )}
-        <span className="text-xs text-muted">JPEG, PNG, WebP, or GIF · max 8 MB</span>
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+            {error && (
+              <p className="mb-4 border border-sale/30 bg-sale/5 px-4 py-3 text-sm text-sale">
+                {error}
+              </p>
+            )}
+
+            <div className="space-y-5">
+              <div>
+                <span className={labelClass}>Background image</span>
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (!busy) setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    if (!busy) onSelectFiles(e.dataTransfer.files);
+                  }}
+                  className={cn(
+                    "mt-1.5 flex flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 text-center transition-colors",
+                    dragOver
+                      ? "border-accent bg-accent/5"
+                      : fieldErrors.image
+                        ? "border-sale bg-sale/5"
+                        : "border-border bg-background",
+                    busy && "pointer-events-none opacity-60",
+                  )}
+                >
+                  {values.image ? (
+                    <div className="relative h-16 w-28 overflow-hidden bg-border/40">
+                      <Image
+                        src={values.image}
+                        alt=""
+                        fill
+                        sizes="112px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <Upload className="h-5 w-5 text-muted" />
+                  )}
+                  <p className="text-sm text-muted">
+                    Drag an image here, or{" "}
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="text-foreground underline underline-offset-2 hover:text-accent"
+                    >
+                      {values.image ? "change image" : "choose from your device"}
+                    </button>
+                  </p>
+                  {pendingImageFile ? (
+                    <p className="max-w-full truncate text-xs text-foreground">
+                      {pendingImageFile.name}
+                    </p>
+                  ) : null}
+                  <p className="text-xs text-muted">
+                    JPEG, PNG, WebP, or GIF · max 8 MB
+                  </p>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => onSelectFiles(e.target.files)}
+                  />
+                </div>
+                {fieldErrors.image && (
+                  <p className={fieldHint}>{fieldErrors.image}</p>
+                )}
+              </div>
+
+              <label className="block">
+                <span className={labelClass}>Redirect URL</span>
+                <input
+                  type="text"
+                  value={values.ctaHref}
+                  onChange={(e) => setField("ctaHref", e.target.value)}
+                  placeholder="/collections/women"
+                  className={cn(
+                    inputClass,
+                    fieldErrors.ctaHref && "border-sale",
+                  )}
+                />
+                {fieldErrors.ctaHref && (
+                  <p className={fieldHint}>{fieldErrors.ctaHref}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={onTestLink}
+                  disabled={!canTest}
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Test link
+                </button>
+              </label>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 justify-end gap-2 border-t border-border px-5 py-4 sm:px-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={busy}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={busy}>
+              {uploading
+                ? "Uploading…"
+                : saving
+                  ? "Saving…"
+                  : banner
+                    ? "Save changes"
+                    : "Create slide"}
+            </Button>
+          </div>
+        </form>
       </div>
-
-      <div className="-mx-5 sm:-mx-8 lg:-mx-10">
-        <HeroCarousel
-          banners={[preview]}
-          mode="edit"
-          fieldErrors={fieldErrors}
-          onFieldChange={(field, value) => {
-            if (field === "eyebrow") setField("eyebrow", value);
-            else if (field === "title") setField("title", value);
-            else if (field === "subtitle") setField("subtitle", value);
-          }}
-          onCtaClick={() => setCtaOpen(true)}
-        />
-      </div>
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        className="hidden"
-        onChange={(e) => onSelectFiles(e.target.files)}
-      />
-
-      <CarouselCtaPopover
-        open={ctaOpen}
-        ctaLabel={values.ctaLabel}
-        ctaHref={values.ctaHref}
-        errors={{
-          ctaLabel: fieldErrors.ctaLabel,
-          ctaHref: fieldErrors.ctaHref,
-        }}
-        onChange={(field, value) => setField(field, value)}
-        onClose={() => setCtaOpen(false)}
-      />
-    </form>
+    </div>
   );
 }

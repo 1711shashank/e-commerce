@@ -3,16 +3,9 @@ import { apiRequest, getApiBase, ApiError } from "@/lib/api";
 import type { Banner } from "@/lib/types";
 
 export type BannerPayload = {
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  ctaLabel: string;
   ctaHref: string;
   image: string;
-  imageAlt?: string;
   sortOrder?: number;
-  isActive?: boolean;
-  textColor?: "light" | "dark";
 };
 
 export async function fetchPublicBanners(): Promise<Banner[]> {

@@ -50,16 +50,9 @@ export interface Category {
 
 export interface Banner {
   id: string;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  ctaLabel: string;
   ctaHref: string;
   image: string;
-  imageAlt?: string;
   sortOrder?: number;
-  isActive?: boolean;
-  textColor?: "light" | "dark";
   createdAt?: string;
   updatedAt?: string;
 }

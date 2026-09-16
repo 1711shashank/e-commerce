@@ -263,7 +263,7 @@ export function ProductDetail({
               </button>
             </div>
 
-            <ProductInfoTabs description={product.description} />
+            <ProductInfoTabs product={product} />
           </div>
         </div>
       </div>

@@ -352,19 +352,9 @@ def _validate_cta_href(value: str) -> str:
 
 
 class BannerSerializer(serializers.ModelSerializer):
-    ctaLabel = serializers.CharField(source="cta_label")
     ctaHref = serializers.CharField(source="cta_href")
     image = serializers.CharField(max_length=2048)
-    imageAlt = serializers.CharField(
-        source="image_alt", required=False, allow_blank=True
-    )
     sortOrder = serializers.IntegerField(source="sort_order", required=False)
-    isActive = serializers.BooleanField(source="is_active", required=False)
-    textColor = serializers.ChoiceField(
-        source="text_color",
-        choices=[Banner.TEXT_LIGHT, Banner.TEXT_DARK],
-        required=False,
-    )
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
     updatedAt = serializers.DateTimeField(source="updated_at", read_only=True)
 
@@ -372,16 +362,9 @@ class BannerSerializer(serializers.ModelSerializer):
         model = Banner
         fields = (
             "id",
-            "eyebrow",
-            "title",
-            "subtitle",
-            "ctaLabel",
             "ctaHref",
             "image",
-            "imageAlt",
             "sortOrder",
-            "isActive",
-            "textColor",
             "createdAt",
             "updatedAt",
         )

@@ -30,12 +30,14 @@ function NewBody() {
   }, [access]);
 
   if (loading) {
-    return <p className="text-sm text-muted">Loading…</p>;
+    return (
+      <p className="px-5 py-8 text-sm text-muted sm:px-8">Loading…</p>
+    );
   }
 
   if (atMax) {
     return (
-      <div className="border border-border bg-surface px-6 py-10 text-center">
+      <div className="mx-auto max-w-lg px-5 py-16 text-center sm:px-8">
         <p className="font-display text-2xl">Slide limit reached</p>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted">
           You can have up to {MAX_BANNERS} carousel slides. Remove one before
@@ -57,7 +59,7 @@ function NewBody() {
 export default function NewCarouselClient() {
   return (
     <RequireAuth>
-      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <NewBody />
       </div>
     </RequireAuth>
